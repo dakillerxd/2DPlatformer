@@ -672,7 +672,8 @@ public class PlayerController2D : MonoBehaviour
                 
                 EnemyController2D enemyCont = collision.gameObject.GetComponent<EnemyController2D>();
                 Vector2 enemyNormal = collision.GetContact(0).normal;
-                Vector2 enemyPushForce = enemyNormal * 5f;
+                Vector2 enemyPushForce = enemyNormal * 6f;
+                Vector2 enemyDashForce = enemyNormal * 7f;
                 
                 
                 // Damage and push the player and enemy
@@ -688,9 +689,11 @@ public class PlayerController2D : MonoBehaviour
                 }
 
                 // Damage and push the enemy if the player is dashing
-                if (isDashing) {
+                if (isDashing)
+                {
+
                     
-                    enemyCont.Push(-enemyPushForce);
+                    enemyCont.Push(-enemyDashForce);
                     enemyCont.DamageHealth(1, true); 
                 }  
 
@@ -726,6 +729,16 @@ public class PlayerController2D : MonoBehaviour
                 SceneTeleporter2D teleporter = collision.gameObject.GetComponent<SceneTeleporter2D>();
                 teleporter.GoToSelectedLevel();
             break;
+            case "Portal":
+
+                Portal2D portal = collision.gameObject.GetComponent<Portal2D>();
+                if (portal.CanTeleport()) {
+                    portal.StartCooldown();
+                    portal.StartCooldownForConnectedPortal();
+                    Teleport(portal.GetConnectedPortalLocation());
+                }
+                
+                break;
         }
     }
     
@@ -776,6 +789,19 @@ public class PlayerController2D : MonoBehaviour
         Debug.Log("Respawned");
     }
 
+
+    private void Teleport(Vector2 position) {
+        
+        // Reset stats/states
+        transform.position = position;
+        rigidBody.linearVelocity = new Vector2(0, 0);
+        TurnInvincible(1f);
+        TurnStunLocked(0.2f);
+        
+        // Play effects
+        PlayVfxEffect(spawnVfx);
+        PlaySfxEffect(spawnSfx);
+    }
 
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
         if (currentHealth > 0 && !isInvincible) {

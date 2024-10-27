@@ -152,23 +152,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   smoothFollowSpeed: 0.5
-  targetPosition: {x: 0, y: 0, z: 0}
   verticalOffset: 1
   horizontalOffset: 1
   verticalOffsetStrength: 1
   horizontalOffsetStrength: 1
-  targetOffset: {x: 0.5, y: 1, z: 0}
   isShaking: 0
-  shakeOffset: {x: 0, y: 0, z: 0}
   useBoundaries: 1
-  minXBoundary: -17
-  maxXBoundary: 35
-  minYBoundary: -10
-  maxYBoundary: 38
-  allowZoom: 1
+  minXLevelBoundary: 0
+  maxXLevelBoundary: 0
+  minYLevelBoundary: 0
+  maxYLevelBoundary: 0
+  allowZoomControl: 1
   zoomSpeed: 2
   minZoom: 2
   maxZoom: 5
-  targetZoom: 3
-  showDebugText: 1
+  showDebugText: 0
   debugText: {fileID: 0}

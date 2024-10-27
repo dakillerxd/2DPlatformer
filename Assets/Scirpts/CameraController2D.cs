@@ -29,10 +29,10 @@ public class CameraController2D : MonoBehaviour
 
     [Header("Camera Boundaries")]
     [SerializeField] private bool useBoundaries;
-    [SerializeField] private float minXBoundary;
-    [SerializeField] private float maxXBoundary;
-    [SerializeField] private float minYBoundary;
-    [SerializeField] private float maxYBoundary;
+    [SerializeField] private float minXLevelBoundary;
+    [SerializeField] private float maxXLevelBoundary;
+    [SerializeField] private float minYLevelBoundary;
+    [SerializeField] private float maxYLevelBoundary;
 
     [Header("Zoom Settings")]
     [SerializeField] private bool allowZoomControl = true;
@@ -89,6 +89,14 @@ public class CameraController2D : MonoBehaviour
         FollowTarget();
         HandleZoom();
         ApplyShake();
+
+        if (useBoundaries) {
+            //Draw the box boundaries 
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
+            Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Top line
+        }
     }
 
 
@@ -167,31 +175,25 @@ public class CameraController2D : MonoBehaviour
         float camHeight = cam.orthographicSize;
         float camWidth = camHeight * cam.aspect;
 
-        float minXBoundaryBoundary = minXBoundary + camWidth;
-        float maxXBoundaryBoundary = maxXBoundary - camWidth;
-        float minYBoundaryBoundary = minYBoundary + camHeight;
-        float maxYBoundaryBoundary = maxYBoundary - camHeight;
+        float minXBoundaryBoundary = minXLevelBoundary + camWidth;
+        float maxXBoundaryBoundary = maxXLevelBoundary - camWidth;
+        float minYBoundaryBoundary = minYLevelBoundary + camHeight;
+        float maxYBoundaryBoundary = maxYLevelBoundary - camHeight;
 
         float newX = Mathf.Clamp(position.x, minXBoundaryBoundary, maxXBoundaryBoundary);
         float newY = Mathf.Clamp(position.y, minYBoundaryBoundary, maxYBoundaryBoundary);
 
-        //Draw the box boundaries 
-        Debug.DrawLine(new Vector3(minXBoundary, minYBoundary, 0), new Vector3(minXBoundary, maxYBoundary, 0), Color.blue); // Left line
-        Debug.DrawLine(new Vector3(maxXBoundary, minYBoundary, 0), new Vector3(maxXBoundary, maxYBoundary, 0), Color.blue); // Right line
-        Debug.DrawLine(new Vector3(minXBoundary, minYBoundary, 0), new Vector3(maxXBoundary, minYBoundary, 0), Color.blue); // Bottom line
-        Debug.DrawLine(new Vector3(minXBoundary, maxYBoundary, 0), new Vector3(maxXBoundary, maxYBoundary, 0), Color.blue); // Top line
-
-
+        
         return new Vector3(newX, newY, position.z);
     }
 
 
     public void SetBoundaries(float minXBoundary, float maxXBoundary, float minYBoundary, float maxYBoundary)
     {
-        this.minXBoundary = minXBoundary;
-        this.maxXBoundary = maxXBoundary;
-        this.minYBoundary = minYBoundary;
-        this.maxYBoundary = maxYBoundary;
+        minXLevelBoundary = minXBoundary;
+        maxXLevelBoundary = maxXBoundary;
+        minYLevelBoundary = minYBoundary;
+        maxYLevelBoundary = maxYBoundary;
     }
 
     #endregion Boundaries
@@ -321,8 +323,8 @@ public class CameraController2D : MonoBehaviour
 
 
         debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
-        debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXBoundary, maxXBoundary);
-        debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYBoundary, maxYBoundary);
+        debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
+        debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYLevelBoundary, maxYLevelBoundary);
 
 
         

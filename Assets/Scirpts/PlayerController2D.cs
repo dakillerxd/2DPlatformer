@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
 public class PlayerController2D : MonoBehaviour
@@ -67,6 +68,8 @@ public class PlayerController2D : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool showDebugText;
     [SerializeField] private bool showFpsText;
+    [SerializeField] private TextMeshProUGUI debugText;
+    [SerializeField] private TextMeshProUGUI fpsText;
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -120,6 +123,7 @@ public class PlayerController2D : MonoBehaviour
 
     [Tab("References")]
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private AudioSource  audioSource;
     [SerializeField] public Rigidbody2D rigidBody;
     [SerializeField] public Collider2D collBody;
     [SerializeField] public Collider2D collFeet;
@@ -137,14 +141,14 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private ParticleSystem healVfx;
 
     [Header("SFX")]
-    [SerializeField] private AudioSource jumpSfx;
-    [SerializeField] private AudioSource spawnSfx;
-    [SerializeField] private AudioSource deathSfx;
-    [SerializeField] private AudioSource dashSfx;
-
-    [Header("Debug")]
-    [SerializeField] private TextMeshProUGUI debugText;
-    [SerializeField] private TextMeshProUGUI fpsText;
+    [SerializeField] private AudioClip jumpSfx;
+    [SerializeField] private AudioClip airJumpSfx;
+    [SerializeField] private AudioClip spawnSfx;
+    [SerializeField] private AudioClip deathSfx;
+    [SerializeField] private AudioClip dashSfx;
+    [SerializeField] private AudioClip hurtSfx;
+    [SerializeField] private AudioClip healSfx;
+    
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -185,6 +189,8 @@ public class PlayerController2D : MonoBehaviour
         remainingDashes = maxDashes;
         isDashCooldownRunning = false;
         deaths = 0;
+        PlaySfxEffect(spawnSfx);
+        PlayVfxEffect(spawnVfx, true);
         CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
     }
 
@@ -268,11 +274,11 @@ public class PlayerController2D : MonoBehaviour
         bool isMoving = rigidBody.linearVelocity.x > movementThreshold || rigidBody.linearVelocity.x < -movementThreshold;
         if (runAbility && runInput && isGrounded && !isWallSliding && isMoving)
         {
-            PlayVfxEffect(runVfx);
+            PlayVfxEffect(runVfx, false);
         }
         else
         {
-            StopVfxEffect(runVfx);
+            StopVfxEffect(runVfx, false);
         }
         
 
@@ -309,7 +315,7 @@ public class PlayerController2D : MonoBehaviour
             int dashDirection = isFacingRight ? 1 : -1;
 
             // Play effects
-            PlayVfxEffect(dashVfx);
+            PlayVfxEffect(dashVfx, false);
             StopVfxEffect(wallSlideVfx, true);
             PlaySfxEffect(dashSfx);
 
@@ -345,33 +351,33 @@ public class PlayerController2D : MonoBehaviour
         isDashCooldownRunning = false;
     }
 
-    private void HandleStepClimbing()
-    {
-        if (!autoClimbStepsAbility) return; // Only check for steps can climb steps
-        if (!isGrounded) return; // Only check for steps when grounded
+    private void HandleStepClimbing() {
+        
+        if (!autoClimbStepsAbility) return; // Only check if can climb steps
+        
+        if (isGrounded || isDashing) { // Check for steps when grounded or dashing
+            
+            Vector2 moveDirection = new Vector2(rigidBody.linearVelocity.x, 0).normalized;
+            if (moveDirection != Vector2.zero ) { // Moving horizontally
 
-        Vector2 moveDirection = new Vector2(rigidBody.linearVelocity.x, 0).normalized;
-        if (moveDirection != Vector2.zero ) { // Moving horizontally
+                // Check for step in front of the player
+                RaycastHit2D hitLower = Physics2D.Raycast(collFeet.bounds.center, moveDirection, collFeet.bounds.extents.x + stepCheckDistance + 0.05f, stepLayer);
+                Debug.DrawRay(collFeet.bounds.center, moveDirection * (collFeet.bounds.extents.x + stepCheckDistance + 0.05f), Color.red);
+                Debug.DrawRay(collFeet.bounds.center + new Vector3(0, stepHeight, 0), moveDirection * (collFeet.bounds.extents.x + stepCheckDistance), Color.red);
 
-            // Check for step in front of the player
-            RaycastHit2D hitLower = Physics2D.Raycast(collFeet.bounds.center, moveDirection, collFeet.bounds.extents.x + stepCheckDistance, stepLayer);
+                if (hitLower.collider != null) {
 
-            // Draw the raycast for debugging
-            Debug.DrawRay(collFeet.bounds.center, moveDirection * (collFeet.bounds.extents.x + stepCheckDistance), Color.red);
-
-            if (hitLower.collider != null) {
-
-                // Check if there's space above the step
-                RaycastHit2D hitUpper = Physics2D.Raycast(collFeet.bounds.center + new Vector3(0, stepHeight, 0), moveDirection, collFeet.bounds.extents.x + stepCheckDistance, stepLayer) ;
-
-                if (hitUpper.collider == null) {
-                    // Move the player up
-                    rigidBody.position += new Vector2(horizontalInput * stepWidth, stepHeight);
+                    // Check if there's space above the step and move the player
+                    RaycastHit2D hitUpper = Physics2D.Raycast(collFeet.bounds.center + new Vector3(0, stepHeight, 0), moveDirection, collFeet.bounds.extents.x + stepCheckDistance, stepLayer);
+                    if (!hitUpper) { rigidBody.position += new Vector2(horizontalInput * stepWidth, stepHeight); }
                 }
-            }
-        } 
+            } 
+        }
     }
 
+        
+
+    
 
 
     private void HandleWallSlide() {
@@ -384,8 +390,8 @@ public class PlayerController2D : MonoBehaviour
         }
 
         // Play wall slide effect
-        if (isWallSliding) { PlayVfxEffect(wallSlideVfx); }
-        else { StopVfxEffect(wallSlideVfx); }
+        if (isWallSliding) { PlayVfxEffect(wallSlideVfx, false); }
+        else { StopVfxEffect(wallSlideVfx, false); }
         
         
         
@@ -486,8 +492,8 @@ public class PlayerController2D : MonoBehaviour
     private void ExecuteJump(int jumpCost, string side) {
 
         // Play effects
-        if (!isGrounded) { PlayVfxEffect(airJumpVfx, true);  } // CameraController2D.Instance?.ShakeCamera(0.2f,0.1f);
-        PlaySfxEffect(jumpSfx);
+        if (!isGrounded) {PlayVfxEffect(airJumpVfx, true); PlaySfxEffect(airJumpSfx); };  // CameraController2D.Instance?.ShakeCamera(0.2f,0.1f);
+        if (isGrounded) {PlaySfxEffect(jumpSfx);}
 
         // Jump
         if (side == "Right") {
@@ -689,14 +695,10 @@ public class PlayerController2D : MonoBehaviour
                 }
 
                 // Damage and push the enemy if the player is dashing
-                if (isDashing)
-                {
-
-                    
+                if (isDashing) {
                     enemyCont.Push(-enemyDashForce);
                     enemyCont.DamageHealth(1, true); 
-                }  
-
+                } 
                 
             break;
             case "Spike":
@@ -772,14 +774,15 @@ public class PlayerController2D : MonoBehaviour
         transform.position = position;
         rigidBody.linearVelocity = new Vector2(0, 0);
         remainingDashes = maxDashes;
-        remainingJumps = maxJumps; 
+        remainingJumps = maxJumps;
+        wasRunning = false;
         isDashCooldownRunning = false;
         TurnInvincible(2f);
         TurnStunLocked(0.5f);
         HealToFullHealth();
 
         // Play effects
-        PlayVfxEffect(spawnVfx);
+        PlayVfxEffect(spawnVfx, false);
         PlaySfxEffect(spawnSfx);
         if (CameraController2D.Instance?.isShaking == true) { // Stop camera shake
             CameraController2D.Instance.StopCameraShake();
@@ -792,14 +795,16 @@ public class PlayerController2D : MonoBehaviour
 
     private void Teleport(Vector2 position) {
         
-        // Reset stats/states
+
+        CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
         transform.position = position;
         rigidBody.linearVelocity = new Vector2(0, 0);
-        TurnInvincible(1f);
+        wasRunning = false;
+        StopVfxEffect(jumpVfx, true);
+        Push(new Vector2(jumpForce, jumpForce));
         TurnStunLocked(0.2f);
         
-        // Play effects
-        PlayVfxEffect(spawnVfx);
+        PlayVfxEffect(spawnVfx, false);
         PlaySfxEffect(spawnSfx);
     }
 
@@ -810,7 +815,7 @@ public class PlayerController2D : MonoBehaviour
             TurnStunLocked();
             currentHealth -= damage;
             SpawnVfxEffect(hurtVfx);
-            if (currentHealth == 1 && currentHealth < maxHealth) { PlayVfxEffect(bleedVfx); }
+            if (currentHealth == 1 && currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
             // CameraController2D.Instance?.ShakeCamera(0.4f,1f);
             // Debug.Log("Damaged by: " + cause);
         } 
@@ -1009,13 +1014,13 @@ public class PlayerController2D : MonoBehaviour
     //------------------------------------
     
     #region Sfx/Vfx functions
-    private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay = false) {
+    private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
         
         if (!effect) return;
         if (forcePlay) {effect.Play();} else { if (!effect.isPlaying) { effect.Play(); } }
     }
 
-    private void StopVfxEffect(ParticleSystem effect, bool clear = false) {
+    private void StopVfxEffect(ParticleSystem effect, bool clear) {
         if (!effect) return;
         
         if (effect.isPlaying) { 
@@ -1029,9 +1034,10 @@ public class PlayerController2D : MonoBehaviour
         Instantiate(effect, transform.position, Quaternion.identity);
     }
 
-    private void PlaySfxEffect(AudioSource effect) {
-        if (!effect) return;
-        effect.Play();
+    private void PlaySfxEffect(AudioClip effect) {
+        if (!audioSource || !effect) return;
+        audioSource.clip = effect;
+        audioSource.Play();
     }
     
     

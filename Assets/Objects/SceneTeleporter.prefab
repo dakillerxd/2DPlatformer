@@ -24218,6 +24218,8 @@ GameObject:
   - component: {fileID: 7433319475137850595}
   - component: {fileID: 5675501794804825328}
   - component: {fileID: 6815104843284206713}
+  - component: {fileID: 4974211650589412614}
+  - component: {fileID: 8144998195808256886}
   - component: {fileID: -6962597204337529161}
   m_Layer: 0
   m_Name: SceneTeleporter
@@ -24356,10 +24358,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableHover: 1
-  hoverSpeed: 0.7
+  hoverSpeed: 0.5
   hoverAmount: 0.2
   hoverDirection: {x: 0, y: 1, z: 0}
-  enableRotation: 0
+--- !u!114 &4974211650589412614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4768939878819942212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9374e85f5c9154ea780b84b83cea70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableRotation: 1
   xRotation:
     continuousRotation: 0
     reverseDirection: 0
@@ -24375,10 +24389,22 @@ MonoBehaviour:
   zRotation:
     continuousRotation: 0
     reverseDirection: 0
-    oscillationAmount: 0
-    oscillationSpeed: 0
+    oscillationAmount: 45
+    oscillationSpeed: 1
     rotationSpeed: 0
-  enablePulse: 1
+--- !u!114 &8144998195808256886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4768939878819942212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2278c47065eda484d957f2098ae8ad29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enablePulse: 0
   pulseAmount: 0.2
   pulseCooldown: 1
   pulseCurve:
@@ -24387,18 +24413,18 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -24407,37 +24433,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   pulseX: 1
   pulseY: 1
-  pulseZ: 1
-  enableBreathing: 0
-  breatheAmount: 0.2
-  breatheSpeed: 5
-  breatheCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  breatheX: 1
-  breatheY: 1
-  breatheZ: 1
+  pulseZ: 0
 --- !u!114 &-6962597204337529161
 MonoBehaviour:
   m_ObjectHideFlags: 0

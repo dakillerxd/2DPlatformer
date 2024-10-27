@@ -41,7 +41,7 @@ public class EnemyController2D : MonoBehaviour
     private bool isTouchingWall;
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
-    [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
+    [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.03f;
     [EndTab]
     
     [Tab("References")]
@@ -208,12 +208,12 @@ public class EnemyController2D : MonoBehaviour
         
         if (isGrounded) {
             if (isFacingRight) {
-                RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.max, Vector2.down, 0.3f, groundLayer);
-                Debug.DrawRay(collBody.bounds.max, Vector2.down * 0.3f, Color.red);
+                RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.max + new Vector3(0.04f,0,0), Vector2.down, 0.3f, groundLayer);
+                Debug.DrawRay(collBody.bounds.max + new Vector3(0.04f,0,0), Vector2.down * 0.3f, Color.red);
                 isTouchingGroundOnRight = hitRight;
             } else {
-                RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.min, Vector2.down, 0.3f, groundLayer);
-                Debug.DrawRay(collBody.bounds.min, Vector2.down * 0.07f, Color.red);
+                RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.min - new Vector3(0.04f,0,0), Vector2.down, 0.5f, groundLayer);
+                Debug.DrawRay(collBody.bounds.min - new Vector3(0.04f,0,0), Vector2.down * 0.05f, Color.red);
                 isTouchingGroundOnLeft = hitLeft;
             }
         }

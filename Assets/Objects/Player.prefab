@@ -132,8 +132,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.4
-  m_Pitch: 1
+  m_Volume: 0.3
+  m_Pitch: 1.2
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -176,7 +176,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.7
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -251,6 +251,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  platformLayer:
+    serializedVersion: 2
+    m_Bits: 128
   isGrounded: 0
   wallCheckDistance: 0.02
   showDebugText: 0
@@ -298,15 +301,86 @@ MonoBehaviour:
   bleedVfx: {fileID: 3183420118479420180}
   wallSlideVfx: {fileID: 7742417552954125015}
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
-  jumpSfx: {fileID: 8300000, guid: 6453b8ce16dd67e44bca113c0c22a91a, type: 3}
-  airJumpSfx: {fileID: 8300000, guid: 6453b8ce16dd67e44bca113c0c22a91a, type: 3}
-  spawnSfx: {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
-  deathSfx: {fileID: 8300000, guid: 2a807d2b9f6358e449eae597fed4c0ba, type: 3}
-  dashSfx: {fileID: 8300000, guid: 0a1706d86ca9d5d41a71c938b9a21363, type: 3}
-  hurtSfx: {fileID: 0}
+  jumpSfx: {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
+  airJumpSfx: {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
+  spawnSfx: {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
+  deathSfx: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
+  dashSfx: {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
+  hurtSfx: {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
   healSfx: {fileID: 0}
+  checkpointSetSfx: {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
+  fallOffMapSfx: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
   horizontalInput: 0
   verticalInput: 0
+--- !u!1 &4153000382075459821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3658711945977759838}
+  - component: {fileID: 8767898529786398378}
+  m_Layer: 0
+  m_Name: Corner
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3658711945977759838
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4153000382075459821}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0.119, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9067867616452130285}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!70 &8767898529786398378
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4153000382075459821}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.05, y: 0.29}
+  m_Direction: 0
 --- !u!1 &4986512388886435590
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,6 +448,7 @@ Transform:
   m_Children:
   - {fileID: 4523606492481414005}
   - {fileID: 5913001649137963258}
+  - {fileID: 3658711945977759838}
   m_Father: {fileID: 6449356787988531081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8348743168451648775

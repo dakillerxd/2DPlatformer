@@ -58,6 +58,7 @@ public class PlayerController2D : MonoBehaviour
     
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask platformLayer;
     [HideInInspector] public bool isGrounded;
     private bool isTouchingWall;
     private bool isTouchingWallOnRight;
@@ -148,6 +149,8 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private AudioClip dashSfx;
     [SerializeField] private AudioClip hurtSfx;
     [SerializeField] private AudioClip healSfx;
+    [SerializeField] private AudioClip checkpointSetSfx;
+    [SerializeField] private AudioClip fallOffMapSfx;
     
     [EndTab]
 
@@ -189,7 +192,6 @@ public class PlayerController2D : MonoBehaviour
         remainingDashes = maxDashes;
         isDashCooldownRunning = false;
         deaths = 0;
-        PlaySfxEffect(spawnSfx);
         PlayVfxEffect(spawnVfx, true);
         CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
     }
@@ -650,10 +652,10 @@ public class PlayerController2D : MonoBehaviour
     private void CollisionChecks() {
 
         // Check if the player is grounded
-        isGrounded = collFeet.IsTouchingLayers(groundLayer);
+        isGrounded = collFeet.IsTouchingLayers(groundLayer) || collFeet.IsTouchingLayers(platformLayer) ;
 
         // Check if the player is touching a wall
-        isTouchingWall = collBody.IsTouchingLayers(groundLayer);
+        isTouchingWall = collBody.IsTouchingLayers(groundLayer) || collBody.IsTouchingLayers(platformLayer);
 
         if (isTouchingWall) {
 
@@ -717,12 +719,14 @@ public class PlayerController2D : MonoBehaviour
         switch (collision.gameObject.tag) {
             case "RespawnTrigger":
 
+                PlaySfxEffect(fallOffMapSfx);
                 RespawnFromCheckpoint();
 
             break;
             case "Checkpoint":
 
                 HealToFullHealth();
+                PlaySfxEffect(checkpointSetSfx);
                 CheckpointManager2D.Instance.ActivateCheckpoint(collision.gameObject);
 
             break;
@@ -832,6 +836,8 @@ public class PlayerController2D : MonoBehaviour
             float maxPushSpeed = 4f;
             // Push the player
             rigidBody.linearVelocity = Vector2.ClampMagnitude(rigidBody.linearVelocity, maxPushSpeed);
+            
+            PlaySfxEffect(jumpSfx);
         }
     }
 

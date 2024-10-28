@@ -50,63 +50,102 @@ MonoBehaviour:
   soundFXPrefab: {fileID: 1853389310802539615, guid: 64a3e35a976dd354b9a777072cc6d6f3, type: 3}
   soundEffects:
   - name: Player Jump
-    clip: {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
     source: {fileID: 0}
   - name: Player Air Jump
-    clip: {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
     source: {fileID: 0}
   - name: Player Dash
-    clip: {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
     source: {fileID: 0}
   - name: Player Teleport
-    clip: {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
     source: {fileID: 0}
   - name: Player Hurt
-    clip: {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
     source: {fileID: 0}
   - name: Player Death
-    clip: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
     source: {fileID: 0}
   - name: Player Fall off Map
-    clip: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
     source: {fileID: 0}
   - name: ?Player Spawn
-    clip: {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips: []
     source: {fileID: 0}
   - name: ?Player Pushed
-    clip: {fileID: 0}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
     source: {fileID: 0}
   - name: Checkpoint Set
-    clip: {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
     volume: 1
     pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
     loop: 0
+    clips:
+    - {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
     source: {fileID: 0}
   music: []

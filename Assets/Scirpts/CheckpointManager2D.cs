@@ -17,8 +17,6 @@ public class CheckpointManager2D : MonoBehaviour
     [SerializeField] private Color activeCheckpointColor = Color.green;
     [SerializeField] private ParticleSystem activateVfx;
     [SerializeField] private ParticleSystem deactivateVfx;
-    [SerializeField] private AudioSource activeSfx;
-    [SerializeField] private AudioSource deactivateSfx;
 
 
 

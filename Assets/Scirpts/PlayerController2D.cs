@@ -156,8 +156,7 @@ public class PlayerController2D : MonoBehaviour
 
 
 
-
-
+    
     private void Awake() {
 
        if (Instance != null && Instance != this) {

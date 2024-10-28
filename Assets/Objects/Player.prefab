@@ -150,7 +150,6 @@ GameObject:
   - component: {fileID: 6449356787988531081}
   - component: {fileID: 4017478420366802647}
   - component: {fileID: 2783392023027556574}
-  - component: {fileID: 3492380458443806836}
   - component: {fileID: 6010112362093298342}
   m_Layer: 0
   m_Name: Player
@@ -259,103 +258,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!82 &3492380458443806836
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3175132503772560621}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 0.3
-  m_Pitch: 1.2
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.7
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &6010112362093298342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,7 +329,7 @@ MonoBehaviour:
   fastDropAbility: 1
   fastFallAcceleration: 0.2
   spriteRenderer: {fileID: 4017478420366802647}
-  audioSource: {fileID: 3492380458443806836}
+  audioSource: {fileID: 0}
   rigidBody: {fileID: 2783392023027556574}
   collBody: {fileID: 6793365586128216939}
   collFeet: {fileID: 6324724260074634322}
@@ -441,15 +343,6 @@ MonoBehaviour:
   bleedVfx: {fileID: 3183420118479420180}
   wallSlideVfx: {fileID: 7742417552954125015}
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
-  jumpSfx: {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
-  airJumpSfx: {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
-  spawnSfx: {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
-  deathSfx: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
-  dashSfx: {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
-  hurtSfx: {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
-  healSfx: {fileID: 0}
-  checkpointSetSfx: {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
-  fallOffMapSfx: {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
   horizontalInput: 0
   verticalInput: 0
 --- !u!1 &4153000382075459821

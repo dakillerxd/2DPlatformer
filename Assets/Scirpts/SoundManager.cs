@@ -7,10 +7,13 @@ using VInspector;
 public class Sound
 {
     public string name;
-    public AudioClip clip;
     [Range(0f, 2f)] public float volume = 1f;
     [Range(0.1f, 3f)] public float pitch = 1f;
+    [Range(-1f, 1f)] public float stereoPan = 0f;
+    [Range(0f, 1f)] public float spatialBlend = 0f;
+    [Range(0f, 1.1f)] public float reverbZoneMix = 1f;
     public bool loop = false;
+    public AudioClip[] clips;
     [HideInInspector] public AudioSource source;
     
 }
@@ -23,7 +26,6 @@ public class SoundManager : MonoBehaviour
     [Range(0f, 1f)] public float soundFXVolume;
     [Range(0f, 1f)] public float musicVolume;
     public AudioSource soundFXPrefab;
-
     public List<Sound> soundEffects = new List<Sound>();
     public List<Sound> music = new List<Sound>();
 
@@ -59,39 +61,30 @@ public class SoundManager : MonoBehaviour
 
     private void SetupSound(Sound sound, float soundCategory) {
         
-        sound.source = gameObject.AddComponent<AudioSource>();
-        sound.source.clip = sound.clip;
-        sound.source.pitch = sound.pitch;
-        sound.source.loop = sound.loop;
-        SetupSoundVolume(sound,soundCategory);
-    }
+        foreach (AudioClip clip in sound.clips)
+        {
+            sound.source = gameObject.AddComponent<AudioSource>();
+            sound.source.clip = clip;
+            sound.source.pitch = sound.pitch;
+            sound.source.panStereo = sound.stereoPan;
+            sound.source.spatialBlend = sound.spatialBlend;
+            sound.source.reverbZoneMix = sound.reverbZoneMix;
+            sound.source.loop = sound.loop;
+            sound.source.volume = sound.volume * soundCategory * masterGameVolume;
+        }
 
-    private void SetupSoundVolume(Sound sound, float soundCategory) {
-        
-        sound.source.volume = sound.volume * soundCategory * masterGameVolume;
     }
-
     
-    private void SetSoundsVolume() {
+    
+    [Button]
+    private void ResetAllSoundsSettings() {
         
-        if (soundEffects.Count >= 1)
+        foreach (AudioSource audioSource in GetComponents<AudioSource>())
         {
-            foreach (Sound soundFx in soundEffects)
-            {
-                soundFx.source.volume = soundFx.volume * soundFXVolume * masterGameVolume;
-                Debug.Log(soundFx.source.volume);
-            }
+            Destroy(audioSource);
         }
 
-        
-        if (music.Count >= 1)
-        {
-            foreach (Sound music in music)
-            {
-                music.source.volume = music.volume * musicVolume * masterGameVolume;
-            }
-        }
-
+        SetupSounds();
     }
 
     private void LoadVolumes() {
@@ -109,7 +102,7 @@ public class SoundManager : MonoBehaviour
     public void PlaySoundFX(string name, float delay = 0f, Transform spawnTransform = null) {
         
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
-        if (soundFx == null) {
+        if (soundFx == null || soundFx.clips.Length == 0) {
             Debug.LogWarning("SoundFX: " + name + " not found!");
             return;
         }
@@ -120,7 +113,7 @@ public class SoundManager : MonoBehaviour
     public void PlayMusic(string name) {
         
         Sound newMusic = music.Find(music => music.name == name);
-        if (newMusic == null) {
+        if (newMusic == null || newMusic.clips.Length == 0) {
             Debug.LogWarning("Music: " + name + " not found!");
             return;
         }
@@ -154,20 +147,30 @@ public class SoundManager : MonoBehaviour
     
     private IEnumerator PlayDelayed(Sound soundFx, float delay, Transform spawnTransform) {
         
+        int rand = Random.Range(0, soundFx.clips.Length);
         yield return new WaitForSeconds(delay);
         if (spawnTransform) {
                 
             AudioSource audioSource = Instantiate(soundFXPrefab, spawnTransform.position, Quaternion.identity);
             audioSource.gameObject.name = "Sfx " + soundFx.name;
-            audioSource.clip = soundFx.clip;
+            audioSource.clip = soundFx.clips[rand];
             audioSource.volume = soundFx.volume * soundFXVolume * masterGameVolume;
+            audioSource.panStereo = soundFx.stereoPan;
+            audioSource.spatialBlend = soundFx.spatialBlend;
+            audioSource.reverbZoneMix = soundFx.reverbZoneMix;
             audioSource.pitch = soundFx.pitch;
+            audioSource.loop = soundFx.loop;
             audioSource.Play();
-            float length = audioSource.clip.length;
-            Destroy(audioSource.gameObject, length);
-                
+
+            if (!audioSource.loop)
+            {
+                float length = audioSource.clip.length;
+                Destroy(audioSource.gameObject, length);
+            }
+            
         } else {
                 
+            soundFx.source.clip = soundFx.clips[rand];
             soundFx.source.Play();
         }
     }

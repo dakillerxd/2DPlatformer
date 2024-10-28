@@ -326,8 +326,8 @@ MonoBehaviour:
     y: 388
     width: 777.33325
     height: 436
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 226}
+  m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -433,8 +433,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 638.6667
-    y: 849.3334
+    x: 1
+    y: 412
     width: 775.33325
     height: 410
   m_SerializedDataModeController:
@@ -533,8 +533,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 317.33334
-    y: 461.33334
+    x: 0
+    y: 24
     width: 320.33334
     height: 282
   m_SerializedDataModeController:
@@ -599,8 +599,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 317.33334
-    y: 769.3334
+    x: 0
+    y: 332
     width: 320.33334
     height: 318
   m_SerializedDataModeController:
@@ -644,7 +644,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: dab70000
     m_LastClickedID: 47066
-    m_ExpandedIDs: 000000003eb7000000ca9a3b
+    m_ExpandedIDs: 000000003eb70000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -752,8 +752,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 317.33334
-    y: 1113.3334
+    x: 0
+    y: 676
     width: 320.33334
     height: 146
   m_SerializedDataModeController:
@@ -788,8 +788,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 638.6667
-    y: 461.33334
+    x: 1
+    y: 24
     width: 775.33325
     height: 362
   m_SerializedDataModeController:
@@ -1638,8 +1638,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1416
-    y: 461.33334
+    x: 1
+    y: 24
     width: 372.33337
     height: 734
   m_SerializedDataModeController:
@@ -1687,8 +1687,8 @@ MonoBehaviour:
     m_TextWithWhitespace: " Hot Reload\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1416
-    y: 1221.3334
+    x: 1
+    y: 784
     width: 372.33337
     height: 38
   m_SerializedDataModeController:

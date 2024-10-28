@@ -98,14 +98,14 @@ public class SettingsManager : MonoBehaviour
     {
         
         SaveManager.Instance.SaveFloat("GameVolume", volume);
-        SoundManager.Instance?.SetGameVolume(volume);
+        // SoundManager.Instance?.SetGameVolume(volume);
     }
 
     public void SetMusicVolume(float volume)
     {
         
         SaveManager.Instance.SaveFloat("MusicVolume", volume);
-        SoundManager.Instance?.SetMusicVolume(volume);
+        // SoundManager.Instance?.SetMusicVolume(volume);
     }
 
 

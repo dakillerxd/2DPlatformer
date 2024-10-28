@@ -73,6 +73,7 @@ public class CheckpointManager2D : MonoBehaviour
         activeCheckpoint = checkpoint;
         SpawnParticleEffect(activateVfx, activeCheckpoint.transform.position, activeCheckpoint.transform.rotation, activeCheckpoint.transform);
         SeCheckpointColor(activeCheckpoint, activeCheckpointColor);
+        SoundManager.Instance?.PlaySoundFX("Checkpoint Set");
     }
 
 

@@ -3,7 +3,6 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
 public class PlayerController2D : MonoBehaviour
@@ -140,17 +139,6 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private ParticleSystem bleedVfx;
     [SerializeField] private ParticleSystem wallSlideVfx;
     [SerializeField] private ParticleSystem healVfx;
-
-    [Header("SFX")]
-    [SerializeField] private AudioClip jumpSfx;
-    [SerializeField] private AudioClip airJumpSfx;
-    [SerializeField] private AudioClip spawnSfx;
-    [SerializeField] private AudioClip deathSfx;
-    [SerializeField] private AudioClip dashSfx;
-    [SerializeField] private AudioClip hurtSfx;
-    [SerializeField] private AudioClip healSfx;
-    [SerializeField] private AudioClip checkpointSetSfx;
-    [SerializeField] private AudioClip fallOffMapSfx;
     
     [EndTab]
 
@@ -319,7 +307,7 @@ public class PlayerController2D : MonoBehaviour
             // Play effects
             PlayVfxEffect(dashVfx, false);
             StopVfxEffect(wallSlideVfx, true);
-            PlaySfxEffect(dashSfx);
+            SoundManager.Instance?.PlaySoundFX("Player Dash");
 
             // Dash
             isDashing = true;
@@ -494,8 +482,8 @@ public class PlayerController2D : MonoBehaviour
     private void ExecuteJump(int jumpCost, string side) {
 
         // Play effects
-        if (!isGrounded) {PlayVfxEffect(airJumpVfx, true); PlaySfxEffect(airJumpSfx); };  // CameraController2D.Instance?.ShakeCamera(0.2f,0.1f);
-        if (isGrounded) {PlaySfxEffect(jumpSfx);}
+        if (!isGrounded) {PlayVfxEffect(airJumpVfx, true); SoundManager.Instance?.PlaySoundFX("Player Air Jump"); };  // CameraController2D.Instance?.ShakeCamera(0.2f,0.1f);
+        if (isGrounded) { SoundManager.Instance?.PlaySoundFX("Player Jump");}
 
         // Jump
         if (side == "Right") {
@@ -545,7 +533,7 @@ public class PlayerController2D : MonoBehaviour
         
         // Effects
         StopVfxEffect(wallSlideVfx, true);
-        PlaySfxEffect(jumpSfx);
+        SoundManager.Instance?.PlaySoundFX("Player Jump");
 
         // Jump
         if (side == "Right") {
@@ -718,15 +706,14 @@ public class PlayerController2D : MonoBehaviour
 
         switch (collision.gameObject.tag) {
             case "RespawnTrigger":
-
-                PlaySfxEffect(fallOffMapSfx);
+                
+                SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
                 RespawnFromCheckpoint();
 
             break;
             case "Checkpoint":
 
                 HealToFullHealth();
-                PlaySfxEffect(checkpointSetSfx);
                 CheckpointManager2D.Instance.ActivateCheckpoint(collision.gameObject);
 
             break;
@@ -787,7 +774,7 @@ public class PlayerController2D : MonoBehaviour
 
         // Play effects
         PlayVfxEffect(spawnVfx, false);
-        PlaySfxEffect(spawnSfx);
+        SoundManager.Instance?.PlaySoundFX("Player Spawn");
         if (CameraController2D.Instance?.isShaking == true) { // Stop camera shake
             CameraController2D.Instance.StopCameraShake();
         }
@@ -809,7 +796,7 @@ public class PlayerController2D : MonoBehaviour
         TurnStunLocked(0.2f);
         
         PlayVfxEffect(spawnVfx, false);
-        PlaySfxEffect(spawnSfx);
+        SoundManager.Instance?.PlaySoundFX("Player Teleport");
     }
 
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
@@ -819,6 +806,7 @@ public class PlayerController2D : MonoBehaviour
             TurnStunLocked();
             currentHealth -= damage;
             SpawnVfxEffect(hurtVfx);
+            SoundManager.Instance.PlaySoundFX("Player Hurt");
             if (currentHealth == 1 && currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
             // CameraController2D.Instance?.ShakeCamera(0.4f,1f);
             // Debug.Log("Damaged by: " + cause);
@@ -827,6 +815,7 @@ public class PlayerController2D : MonoBehaviour
     }
 
     private void Push(Vector2 pushForce) {
+        
         if (currentHealth > 0 && !isInvincible) {
             // Reset current velocity before applying push
             rigidBody.linearVelocity = Vector2.zero;
@@ -836,8 +825,9 @@ public class PlayerController2D : MonoBehaviour
             float maxPushSpeed = 4f;
             // Push the player
             rigidBody.linearVelocity = Vector2.ClampMagnitude(rigidBody.linearVelocity, maxPushSpeed);
-            
-            PlaySfxEffect(jumpSfx);
+
+            SoundManager.Instance?.PlaySoundFX("Player Pushed");
+
         }
     }
 
@@ -846,7 +836,7 @@ public class PlayerController2D : MonoBehaviour
         if (currentHealth <= 0) {
 
             SpawnVfxEffect(deathVfx);
-            PlaySfxEffect(deathSfx);
+            SoundManager.Instance?.PlaySoundFX("Player Death");
 
             Debug.Log("Death by: " + cause);
 
@@ -1019,7 +1009,7 @@ public class PlayerController2D : MonoBehaviour
     
     //------------------------------------
     
-    #region Sfx/Vfx functions
+    #region Vfx functions
     private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
         
         if (!effect) return;
@@ -1039,13 +1029,6 @@ public class PlayerController2D : MonoBehaviour
         if (!effect) return;
         Instantiate(effect, transform.position, Quaternion.identity);
     }
-
-    private void PlaySfxEffect(AudioClip effect) {
-        if (!audioSource || !effect) return;
-        audioSource.clip = effect;
-        audioSource.Play();
-    }
-    
     
     #endregion Sfx/Vfx functions
     

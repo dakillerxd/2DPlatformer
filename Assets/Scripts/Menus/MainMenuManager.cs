@@ -31,7 +31,7 @@ public class MainMenuManager : MonoBehaviour
         if (buttonStart != null)
         {
             buttonStart.onClick.RemoveAllListeners();
-            buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonStart.onClick.AddListener(() => CustomSceneManager.Instance?.LoadScene(2, false));
             buttonStart.onClick.AddListener(() => GameManager.Instance.chosenGameDifficulty = GameDifficulty.Normal);
             buttonStart.onClick.AddListener(() => GameManager.Instance.ResetGame());
@@ -41,7 +41,7 @@ public class MainMenuManager : MonoBehaviour
         if (buttonOptions != null)
         {
             buttonOptions.onClick.RemoveAllListeners();
-            buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonOptions.onClick.AddListener(() => ShowOptions());
 
         }
@@ -49,7 +49,7 @@ public class MainMenuManager : MonoBehaviour
         if (buttonCredits != null)
         {
             buttonCredits.onClick.RemoveAllListeners();
-            buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonCredits.onClick.AddListener(() => ShowCredits());
 
         }
@@ -57,21 +57,21 @@ public class MainMenuManager : MonoBehaviour
         if (buttonQuit != null)
         {
             buttonQuit.onClick.RemoveAllListeners();
-            buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonQuit.onClick.AddListener(() => CustomSceneManager.Instance?.ExitGame());
         }
 
         if (buttonOptionsBack != null)
         {
             buttonOptionsBack.onClick.RemoveAllListeners();
-            buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonOptionsBack.onClick.AddListener(() => ShowMainMenu());
         }
 
         if (buttonCreditsBack != null)
         {
             buttonCreditsBack.onClick.RemoveAllListeners();
-            buttonCreditsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySound("ButtonClick"));
+            buttonCreditsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonCreditsBack.onClick.AddListener(() => ShowMainMenu());
         }
 

@@ -182,7 +182,7 @@ public class GameManager : MonoBehaviour
         if (useCursorControl) SetCursorState(true);
 
         UIManager.Instance?.UpdateUI();
-        SoundManager.Instance?.PlaySound("GameOverWin", 2f);
+        SoundManager.Instance?.PlaySoundFX("GameOverWin", 2f);
 
         Debug.Log(state.ToString());
     }

@@ -274,11 +274,11 @@ MonoBehaviour:
   canTakeFallDamage: 0
   maxFallDamage: 1
   isFacingRight: 1
-  moveSpeed: 20
-  airMoveSpeed: 15
-  moveAcceleration: 10
-  groundFriction: 3
-  airFriction: 1
+  walkSpeed: 4
+  airWalkSpeed: 3
+  moveAcceleration: 15
+  groundFriction: 15
+  airFriction: 7
   objectVelocityDecayRate: 15
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
@@ -305,8 +305,8 @@ MonoBehaviour:
   debugText: {fileID: 0}
   fpsText: {fileID: 0}
   runAbility: 1
-  runSpeed: 25
-  airRunSpeed: 30
+  runSpeed: 5
+  airRunSpeed: 6
   autoClimbStepsAbility: 1
   stepHeight: 0.12
   stepWidth: 0.1
@@ -324,7 +324,7 @@ MonoBehaviour:
   wallJumpVerticalForce: 5
   wallJumpHorizontalForce: 4
   dashAbility: 1
-  dashForce: 7
+  dashForce: 10
   maxDashes: 1
   dashCooldownDuration: 1
   holdDashRequestTime: 0.1

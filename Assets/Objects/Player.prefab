@@ -278,7 +278,7 @@ MonoBehaviour:
   airMoveSpeed: 3
   moveAcceleration: 2
   groundFriction: 5
-  airFriction: 1
+  airFriction: 2
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.5

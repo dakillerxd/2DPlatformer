@@ -647,7 +647,7 @@ public class PlayerController2D : MonoBehaviour
         if (isTouchingWall) {
 
             // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, groundLayer);
+            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, groundLayer );
             Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
             isTouchingWallOnRight = hitRight;
 

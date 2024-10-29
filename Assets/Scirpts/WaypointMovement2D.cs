@@ -2,19 +2,21 @@ using UnityEngine;
 
 public class WaypointMovement2D : MonoBehaviour
 {
-    [Header("Movement Settings")]
+    [Header("Settings")]
     [SerializeField] private Vector3[] waypoints;
-    [SerializeField] private float speed = 2f;
+    [SerializeField] private float maxSpeed = 5f;
+    [SerializeField] private float acceleration = 10f;
     [SerializeField] private bool loop = true;
     [SerializeField] private float waitTime = 0.5f;
-
-    private Vector3 currentVelocity;
-    private Vector3 previousPosition;
     private int currentWaypointIndex = 0;
     private float waitTimer = 0f;
+    
+    [Header("References")]
+    private Rigidbody2D rigidBody;
 
     private void Start()
     {
+        rigidBody = GetComponent<Rigidbody2D>();
         if (waypoints.Length == 0)
         {
             waypoints = new Vector3[]
@@ -25,7 +27,6 @@ public class WaypointMovement2D : MonoBehaviour
         }
 
         transform.position = waypoints[0];
-        previousPosition = transform.position;
     }
 
     private void FixedUpdate()
@@ -33,26 +34,28 @@ public class WaypointMovement2D : MonoBehaviour
         MoveBetweenWaypoints();
     }
 
-
     private void MoveBetweenWaypoints()
     {
         if (waitTimer > 0)
         {
             waitTimer -= Time.fixedDeltaTime;
-            currentVelocity = Vector3.zero;
+            rigidBody.linearVelocity = Vector2.zero;
             return;
         }
 
         Vector3 targetPosition = waypoints[currentWaypointIndex];
-        Vector3 moveDirection = (targetPosition - transform.position).normalized;
+        Vector2 directionToTarget = ((Vector2)(targetPosition - transform.position)).normalized;
         
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.fixedDeltaTime);
+        // Calculate desired velocity
+        Vector2 desiredVelocity = directionToTarget * maxSpeed;
         
-        currentVelocity = (transform.position - previousPosition) / Time.fixedDeltaTime;
-        previousPosition = transform.position;
+        // Smoothly transition to desired velocity
+        rigidBody.linearVelocity = Vector2.Lerp(rigidBody.linearVelocity, desiredVelocity, acceleration * Time.fixedDeltaTime);
 
-        if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+        // Check if reached waypoint
+        if (Vector2.Distance(transform.position, targetPosition) < 0.1f)
         {
+            rigidBody.linearVelocity = Vector2.zero;
             waitTimer = waitTime;
             
             if (loop)

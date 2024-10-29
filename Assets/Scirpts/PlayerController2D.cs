@@ -1,3 +1,4 @@
+using System;
 using VInspector;
 using UnityEngine;
 using TMPro;
@@ -32,6 +33,12 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float moveAcceleration = 2f; // How fast the player gets to max speed
     [SerializeField] private float groundFriction = 5f; // The higher the friction there is less resistance
     [SerializeField] private float airFriction = 1f; // The higher the friction there is less resistance
+    [SerializeField] private float objectVelocityDecayRate = 15f;
+    private bool isMoving;
+    private bool leftGroundObject;
+    private Vector3 groundObjectVelocity;
+    private Rigidbody2D groundObjectRigidbody;
+    
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 4f;
@@ -59,6 +66,7 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
     [HideInInspector] public bool isGrounded;
+    [HideInInspector] public bool isOnPlatform;
     private bool isTouchingWall;
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
@@ -123,7 +131,6 @@ public class PlayerController2D : MonoBehaviour
 
     [Tab("References")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private AudioSource  audioSource;
     [SerializeField] public Rigidbody2D rigidBody;
     [SerializeField] public Collider2D collBody;
     [SerializeField] public Collider2D collFeet;
@@ -214,12 +221,44 @@ public class PlayerController2D : MonoBehaviour
 
     //------------------------------------
     
-    #region Movement functions
+    #region Movement function
     private void HandleMovement() {
+        
+        float movementThreshold = 0.1f;
+        isMoving = CalculateMovementSpeed()  > movementThreshold || CalculateMovementSpeed() < -movementThreshold;
+        
+        
+        HandleRunVfx();
 
-        float speed = horizontalInput;
+        
+        // Move
+        if (isMoving)
+        {
+            rigidBody.linearVelocity = new Vector2(CalculateMovementSpeed() + CalculateGroundObjectSpeed(), rigidBody.linearVelocity.y);
+        }
+        else
+        {
+            ApplyFriction();
+        }
+        
+        
+    }
+
+    private void ApplyFriction() {
+        if (isMoving) return;
+        
+        float friction =  isGrounded ? groundFriction : airFriction;
+        float currentVelocity = rigidBody.linearVelocity.x - CalculateGroundObjectSpeed();
+        rigidBody.linearVelocity = new Vector2(Mathf.Lerp(currentVelocity, 0, friction * Time.fixedDeltaTime) + CalculateGroundObjectSpeed(), rigidBody.linearVelocity.y);
+        
+        
+    }
+    private float CalculateMovementSpeed() {
+        
+        float speed = rigidBody.linearVelocity.x - CalculateGroundObjectSpeed();
         float acceleration = moveAcceleration;
 
+        // Handle move speed
         if (isWallSliding) { // Wall sliding
 
             if (horizontalInput < wallSlideStickStrength && horizontalInput > -wallSlideStickStrength) { 
@@ -229,39 +268,50 @@ public class PlayerController2D : MonoBehaviour
             }
         } else {
             if (isGrounded) { // On Ground
-                
-                if (runAbility && runInput) { // Run
 
-                    speed *= runSpeed;
-                    wasRunning = true;
+                speed = runAbility && runInput ? runSpeed : moveSpeed;
+                wasRunning = runAbility && runInput;
 
-                } else { // Walk
 
-                    speed *= moveSpeed;
-                    wasRunning = false;
-                }
-
-            } else if (!isGrounded) { // In air
+            } else{ // In air
 
                 if (isTouchingWall) { wasRunning = false;}
 
-                if (runAbility && wasRunning) { // Run
-
-                    speed *= airRunSpeed;
-
-                } else { // Walk
-
-                    speed *= airMoveSpeed;
-                    wasRunning = false;
-                }
+                speed = runAbility && runInput ? airRunSpeed : airMoveSpeed;
+                wasRunning = runAbility && runInput;
+                
             } 
         }
+        
+        
+        // Lerp the player movement
+        float targetMoveSpeed = Mathf.Lerp(0, horizontalInput * speed, acceleration * Time.fixedDeltaTime);
+        
+        
+        return targetMoveSpeed;
+    }
+    
+    private float CalculateGroundObjectSpeed() {
+        
+        float targetGroundObjectSpeed;
+        
+        groundObjectVelocity = groundObjectRigidbody ? groundObjectRigidbody.linearVelocity : Vector2.zero;
+        
+        if (!leftGroundObject) {
+            targetGroundObjectSpeed = groundObjectVelocity.x;
+        } else {
+            targetGroundObjectSpeed = Mathf.Lerp(groundObjectVelocity.x, 0, objectVelocityDecayRate * Time.fixedDeltaTime);
+        }
+        
+        return  targetGroundObjectSpeed;
+    }
 
 
-        // Play run effect
-        float movementThreshold = 0.2f;
-        bool isMoving = rigidBody.linearVelocity.x > movementThreshold || rigidBody.linearVelocity.x < -movementThreshold;
-        if (runAbility && runInput && isGrounded && !isWallSliding && isMoving)
+    private void HandleRunVfx() {
+        
+        if (!runAbility) return;
+        
+        if (runInput && isGrounded && !isWallSliding && isMoving)
         {
             PlayVfxEffect(runVfx, false);
         }
@@ -269,18 +319,15 @@ public class PlayerController2D : MonoBehaviour
         {
             StopVfxEffect(runVfx, false);
         }
-        
-
-        // Apply friction
-        if (isGrounded) {acceleration *= groundFriction;} else {acceleration *= airFriction;}
-
-        // Lerp the player movement
-        float newXVelocity = Mathf.Lerp(rigidBody.linearVelocity.x, speed, acceleration * Time.fixedDeltaTime);
-        rigidBody.linearVelocity = new Vector2(newXVelocity, rigidBody.linearVelocity.y);
-
-
     }
-
+    
+    #endregion Movement function
+    
+    //------------------------------------
+    
+    
+    #region Abilitis functions
+    
     private void HandleFastDrop() {
 
         if (!fastDropAbility) return;
@@ -364,11 +411,7 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-        
-
     
-
-
     private void HandleWallSlide() {
 
         // Check if wall sliding
@@ -417,8 +460,8 @@ public class PlayerController2D : MonoBehaviour
         }   
     }
 
-
-    #endregion Movement functions
+    #endregion Abilitis functions
+    
 
     //------------------------------------
     
@@ -598,8 +641,8 @@ public class PlayerController2D : MonoBehaviour
 
         } else { // Apply gravity when grounded
 
-            const float groundGravityForce = 0.1f;
-            rigidBody.linearVelocity += groundGravityForce * Time.fixedDeltaTime * Vector2.down;
+            // const float groundGravityForce = 0.1f;
+            // rigidBody.linearVelocity += groundGravityForce * Time.fixedDeltaTime * Vector2.down;
 
             // Check for landing at fast falling
             if (isFastFalling) {
@@ -644,6 +687,8 @@ public class PlayerController2D : MonoBehaviour
         // Check if the player is touching a wall
         isTouchingWall = collBody.IsTouchingLayers(groundLayer) || collBody.IsTouchingLayers(platformLayer);
 
+        isOnPlatform = collFeet.IsTouchingLayers(platformLayer);
+
         if (isTouchingWall) {
 
             // Check collision with walls on the right
@@ -661,6 +706,9 @@ public class PlayerController2D : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision) {
         
         if (collision.contactCount == 0) return;
+
+        groundObjectRigidbody = collision.gameObject.GetComponent<Rigidbody2D>();
+        leftGroundObject = false;
 
         switch (collision.gameObject.tag) {
             case "Enemy":
@@ -699,6 +747,11 @@ public class PlayerController2D : MonoBehaviour
 
             break;
         }
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        leftGroundObject = true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -1067,6 +1120,7 @@ public class PlayerController2D : MonoBehaviour
 
                 debugStringBuilder.AppendFormat("\nCollisions:\n");
                 debugStringBuilder.AppendFormat("Grounded: {0}\n", isGrounded);
+                debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
                 debugStringBuilder.AppendFormat("Touching Wall: {0}\n", isTouchingWall);
                 debugStringBuilder.AppendFormat("Wall on Right: {0}\n", isTouchingWallOnRight);
                 debugStringBuilder.AppendFormat("Wall on Left: {0}\n", isTouchingWallOnLeft);

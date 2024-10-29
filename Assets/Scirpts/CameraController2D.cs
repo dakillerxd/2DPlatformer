@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using VInspector;
+using Random = UnityEngine.Random;
 
 public class CameraController2D : MonoBehaviour
 {
@@ -89,14 +91,7 @@ public class CameraController2D : MonoBehaviour
         FollowTarget();
         HandleZoom();
         ApplyShake();
-
-        if (useBoundaries) {
-            //Draw the box boundaries 
-            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
-            Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
-            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line
-            Debug.DrawLine(new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Top line
-        }
+        
     }
 
 
@@ -194,6 +189,17 @@ public class CameraController2D : MonoBehaviour
         maxXLevelBoundary = maxXBoundary;
         minYLevelBoundary = minYBoundary;
         maxYLevelBoundary = maxYBoundary;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (useBoundaries) {
+            //Draw the box boundaries 
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
+            Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Top line
+        }
     }
 
     #endregion Boundaries

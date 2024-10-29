@@ -35,6 +35,7 @@ public class EnemyController2D : MonoBehaviour
 
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask platformLayer;
     private bool isGrounded;
     private bool isTouchingGroundOnRight;
     private bool isTouchingGroundOnLeft;
@@ -203,22 +204,24 @@ public class EnemyController2D : MonoBehaviour
     
     private void CollisionChecks() {
 
-        // Check if the player is grounded
-        isGrounded = collFeet.IsTouchingLayers(groundLayer);
+        // Check if the enemy is grounded
+        isGrounded = collFeet.IsTouchingLayers(groundLayer) || collFeet.IsTouchingLayers(platformLayer);
         
         if (isGrounded) {
             if (isFacingRight) {
                 RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.max + new Vector3(0.04f,0,0), Vector2.down, 0.3f, groundLayer);
+                RaycastHit2D hitRightPlat = Physics2D.Raycast(collBody.bounds.max + new Vector3(0.04f,0,0), Vector2.down, 0.3f, platformLayer);
                 Debug.DrawRay(collBody.bounds.max + new Vector3(0.04f,0,0), Vector2.down * 0.3f, Color.red);
-                isTouchingGroundOnRight = hitRight;
+                isTouchingGroundOnRight = hitRight || hitRightPlat;
             } else {
                 RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.min - new Vector3(0.04f,0,0), Vector2.down, 0.5f, groundLayer);
+                RaycastHit2D hitLeftPlat = Physics2D.Raycast(collBody.bounds.min - new Vector3(0.04f,0,0), Vector2.down, 0.5f, platformLayer);
                 Debug.DrawRay(collBody.bounds.min - new Vector3(0.04f,0,0), Vector2.down * 0.05f, Color.red);
-                isTouchingGroundOnLeft = hitLeft;
+                isTouchingGroundOnLeft = hitLeft || hitLeftPlat;
             }
         }
         
-        // Check if the player is touching a wall
+        // Check if the enemy is touching a wall
         isTouchingWall = collBody.IsTouchingLayers(groundLayer);
         
         if (isTouchingWall) {

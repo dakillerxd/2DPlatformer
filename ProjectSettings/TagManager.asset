@@ -10,6 +10,7 @@ TagManager:
   - Checkpoint
   - RespawnTrigger
   - Portal
+  - Platform
   layers:
   - Default
   - TransparentFX

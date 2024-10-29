@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using VInspector;
 
 public class CrateController2D : MonoBehaviour
 {
@@ -30,6 +27,7 @@ public class CrateController2D : MonoBehaviour
 
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask platformLayer;
     private bool isGrounded;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.03f;
     
@@ -135,7 +133,7 @@ public class CrateController2D : MonoBehaviour
     private void CollisionChecks() {
 
         // Check if the player is grounded
-        isGrounded = collBody.IsTouchingLayers(groundLayer);
+        isGrounded = collBody.IsTouchingLayers(groundLayer) || collBody.IsTouchingLayers(platformLayer);
         
         
     }

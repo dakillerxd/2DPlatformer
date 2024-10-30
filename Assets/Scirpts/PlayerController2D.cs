@@ -158,13 +158,14 @@ public class PlayerController2D : MonoBehaviour
     // ----------------------------------------------------------------------
 
     [Header("Input")]
-    [HideInInspector] public  float horizontalInput;
-    [HideInInspector] public  float verticalInput;
+    [HideInInspector] public float horizontalInput;
+    [HideInInspector] public float verticalInput;
     private bool jumpInputDownRequested;
     private bool jumpInputUp;
     private bool jumpInputHeld;
     private bool dashRequested;
     private bool runInput;
+    private bool dropDownInput;
 
 
 
@@ -209,6 +210,7 @@ public class PlayerController2D : MonoBehaviour
         UpdateFpsText();
         
         CheckForInput();
+        HandleDropDown();
         CountTimers();
         CoyoteTimeCheck();
         CheckFaceDirection();
@@ -220,6 +222,7 @@ public class PlayerController2D : MonoBehaviour
         CollisionChecks();
         HandleGravity();
         HandleMovement();
+        
         HandleJump();
         HandleRunning();
         HandleWallSlide();
@@ -306,6 +309,28 @@ public class PlayerController2D : MonoBehaviour
         // Lerp from the last velocity to 0
         groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectVelocityDecayRate);
         return groundObjectLastVelocityX;
+    }
+
+    private void HandleDropDown()
+    { 
+        if (!isOnPlatform) return;
+
+        if (dropDownInput) {
+            Collider2D platformCollider = groundObjectRigidbody.gameObject.GetComponent<Collider2D>();
+            platformCollider.enabled = false;
+            StartCoroutine(DropDownCooldown(platformCollider));
+        }
+    }
+    
+    private IEnumerator DropDownCooldown(Collider2D  platformCollider) {
+
+        float time = 0.3f;
+        
+        while (time > 0) {
+            time -= Time.deltaTime;
+            yield return null;
+        }
+        platformCollider.enabled = true;
     }
     
     #endregion Movement function
@@ -1008,18 +1033,18 @@ public class PlayerController2D : MonoBehaviour
                     isJumpCut = false;
                 }
             }
-
             
             // Check for run input
-            if (runAbility) {
-                runInput = Input.GetButton("Run");
-            }
+            if (runAbility) { runInput = Input.GetButton("Run"); }
 
             // Check for dash input
             if (dashAbility && remainingDashes > 0 && Input.GetButtonDown("Dash")) {
                 dashRequested = true;
                 dashBufferTimer = 0f;
             }
+            
+            // Check for drop down input
+            dropDownInput = verticalInput < -0.2 && Input.GetButtonDown("Crouch");
 
         } else { // Set inputs to 0 if the player cannot move
 
@@ -1167,6 +1192,7 @@ public class PlayerController2D : MonoBehaviour
                 debugStringBuilder.AppendFormat("Run: {0}\n", runInput);
                 debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", Input.GetButtonDown("Jump"), variableJumpHeldDuration, variableJumpMaxHoldDuration);
                 debugStringBuilder.AppendFormat("Dash: {0}\n", Input.GetButtonDown("Dash"));
+                debugStringBuilder.AppendFormat("Drop Down: {0}\n", dropDownInput);
 
                 debugText.text = debugStringBuilder.ToString();
             }

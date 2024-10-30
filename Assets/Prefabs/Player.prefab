@@ -415,7 +415,7 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.02, y: 0.29}
+  m_Size: {x: 0.02, y: 0.3}
   m_Direction: 0
 --- !u!1 &4986512388886435590
 GameObject:
@@ -576,14 +576,6 @@ PrefabInstance:
     - target: {fileID: 1077272797993549907, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerPeakMoveSpeed
-      objectReference: {fileID: 0}
-    - target: {fileID: 1432060674752734184, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
-      propertyPath: EmissionModule.rateOverTime.scalar
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1432060674752734184, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
-      propertyPath: EmissionModule.rateOverTime.minMaxState
-      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2489592728956220137, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
       propertyPath: m_LocalPosition.x

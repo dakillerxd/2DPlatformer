@@ -193,10 +193,9 @@ public class CameraController2D : MonoBehaviour
         maxYLevelBoundary = maxYBoundary;
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (useBoundaries) {
-            //Draw the box boundaries 
             Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
             Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
             Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line

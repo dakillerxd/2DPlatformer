@@ -45,7 +45,7 @@ public class CameraController2D : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool showDebugText;
-    [SerializeField] private TextMeshProUGUI debugText;
+    private TextMeshProUGUI debugText;
     [EndTab]
 
 
@@ -70,6 +70,8 @@ public class CameraController2D : MonoBehaviour
     private void Start()
     {
         cam = GetComponent<Camera>();
+        debugText = GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>();
+        target = GameObject.Find("Player").GetComponent<Transform>();
         cam.orthographicSize = currentZoom;
         isShaking = false;
     }

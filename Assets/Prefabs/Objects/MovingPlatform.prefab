@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8934283917358292718}
   - component: {fileID: 5505493582261667100}
   m_Layer: 7
-  m_Name: Platform
+  m_Name: MovingPlatform
   m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3822369395571457689}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.0109, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
@@ -176,9 +176,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waypoints:
-  - {x: 12, y: 0, z: 0}
   - {x: 7, y: 0, z: 0}
-  maxSpeed: 4
-  acceleration: 1
-  loop: 1
+  - {x: 12, y: 0, z: 0}
+  maxSpeed: 2
+  accelerationPercent: 100
+  decelerationPercent: 100
+  decelerationDistance: 1.5
+  loop: 0
   waitTime: 0.5

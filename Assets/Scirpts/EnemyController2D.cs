@@ -308,6 +308,7 @@ public class EnemyController2D : MonoBehaviour
 
     public void Push(Vector2 pushForce) {
         
+        TurnStunLocked(0.3f);
         rigidBody.linearVelocity = Vector2.zero; // Reset current velocity before applying push
         rigidBody.AddForce(pushForce, ForceMode2D.Impulse); // Apply a consistent impulse force
         float maxPushSpeed = 10f;  // Clamp the resulting velocity to prevent excessive speed

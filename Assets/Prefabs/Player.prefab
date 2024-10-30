@@ -277,10 +277,10 @@ MonoBehaviour:
   walkSpeed: 4
   airWalkSpeed: 3
   moveAcceleration: 15
-  groundFriction: 15
-  airFriction: 7
+  groundFriction: 0.15
+  airFriction: 0.03
   movementThreshold: 0.1
-  objectVelocityDecayRate: 2
+  objectVelocityDecayRate: 0.5
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.5
@@ -301,10 +301,8 @@ MonoBehaviour:
   isGrounded: 0
   isOnPlatform: 0
   wallCheckDistance: 0.02
-  showDebugText: 1
+  showDebugText: 0
   showFpsText: 1
-  debugText: {fileID: 0}
-  fpsText: {fileID: 0}
   runAbility: 1
   runSpeed: 5
   airRunSpeed: 6
@@ -327,6 +325,7 @@ MonoBehaviour:
   wallJumpHorizontalForce: 4
   dashAbility: 1
   dashForce: 10
+  dashPushForce: 10
   maxDashes: 1
   dashCooldownDuration: 1
   holdDashRequestTime: 0.1
@@ -339,7 +338,8 @@ MonoBehaviour:
   hurtVfx: {fileID: 5060159489429807464, guid: 2fe82b81a05eb4c499f6106eab7c6bcc, type: 3}
   jumpVfx: {fileID: 0}
   airJumpVfx: {fileID: 5789889679916270293}
-  runVfx: {fileID: 4562808088674882018}
+  peakMoveSpeedVfx: {fileID: 4562808088674882018}
+  groundRunVfx: {fileID: 1539653092228042522}
   deathVfx: {fileID: 5936299839186477038, guid: 7d4c0534cb4d9dc4982b85547abfe92b, type: 3}
   spawnVfx: {fileID: 0}
   dashVfx: {fileID: 6133111000707265534}
@@ -415,7 +415,7 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.02, y: 0.3}
+  m_Size: {x: 0.02, y: 0.29}
   m_Direction: 0
 --- !u!1 &4986512388886435590
 GameObject:
@@ -447,6 +447,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1009128701140074723}
+  - {fileID: 7567345570664528681}
   - {fileID: 1293560118218533357}
   - {fileID: 6245637364322891822}
   - {fileID: 4537635360908230868}
@@ -483,7 +484,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4523606492481414005}
-  - {fileID: 5913001649137963258}
   - {fileID: 3658711945977759838}
   m_Father: {fileID: 6449356787988531081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -565,84 +565,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.3, y: 0.28784254}
   m_EdgeRadius: 0
---- !u!1 &8676561356049123366
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5913001649137963258}
-  - component: {fileID: 6324724260074634322}
-  m_Layer: 0
-  m_Name: Feet
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &5913001649137963258
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8676561356049123366}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 9067867616452130285}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &6324724260074634322
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8676561356049123366}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.14048171}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.25, y: 0.010725498}
-  m_EdgeRadius: 0
 --- !u!1001 &3210479740864410122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -653,7 +575,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1077272797993549907, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
       propertyPath: m_Name
-      value: PlayerRunEffect
+      value: Vfx_PlayerPeakMoveSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 1432060674752734184, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1432060674752734184, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
+      propertyPath: EmissionModule.rateOverTime.minMaxState
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2489592728956220137, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
       propertyPath: m_LocalPosition.x
@@ -720,7 +650,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5224745617554692757, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
       propertyPath: m_Name
-      value: PlayerWallSlidingEffect
+      value: Vfx_PlayerWallSliding
       objectReference: {fileID: 0}
     - target: {fileID: 8928154913662448529, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -777,6 +707,73 @@ ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 5060159489429807464, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
   m_PrefabInstance: {fileID: 3263943700461210559}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3656411213430128229
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2170483418551630433}
+    m_Modifications:
+    - target: {fileID: 3964079908397169605, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_Name
+      value: Vfx_PlayerGroundRun
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+--- !u!198 &1539653092228042522 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2874383928776749439, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+  m_PrefabInstance: {fileID: 3656411213430128229}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7567345570664528681 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+  m_PrefabInstance: {fileID: 3656411213430128229}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7643887874634750588
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -787,7 +784,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5224745617554692757, guid: 2e1b6eefe420ea342b869a161b5e13f5, type: 3}
       propertyPath: m_Name
-      value: PlayerBleedEffect
+      value: Vfx_PlayerBleed
       objectReference: {fileID: 0}
     - target: {fileID: 8928154913662448529, guid: 2e1b6eefe420ea342b869a161b5e13f5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -854,7 +851,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4581527946544122590, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
       propertyPath: m_Name
-      value: PlayerDashEffect
+      value: Vfx_PlayerDash
       objectReference: {fileID: 0}
     - target: {fileID: 5810593304749069595, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -921,7 +918,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4581527946544122590, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
       propertyPath: m_Name
-      value: PlayerJumpEffect
+      value: Vfx_PlayerAirJump
       objectReference: {fileID: 0}
     - target: {fileID: 5810593304749069595, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
       propertyPath: m_LocalPosition.x

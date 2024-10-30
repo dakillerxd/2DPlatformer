@@ -103,7 +103,7 @@ public class SoundManager : MonoBehaviour
         
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
         if (soundFx == null || soundFx.clips.Length == 0) {
-            Debug.LogWarning("SoundFX: " + name + " not found!");
+            // Debug.LogWarning("SoundFX: " + name + " not found!");
             return;
         }
         
@@ -114,7 +114,7 @@ public class SoundManager : MonoBehaviour
         
         Sound newMusic = music.Find(music => music.name == name);
         if (newMusic == null || newMusic.clips.Length == 0) {
-            Debug.LogWarning("Music: " + name + " not found!");
+            // Debug.LogWarning("Music: " + name + " not found!");
             return;
         }
         
@@ -127,7 +127,7 @@ public class SoundManager : MonoBehaviour
         
         Sound s = soundEffects.Find(sound => sound.name == name);
         if (s == null) {
-            Debug.LogWarning("SoundFX: " + name + " not found!");
+            // Debug.LogWarning("SoundFX: " + name + " not found!");
             return;
         }
         s.source.Stop();

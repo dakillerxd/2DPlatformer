@@ -27,25 +27,26 @@ public class PlayerController2D : MonoBehaviour
     [HideInInspector] public bool isFacingRight = true;
 
     [Header("Movement")]
-    [SerializeField] private float walkSpeed = 4f;
-    [SerializeField] private float airWalkSpeed = 3f;
-    [SerializeField] private float moveAcceleration = 2f; // How fast the player gets to max speed
-    [SerializeField] private float groundFriction = 5f; // The higher the friction there is less resistance
-    [SerializeField] private float airFriction = 1f; // The higher the friction there is less resistance
-    [SerializeField] private float movementThreshold = 0.1f;
+    [SerializeField] [Min(0.1f)] private float walkSpeed = 4f;
+    [SerializeField] [Min(0.1f)] private float airWalkSpeed = 3f;
+    [SerializeField] [Min(0.1f)] private float moveAcceleration = 15f; // How fast the player gets to max speed
+    [SerializeField] [Min(0.01f)] private float groundFriction = 0.15f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)]private float airFriction = 0.03f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)]private float movementThreshold = 0.1f;
     private bool isMoving;
     private float moveSpeed;
     private bool onGroundObject;
     private Rigidbody2D groundObjectRigidbody;
-    private float groundObjectMoveSpeed;
-    [SerializeField] private float objectVelocityDecayRate = 15f;
+    private float groundObjectLastVelocityX;
+    private float groundObjectMomentum;
+    [SerializeField] [Range(0f, 1f)] private float objectVelocityDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
     [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.5f; // Multiplier for jump cut height
-    [SerializeField] [Range(0, 5f)] private int maxJumps = 2;
+    [SerializeField] [Range(1, 5f)] private int maxJumps = 2;
     [SerializeField] [Range(0.1f, 1f)] private float holdJumpDownBuffer = 0.2f; // For how long the jump buffer will hold
     [SerializeField] [Range(0, 2f)] private float coyoteJumpBuffer = 0.1f; // For how long the coyote buffer will hold
     private bool isJumping;
@@ -77,8 +78,8 @@ public class PlayerController2D : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool showDebugText;
     [SerializeField] private bool showFpsText;
-    [SerializeField] private TextMeshProUGUI debugText;
-    [SerializeField] private TextMeshProUGUI fpsText;
+    private TextMeshProUGUI debugText;
+    private TextMeshProUGUI fpsText;
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -114,7 +115,8 @@ public class PlayerController2D : MonoBehaviour
 
     [Header("Dash")]
     [SerializeField] private bool dashAbility = true;
-    [SerializeField] private float dashForce = 14f;
+    [SerializeField] private float dashForce = 10f;
+    [SerializeField] private float dashPushForce = 10f;
     [SerializeField] private int maxDashes = 1;
     [SerializeField] private float dashCooldownDuration = 1f;
     [SerializeField] [Range(0.1f, 1f)] private float holdDashRequestTime = 0.1f; // For how long the dash buffer will hold
@@ -142,7 +144,8 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private ParticleSystem hurtVfx;
     [SerializeField] private ParticleSystem jumpVfx;
     [SerializeField] private ParticleSystem airJumpVfx;
-    [SerializeField] private ParticleSystem runVfx;
+    [SerializeField] private ParticleSystem peakMoveSpeedVfx;
+    [SerializeField] private ParticleSystem groundRunVfx;
     [SerializeField] private ParticleSystem deathVfx;
     [SerializeField] private ParticleSystem spawnVfx;
     [SerializeField] private ParticleSystem dashVfx;
@@ -185,10 +188,14 @@ public class PlayerController2D : MonoBehaviour
 
     private void Start() {
 
+        fpsText = GameObject.Find("FpsText").GetComponent<TextMeshProUGUI>();
+        debugText = GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
+        
         currentHealth = maxHealth;
         remainingDashes = maxDashes;
         isDashCooldownRunning = false;
         deaths = 0;
+        groundObjectLastVelocityX = 0;
         PlayVfxEffect(spawnVfx, true);
         CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
     }
@@ -227,28 +234,27 @@ public class PlayerController2D : MonoBehaviour
     
     #region Movement function
     private void HandleMovement() {
-
-        float baseSpeed = rigidBody.linearVelocity.x - GroundObjectMoveSpeed();
-        moveSpeed = Mathf.Lerp(baseSpeed, CalculateTargetMoveSpeed(), CalculateFriction() * Time.fixedDeltaTime);
+        
+        // Get the ground object momentum
+        groundObjectMomentum = CalculateGroundObjectMomentum();
+        
+        // Get move speed and apply fiction
+        float baseMoveSpeed = rigidBody.linearVelocity.x - groundObjectMomentum;
+        moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateFriction());
+        
+        // Move
+        rigidBody.linearVelocityX = moveSpeed + groundObjectMomentum;
         isMoving = moveSpeed  > movementThreshold || moveSpeed < -movementThreshold;
-
-        if (onGroundObject)
-        {
-            groundObjectMoveSpeed = GroundObjectMoveSpeed();
-        }
-        else
-        {
-            groundObjectMoveSpeed = Mathf.Lerp(GroundObjectMoveSpeed(), 0, objectVelocityDecayRate * Time.fixedDeltaTime);
-        }
-        
-        
-        rigidBody.linearVelocity = new Vector2(moveSpeed + groundObjectMoveSpeed , rigidBody.linearVelocity.y);
     }
-
     private float CalculateFriction() {
         
-        float friction =  isGrounded ? groundFriction : airFriction;
-        return friction;
+        // If grounded use ground friction else use air friction
+        if (isGrounded)
+        {
+            return isOnPlatform ? groundFriction*3 : groundFriction; // If on a platform multiply the ground friction
+        }
+
+        return airFriction;
         
     }
     private float CalculateTargetMoveSpeed() {
@@ -276,31 +282,35 @@ public class PlayerController2D : MonoBehaviour
 
                 targetSpeed *= runAbility && runInput ? airRunSpeed : airWalkSpeed;
                 wasRunning = runAbility && runInput;
-                
             } 
         }
         
         
         // Lerp the player movement
-        float targetMoveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
+        float targetMoveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, acceleration);
         
         
         return targetMoveSpeed;
     }
-    private float GroundObjectMoveSpeed() {
-        
-   
-        Vector2 groundObjectVelocity = groundObjectRigidbody ? groundObjectRigidbody.linearVelocity : Vector2.zero;
-        float speed = groundObjectVelocity.x;
+    private float CalculateGroundObjectMomentum()
+    {
+        if (!groundObjectRigidbody) return 0;
+    
+        float currentVelocity = groundObjectRigidbody.linearVelocityX;
+    
+        if (onGroundObject) {
+            groundObjectLastVelocityX = currentVelocity;
+            return currentVelocity;
+        }
 
-        
-        return  speed;
+        // Lerp from the last velocity to 0
+        groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectVelocityDecayRate);
+        return groundObjectLastVelocityX;
     }
     
     #endregion Movement function
     
     //------------------------------------
-    
     
     #region Abilitis functions
 
@@ -308,15 +318,24 @@ public class PlayerController2D : MonoBehaviour
         if (!runAbility) return;
         
         
-        isRunning = runInput && isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
+        bool isRunningOnGround = runInput && isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
+        bool isRunningOnAir = wasRunning && !isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
         
-        if (isRunning)
-        {
-            PlayVfxEffect(runVfx, false);
+        if (isRunningOnGround) { // When on ground
+            PlayVfxEffect(peakMoveSpeedVfx, false);
+            PlayVfxEffect(groundRunVfx, false);
+            
+        } else {
+            StopVfxEffect(groundRunVfx, false);
         }
-        else
-        {
-            StopVfxEffect(runVfx, false);
+        
+        if (isRunningOnAir) { // When in the air
+            PlayVfxEffect(peakMoveSpeedVfx, false);
+        }
+
+        if (!isRunningOnAir && !isRunningOnGround) {
+            StopVfxEffect(groundRunVfx, false);
+            StopVfxEffect(peakMoveSpeedVfx, false);
         }
     
     }
@@ -352,7 +371,7 @@ public class PlayerController2D : MonoBehaviour
             remainingDashes --;
             TurnInvincible();
             TurnStunLocked(0.1f);
-            rigidBody.linearVelocity = new Vector2(dashForce * dashDirection, rigidBody.linearVelocity.y);
+            rigidBody.linearVelocityX += dashForce * dashDirection;
             dashRequested = false;
             StartCoroutine(DashCooldown());
         }
@@ -454,7 +473,6 @@ public class PlayerController2D : MonoBehaviour
 
     #endregion Abilitis functions
     
-
     //------------------------------------
     
     #region Jump functions
@@ -572,8 +590,10 @@ public class PlayerController2D : MonoBehaviour
         // Jump
         if (side == "Right") {
             rigidBody.linearVelocity = new Vector2(wallJumpHorizontalForce, wallJumpVerticalForce);
+            FlipPlayer("Right");
         } else if (side == "Left") {
             rigidBody.linearVelocity = new Vector2(-wallJumpHorizontalForce, wallJumpVerticalForce);
+            FlipPlayer("Left");
         }
         jumpInputDownRequested = false;
         variableJumpHeldDuration = 0;
@@ -673,23 +693,27 @@ public class PlayerController2D : MonoBehaviour
 
     private void CollisionChecks() {
 
-        // Check if the player is grounded
-        isGrounded = collFeet.IsTouchingLayers(groundLayer) || collFeet.IsTouchingLayers(platformLayer) ;
+        
+        LayerMask combinedMask = groundLayer | platformLayer;
+        
+        // Check if on grounded
+        isGrounded = collFeet.IsTouchingLayers(combinedMask);
 
-        // Check if the player is touching a wall
-        isTouchingWall = collBody.IsTouchingLayers(groundLayer) || collBody.IsTouchingLayers(platformLayer);
-
+        // Check if on platform
         isOnPlatform = collFeet.IsTouchingLayers(platformLayer);
-
+        
+        
+        // Check if touching a wall
+        isTouchingWall = collBody.IsTouchingLayers(combinedMask);
         if (isTouchingWall) {
 
             // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, groundLayer );
+            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedMask );
             Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
             isTouchingWallOnRight = hitRight;
 
             // Check collision with walls on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, groundLayer);
+            RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedMask);
             Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
             isTouchingWallOnLeft = hitLeft;
         }
@@ -698,18 +722,18 @@ public class PlayerController2D : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision) {
         
         if (collision.contactCount == 0) return;
-
-        groundObjectRigidbody = collision.gameObject.GetComponent<Rigidbody2D>();
-        onGroundObject = true;
-        Debug.Log(groundObjectRigidbody);
-
+        
         switch (collision.gameObject.tag) {
+            case "Platform":
+                    collision.gameObject.TryGetComponent<Rigidbody2D>(out groundObjectRigidbody);
+                    onGroundObject = true; 
+            break;
             case "Enemy":
                 
                 EnemyController2D enemyCont = collision.gameObject.GetComponent<EnemyController2D>();
                 Vector2 enemyNormal = collision.GetContact(0).normal;
                 Vector2 enemyPushForce = enemyNormal * 6f;
-                Vector2 enemyDashForce = enemyNormal * 7f;
+                Vector2 enemyDashForce = enemyNormal * dashPushForce;
                 
                 
                 // Damage and push the player and enemy
@@ -717,9 +741,7 @@ public class PlayerController2D : MonoBehaviour
 
                     Push(enemyPushForce);
                     
-                }
-                else
-                {
+                } else {
                     Push(enemyPushForce);
                     DamageHealth(1, true, collision.gameObject.name);
                 }
@@ -727,7 +749,7 @@ public class PlayerController2D : MonoBehaviour
                 // Damage and push the enemy if the player is dashing
                 if (isDashing) {
                     enemyCont.Push(-enemyDashForce);
-                    enemyCont.DamageHealth(1, true); 
+                    // enemyCont.DamageHealth(1, true); 
                 } 
                 
             break;
@@ -787,7 +809,6 @@ public class PlayerController2D : MonoBehaviour
     }
     
     #endregion Collision functions
-
     
     //------------------------------------
     
@@ -831,7 +852,7 @@ public class PlayerController2D : MonoBehaviour
         }
         
 
-        Debug.Log("Respawned");
+        // Debug.Log("Respawned");
     }
 
 
@@ -841,8 +862,11 @@ public class PlayerController2D : MonoBehaviour
         CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
         transform.position = position;
         rigidBody.linearVelocity = new Vector2(0, 0);
+        isDashing = false;
         wasRunning = false;
         StopVfxEffect(jumpVfx, true);
+        StopVfxEffect(dashVfx, true);
+        StopVfxEffect(wallSlideVfx, true);
         Push(new Vector2(jumpForce, jumpForce));
         TurnStunLocked(0.2f);
         
@@ -868,6 +892,7 @@ public class PlayerController2D : MonoBehaviour
     private void Push(Vector2 pushForce) {
         
         if (currentHealth > 0 && !isInvincible) {
+            
             // Reset current velocity before applying push
             rigidBody.linearVelocity = Vector2.zero;
             // Apply a consistent impulse force
@@ -889,7 +914,7 @@ public class PlayerController2D : MonoBehaviour
             SpawnVfxEffect(deathVfx);
             SoundManager.Instance?.PlaySoundFX("Player Death");
 
-            Debug.Log("Death by: " + cause);
+            // Debug.Log("Death by: " + cause);
 
             RespawnFromCheckpoint();
         }
@@ -1018,8 +1043,12 @@ public class PlayerController2D : MonoBehaviour
     
     private void FlipPlayer(string side) {
     
-        if (isFacingRight && side == "Right") return; // Only flip the player if he is not already facing the wanted direction
+        if (isFacingRight && side == "Right" || !isFacingRight && side == "Left") return; // Only flip the player if he is not already facing the wanted direction
 
+        StopVfxEffect(groundRunVfx, true);
+        StopVfxEffect(peakMoveSpeedVfx, true);
+        wasRunning = false;
+        
         if (side == "Left") {
             isFacingRight = false;
             transform.Rotate(0f, -180f, 0f);
@@ -1080,6 +1109,11 @@ public class PlayerController2D : MonoBehaviour
         if (!effect) return;
         Instantiate(effect, transform.position, Quaternion.identity);
     }
+
+    private bool IsVfxPlaying(ParticleSystem effect) {
+        if (!effect) return false;
+        return  effect.isPlaying;
+    }
     
     #endregion Sfx/Vfx functions
     
@@ -1102,8 +1136,8 @@ public class PlayerController2D : MonoBehaviour
                 debugStringBuilder.AppendFormat("Deaths: {0}\n\n", deaths);
                 debugStringBuilder.AppendFormat("Jumps: {0} / {1}\n", remainingJumps, maxJumps);
                 debugStringBuilder.AppendFormat("Dashes: {0} / {1} ({2:0.0} / {3:0.0})\n", remainingDashes, maxDashes, dashCooldownTimer, dashCooldownDuration);
-                debugStringBuilder.AppendFormat("Velocity: {0}\n", rigidBody.linearVelocity);
-                debugStringBuilder.AppendFormat("Move Speed: {0:0.0}\n", moveSpeed);
+                debugStringBuilder.AppendFormat("Velocity: {0:0.0}\n", rigidBody.linearVelocity);
+                debugStringBuilder.AppendFormat("Move Speed: ({0:0.0},{1:0.0})\n", moveSpeed, groundObjectMomentum);
 
                 debugStringBuilder.AppendFormat("\nStates:\n");
                 debugStringBuilder.AppendFormat("Facing Right: {0}\n", isFacingRight);
@@ -1124,7 +1158,9 @@ public class PlayerController2D : MonoBehaviour
                 debugStringBuilder.AppendFormat("Touching Wall: {0}\n", isTouchingWall);
                 debugStringBuilder.AppendFormat("Wall on Right: {0}\n", isTouchingWallOnRight);
                 debugStringBuilder.AppendFormat("Wall on Left: {0}\n", isTouchingWallOnLeft);
-                debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0}\n", groundObjectRigidbody, groundObjectMoveSpeed);
+                if (groundObjectRigidbody) {
+                    debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX);
+                }
 
                 debugStringBuilder.AppendFormat("\nInputs:\n");
                 debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");

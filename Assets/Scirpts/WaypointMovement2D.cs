@@ -5,7 +5,9 @@ public class WaypointMovement2D : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Vector3[] waypoints;
     [SerializeField] private float maxSpeed = 5f;
-    [SerializeField] private float acceleration = 10f;
+    [SerializeField, Range(0, 100)] private float accelerationPercent = 100f;
+    [SerializeField, Range(0, 100)] private float decelerationPercent = 100f;
+    [SerializeField] private float decelerationDistance = 1f;
     [SerializeField] private bool loop = true;
     [SerializeField] private float waitTime = 0.5f;
     private int currentWaypointIndex = 0;
@@ -34,6 +36,8 @@ public class WaypointMovement2D : MonoBehaviour
         MoveBetweenWaypoints();
     }
 
+    
+    
     private void MoveBetweenWaypoints()
     {
         if (waitTimer > 0)
@@ -45,15 +49,32 @@ public class WaypointMovement2D : MonoBehaviour
 
         Vector3 targetPosition = waypoints[currentWaypointIndex];
         Vector2 directionToTarget = ((Vector2)(targetPosition - transform.position)).normalized;
+        float distanceToTarget = Vector2.Distance(transform.position, targetPosition);
         
+        // Calculate speed based on distance
+        float targetSpeed = maxSpeed;
+        if (decelerationPercent > 0 && distanceToTarget < decelerationDistance)
+        {
+            float decelerationFactor = distanceToTarget / decelerationDistance;
+            targetSpeed = Mathf.Lerp(0, maxSpeed, decelerationFactor);
+        }
+
         // Calculate desired velocity
-        Vector2 desiredVelocity = directionToTarget * maxSpeed;
+        Vector2 desiredVelocity = directionToTarget * targetSpeed;
         
-        // Smoothly transition to desired velocity
-        rigidBody.linearVelocity = Vector2.Lerp(rigidBody.linearVelocity, desiredVelocity, acceleration * Time.fixedDeltaTime);
+        // Apply acceleration or deceleration based on percentages
+        float currentRate = distanceToTarget < decelerationDistance ? 
+            decelerationPercent / 100f * 15f : // Base deceleration rate of 15
+            accelerationPercent / 100f * 10f;  // Base acceleration rate of 10
+
+        rigidBody.linearVelocity = Vector2.Lerp(
+            rigidBody.linearVelocity, 
+            desiredVelocity, 
+            currentRate
+        );
 
         // Check if reached waypoint
-        if (Vector2.Distance(transform.position, targetPosition) < 0.1f)
+        if (distanceToTarget < 0.1f)
         {
             rigidBody.linearVelocity = Vector2.zero;
             waitTimer = waitTime;
@@ -92,6 +113,14 @@ public class WaypointMovement2D : MonoBehaviour
             else if (loop)
             {
                 Gizmos.DrawLine(waypoints[i], waypoints[0]);
+            }
+
+            // Draw deceleration zones
+            if (decelerationPercent > 0)
+            {
+                Gizmos.color = new Color(1f, 0f, 0f, 0.2f);
+                Gizmos.DrawWireSphere(waypoints[i], decelerationDistance);
+                Gizmos.color = Color.yellow;
             }
         }
     }

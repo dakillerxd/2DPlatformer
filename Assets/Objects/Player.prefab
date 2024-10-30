@@ -279,7 +279,8 @@ MonoBehaviour:
   moveAcceleration: 15
   groundFriction: 15
   airFriction: 7
-  objectVelocityDecayRate: 15
+  movementThreshold: 0.1
+  objectVelocityDecayRate: 2
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.5
@@ -307,6 +308,7 @@ MonoBehaviour:
   runAbility: 1
   runSpeed: 5
   airRunSpeed: 6
+  runningThreshold: 3
   autoClimbStepsAbility: 1
   stepHeight: 0.12
   stepWidth: 0.1

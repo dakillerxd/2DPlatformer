@@ -1124,11 +1124,12 @@ public class PlayerController2D : MonoBehaviour
                 debugStringBuilder.AppendFormat("Touching Wall: {0}\n", isTouchingWall);
                 debugStringBuilder.AppendFormat("Wall on Right: {0}\n", isTouchingWallOnRight);
                 debugStringBuilder.AppendFormat("Wall on Left: {0}\n", isTouchingWallOnLeft);
+                debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0}\n", groundObjectRigidbody, groundObjectMoveSpeed);
 
                 debugStringBuilder.AppendFormat("\nInputs:\n");
                 debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");
                 debugStringBuilder.AppendFormat("Run: {0}\n", runInput);
-                debugStringBuilder.AppendFormat("Jump: {0} ({1:0.0} / {2:0.0})\n", Input.GetButtonDown("Jump"), variableJumpHeldDuration, variableJumpMaxHoldDuration);
+                debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", Input.GetButtonDown("Jump"), variableJumpHeldDuration, variableJumpMaxHoldDuration);
                 debugStringBuilder.AppendFormat("Dash: {0}\n", Input.GetButtonDown("Dash"));
 
                 debugText.text = debugStringBuilder.ToString();

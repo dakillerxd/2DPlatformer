@@ -3,11 +3,11 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
-using UnityEngine.SceneManagement;
+
 
 public class PlayerController2D : MonoBehaviour
 {
-    private static PlayerController2D Instance { get; set; }
+    public static PlayerController2D Instance { get; private set; }
 
 
     [Tab("Player Settings")]
@@ -73,13 +73,6 @@ public class PlayerController2D : MonoBehaviour
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
-
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugText;
-    [SerializeField] private bool showFpsText;
-    private TextMeshProUGUI debugText;
-    private TextMeshProUGUI fpsText;
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -135,6 +128,7 @@ public class PlayerController2D : MonoBehaviour
     // ----------------------------------------------------------------------
 
     [Tab("References")]
+    [Header("Components")]
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] public Rigidbody2D rigidBody;
     [SerializeField] public Collider2D collBody;
@@ -181,17 +175,10 @@ public class PlayerController2D : MonoBehaviour
 
             Instance = this;
        }
-
-       QualitySettings.vSyncCount = 0;
-       Application.targetFrameRate = 120;
     }
  
 
     private void Start() {
-
-        fpsText = GameObject.Find("FpsText").GetComponent<TextMeshProUGUI>();
-        debugText = GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
-        
         currentHealth = maxHealth;
         remainingDashes = maxDashes;
         isDashCooldownRunning = false;
@@ -205,9 +192,6 @@ public class PlayerController2D : MonoBehaviour
     private void Update() {
 
         if (Input.GetKeyDown(KeyCode.R)) { RespawnFromCheckpoint();}
-        if (Input.GetKeyDown(KeyCode.T)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name);}
-        UpdateDebugText(); 
-        UpdateFpsText();
         
         CheckForInput();
         HandleDropDown();
@@ -1145,13 +1129,12 @@ public class PlayerController2D : MonoBehaviour
     //------------------------------------
     
     #region Debugging functions
-    #if UNITY_EDITOR || DEVELOPMENT_BUILD
 
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
-    private void UpdateDebugText() {
+    public void UpdateDebugText(TextMeshProUGUI textObject, bool showDebugText) {
 
-        if (debugText) {
-            debugText.enabled = showDebugText;
+        if (textObject) {
+            textObject.enabled = showDebugText;
             if (showDebugText) {  
 
                 debugStringBuilder.Clear();
@@ -1194,33 +1177,11 @@ public class PlayerController2D : MonoBehaviour
                 debugStringBuilder.AppendFormat("Dash: {0}\n", Input.GetButtonDown("Dash"));
                 debugStringBuilder.AppendFormat("Drop Down: {0}\n", dropDownInput);
 
-                debugText.text = debugStringBuilder.ToString();
+                textObject.text = debugStringBuilder.ToString();
             }
         }
     }
-
-    private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
-    private void UpdateFpsText() {
-
-        if (fpsText) {
-            fpsText.enabled = showFpsText;
-            if (showFpsText) {  
-
-                fpsStringBuilder.Clear();
-
-                float deltaTime = 0.0f;
-                deltaTime += Time.unscaledDeltaTime - deltaTime;
-                float fps = 1.0f / deltaTime;
-
-                fpsStringBuilder.AppendFormat("FPS: {0}\n", (int)fps);
-                fpsStringBuilder.AppendFormat("VSync: {0}\n", QualitySettings.vSyncCount);
-
-                fpsText.text = fpsStringBuilder.ToString();
-            }
-        }
-    }
-
-    #endif
+    
     #endregion Debugging functions
     
 }

@@ -19,14 +19,14 @@ public class WaypointMovement2D : MonoBehaviour
     
     
     [Header("References")]
-    [SerializeField] private Rigidbody2D platformRigidBody;
+    [SerializeField] private Rigidbody2D objectRigidBody;
     [SerializeField] private GameObject waypointPrefab;
 
     private void Start() {
         
-        if (!platformRigidBody) { platformRigidBody = GetComponentInChildren<Rigidbody2D>(); } // Find the rigidbody
+        if (!objectRigidBody) { objectRigidBody = GetComponentInChildren<Rigidbody2D>(); } // Find the rigidbody
         if (waypoints.Count == 0) { AddWaypoint(); } // Add a waypoint if there is non
-        platformRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
+        objectRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
     }
 
     private void FixedUpdate() {
@@ -67,7 +67,7 @@ public class WaypointMovement2D : MonoBehaviour
             waypoints[i].name = "Waypoint " + i;
         }
         
-        platformRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
+        objectRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
     }
     
     private void MoveBetweenWaypoints() {
@@ -77,13 +77,13 @@ public class WaypointMovement2D : MonoBehaviour
         if (waitTimer > 0)
         {
             waitTimer -= Time.fixedDeltaTime;
-            platformRigidBody.linearVelocity = Vector2.zero;
+            objectRigidBody.linearVelocity = Vector2.zero;
             return;
         }
 
         Vector3 targetPosition = waypoints[currentWaypointIndex].transform.position;
-        Vector2 directionToTarget = ((Vector2)(targetPosition - platformRigidBody.transform.position)).normalized;
-        float distanceToTarget = Vector2.Distance(platformRigidBody.transform.position, targetPosition);
+        Vector2 directionToTarget = ((Vector2)(targetPosition - objectRigidBody.transform.position)).normalized;
+        float distanceToTarget = Vector2.Distance(objectRigidBody.transform.position, targetPosition);
         
         // Calculate speed based on distance
         float targetSpeed = maxSpeed;
@@ -101,8 +101,8 @@ public class WaypointMovement2D : MonoBehaviour
             decelerationPercent / 100f * 15f : // Base deceleration rate of 15
             accelerationPercent / 100f * 10f;  // Base acceleration rate of 10
 
-        platformRigidBody.linearVelocity = Vector2.Lerp(
-            platformRigidBody.linearVelocity, 
+        objectRigidBody.linearVelocity = Vector2.Lerp(
+            objectRigidBody.linearVelocity, 
             desiredVelocity, 
             currentRate
         );
@@ -110,7 +110,7 @@ public class WaypointMovement2D : MonoBehaviour
         // Check if reached waypoint
         if (distanceToTarget < 0.1f)
         {
-            platformRigidBody.linearVelocity = Vector2.zero;
+            objectRigidBody.linearVelocity = Vector2.zero;
             waitTimer = waitTime;
             
             if (loop)

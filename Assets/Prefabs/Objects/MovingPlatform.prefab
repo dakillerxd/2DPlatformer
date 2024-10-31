@@ -275,10 +275,10 @@ MonoBehaviour:
   accelerationPercent: 100
   decelerationPercent: 100
   decelerationDistance: 1.3
-  loop: 0
+  loop: 1
   waitTime: 0.2
   waypoints:
   - {fileID: 5412873262660402547}
   - {fileID: 7269808971420523508}
-  platformRigidBody: {fileID: 4507320492004289905}
+  objectRigidBody: {fileID: 4507320492004289905}
   waypointPrefab: {fileID: 1462159494570231694, guid: a62dcb94264dbf241ac82189688b582d, type: 3}

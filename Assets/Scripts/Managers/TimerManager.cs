@@ -56,7 +56,6 @@ public class TimerManager : MonoBehaviour
             currentGameTime -= Time.deltaTime;
             currentGameTime = Mathf.Max(currentGameTime, 0f);
             UIManager.Instance?.UpdateTimeUI();
-            GameManager.Instance?.CheckGameOver();
 
             if ((currentGameTime <= warningTime) && (!warningTimeAnimationPlayed)) {
                 warningTimeAnimationPlayed = true;

@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 6152043537480098707}
   - component: {fileID: 4140535041775387755}
   - component: {fileID: 3674096801475792548}
+  - component: {fileID: 2974865284490116210}
   m_Layer: 0
-  m_Name: Checkpoint
+  m_Name: CheckpointPrefab
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,3 +152,15 @@ MonoBehaviour:
   hoverSpeed: 1
   hoverAmount: 0.1
   hoverDirection: {x: 0, y: 1, z: 0}
+--- !u!114 &2974865284490116210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150677472550667363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a612298b6d23d46bb0a2c082a275fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

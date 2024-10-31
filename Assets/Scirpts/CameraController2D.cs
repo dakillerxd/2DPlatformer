@@ -43,11 +43,6 @@ public class CameraController2D : MonoBehaviour
     [SerializeField] private float maxZoom = 5f;
     private float currentZoom = 3f;
 
-    [Header("Debug")]
-    [SerializeField] private bool showDebugText;
-    private TextMeshProUGUI debugText;
-    [EndTab]
-
 
     private Camera cam;
     private Vector3 currentVelocity;
@@ -67,10 +62,8 @@ public class CameraController2D : MonoBehaviour
     }
 
 
-    private void Start()
-    {
+    private void Start() {
         cam = GetComponent<Camera>();
-        debugText = GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>();
         target = GameObject.Find("Player").GetComponent<Transform>();
         cam.orthographicSize = currentZoom;
         isShaking = false;
@@ -79,12 +72,6 @@ public class CameraController2D : MonoBehaviour
     private void Update()
     {
         HandleZoomInput();
-        HandleTargetSelection();
-
-            if (debugText) {
-                debugText.enabled = showDebugText;
-                if (showDebugText) { UpdateDebugText(); }
-            }
     }
 
 
@@ -98,29 +85,9 @@ public class CameraController2D : MonoBehaviour
 
 
     #region Target
-    private void HandleTargetSelection()
-    {
-        if (Input.GetMouseButtonDown(0)) 
-        {
-            Vector2 mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
-            if (hit)
-            {
-                if (hit.collider.CompareTag("Player"))
-                {
-                    SetTarget(hit.collider.transform.parent.parent);
-                    Debug.Log("Set camera target to: " + hit.collider.transform.parent.parent.name);
-                }
-                else
-                {
-                    Debug.Log("Clicked on: " + hit.collider.gameObject.name);
-                }
-            }
-        }
-    }
 
-    private void SetTarget(Transform newTarget)
+    public void SetTarget(Transform newTarget)
     {
         target = newTarget;
     }
@@ -313,35 +280,38 @@ public class CameraController2D : MonoBehaviour
     #endregion Calculations
 
     #region Debugging functions
-    #if UNITY_EDITOR || DEVELOPMENT_BUILD
-
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
-    private void UpdateDebugText() {
-
-        debugStringBuilder.Clear();
+    public void UpdateDebugText(TextMeshProUGUI textObject, bool showDebugText) {
         
-        debugStringBuilder.AppendFormat("Camera:\n");
-        debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", shakeOffset.x, shakeOffset.y);
-        debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", currentZoom, minZoom, maxZoom);
+        if (textObject) {
+            textObject.enabled = showDebugText;
+            if (showDebugText) {         
+                
+                debugStringBuilder.Clear();
+        
+                debugStringBuilder.AppendFormat("Camera:\n");
+                debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", shakeOffset.x, shakeOffset.y);
+                debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", currentZoom, minZoom, maxZoom);
 
-        debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-        debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", targetPosition.x, targetPosition.y);
-        debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", targetOffset.x, targetOffset.y);
+                debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
+                debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", targetPosition.x, targetPosition.y);
+                debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", targetOffset.x, targetOffset.y);
 
 
-        debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
-        debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
-        debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYLevelBoundary, maxYLevelBoundary);
+                debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
+                debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
+                debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYLevelBoundary, maxYLevelBoundary);
 
 
         
 
 
-        debugText.text = debugStringBuilder.ToString();
+                textObject.text = debugStringBuilder.ToString(); }
+        }
+
+
     }
-
-
-    #endif
+    
     #endregion Debugging functions
 
 }

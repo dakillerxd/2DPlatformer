@@ -313,25 +313,7 @@ public class UIManager : MonoBehaviour
             
             gameOverScoreText.text = ScoreManager.Instance.currentScore.ToString();
         }
-
-        if (gameOverTitleText != null && gameOverMessageText != null)
-        {
-            switch (GameManager.Instance.currentGameOverState)
-            {
-                case GameOverState.Lose:
-                    gameOverTitleText.text = "You lose";
-                    gameOverMessageText.text = GetRandomMessage(loseMessages);
-                    break;
-                case GameOverState.Win:
-                    gameOverTitleText.text = "Congratulations!";
-                    gameOverMessageText.text = GetRandomMessage(winMessages);
-                    break;
-                case GameOverState.PerfectWin:
-                    gameOverTitleText.text = "Perfect!";
-                    gameOverMessageText.text = GetRandomMessage(perfectWinMessages);
-                    break;
-            }
-        }
+        
 
     }
 

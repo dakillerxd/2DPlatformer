@@ -29,7 +29,6 @@ public class ScoreManager : MonoBehaviour
     {
         currentScore += score;
         UIManager.Instance?.UpdateScoreUI();
-        GameManager.Instance?.CheckGameOver();
     }
 
 

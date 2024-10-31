@@ -33,9 +33,7 @@ public class MainMenuManager : MonoBehaviour
             buttonStart.onClick.RemoveAllListeners();
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonStart.onClick.AddListener(() => CustomSceneManager.Instance?.LoadScene(2, false));
-            buttonStart.onClick.AddListener(() => GameManager.Instance.chosenGameDifficulty = GameDifficulty.Normal);
-            buttonStart.onClick.AddListener(() => GameManager.Instance.ResetGame());
-
+            
         }
 
         if (buttonOptions != null)

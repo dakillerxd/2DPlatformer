@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 112237788478723639}
   - component: {fileID: 1853389310802539615}
   m_Layer: 0
-  m_Name: SoundFXPrefab
+  m_Name: PrefabSoundFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

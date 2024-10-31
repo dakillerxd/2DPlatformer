@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections;
 
 
-public class PlayerController2D : MonoBehaviour
+public class PlayerController2D : Entity2D
 {
     public static PlayerController2D Instance { get; private set; }
 
@@ -35,13 +35,7 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] [Min(0.01f)]private float movementThreshold = 0.1f;
     private bool isMoving;
     private float moveSpeed;
-    private bool onGroundObject;
-    private Rigidbody2D groundObjectRigidbody;
-    private float groundObjectLastVelocityX;
-    private float groundObjectMomentum;
-    [SerializeField] [Range(0f, 1f)] private float objectVelocityDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     
-
     [Header("Jump")]
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
@@ -73,6 +67,12 @@ public class PlayerController2D : MonoBehaviour
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
+    private bool onGroundObject;
+    private Rigidbody2D groundObjectRigidbody;
+    private SoftObject2D softObject;
+    private float groundObjectLastVelocityX;
+    private float groundObjectMomentum;
+    [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -291,31 +291,21 @@ public class PlayerController2D : MonoBehaviour
         }
 
         // Lerp from the last velocity to 0
-        groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectVelocityDecayRate);
+        groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectMomentumDecayRate);
         return groundObjectLastVelocityX;
     }
 
-    private void HandleDropDown()
-    { 
-        if (!isOnPlatform) return;
+    private void HandleDropDown() { 
+        
+        if (!isOnPlatform || !softObject) return;
 
         if (dropDownInput) {
-            Collider2D platformCollider = groundObjectRigidbody.gameObject.GetComponent<Collider2D>();
-            platformCollider.enabled = false;
-            StartCoroutine(DropDownCooldown(platformCollider));
+            softObject.StartDropDownCooldown();
+            softObject = null;
         }
     }
     
-    private IEnumerator DropDownCooldown(Collider2D  platformCollider) {
 
-        float time = 0.3f;
-        
-        while (time > 0) {
-            time -= Time.deltaTime;
-            yield return null;
-        }
-        platformCollider.enabled = true;
-    }
     
     #endregion Movement function
     
@@ -735,6 +725,7 @@ public class PlayerController2D : MonoBehaviour
         switch (collision.gameObject.tag) {
             case "Platform":
                     collision.gameObject.TryGetComponent<Rigidbody2D>(out groundObjectRigidbody);
+                    collision.gameObject.TryGetComponent<SoftObject2D>(out softObject);
                     onGroundObject = true; 
             break;
             case "Enemy":
@@ -793,27 +784,6 @@ public class PlayerController2D : MonoBehaviour
                 RespawnFromCheckpoint();
 
             break;
-            case "Checkpoint":
-
-                HealToFullHealth();
-                CheckpointManager2D.Instance.ActivateCheckpoint(collision.gameObject);
-
-            break;
-            case "Teleporter":
-
-                SceneTeleporter2D teleporter = collision.gameObject.GetComponent<SceneTeleporter2D>();
-                teleporter.GoToSelectedLevel();
-            break;
-            case "Portal":
-
-                Portal2D portal = collision.gameObject.GetComponent<Portal2D>();
-                if (portal.CanTeleport()) {
-                    portal.StartCooldown();
-                    portal.StartCooldownForConnectedPortal();
-                    Teleport(portal.GetConnectedPortalLocation());
-                }
-                
-                break;
         }
     }
     
@@ -865,22 +835,23 @@ public class PlayerController2D : MonoBehaviour
     }
 
 
-    private void Teleport(Vector2 position) {
+    public void Teleport(Vector2 position, bool keepMomentum) {
         
-
         CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
         transform.position = position;
-        rigidBody.linearVelocity = new Vector2(0, 0);
-        isDashing = false;
-        wasRunning = false;
-        StopVfxEffect(jumpVfx, true);
-        StopVfxEffect(dashVfx, true);
-        StopVfxEffect(wallSlideVfx, true);
-        Push(new Vector2(jumpForce, jumpForce));
-        TurnStunLocked(0.2f);
-        
         PlayVfxEffect(spawnVfx, false);
         SoundManager.Instance?.PlaySoundFX("Player Teleport");
+
+        if (!keepMomentum) {
+            rigidBody.linearVelocity = new Vector2(0, 0);
+            isDashing = false;
+            wasRunning = false;
+            StopVfxEffect(jumpVfx, true);
+            StopVfxEffect(dashVfx, true);
+            StopVfxEffect(wallSlideVfx, true);
+            Push(new Vector2(jumpForce, jumpForce));
+            TurnStunLocked(0.2f);
+        }
     }
 
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {

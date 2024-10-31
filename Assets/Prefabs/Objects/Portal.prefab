@@ -10029,6 +10029,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectedPortal: {fileID: 0}
+  keepMomentum: 1
+  portalPrefab: {fileID: 4768939878819942212}
 --- !u!1 &4878374697803157158
 GameObject:
   m_ObjectHideFlags: 0

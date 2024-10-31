@@ -12,8 +12,8 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
 
     [Header("Settings")]
     [SerializeField] public Vector2 playerSpawnPoint;
-    [SerializeField] public GameObject activeCheckpoint;
-    [SerializeField] private List<GameObject> checkpointList = new List<GameObject>();
+    [SerializeField] public Checkpoint2D activeCheckpoint;
+    [SerializeField] private List<Checkpoint2D> checkpointList = new List<Checkpoint2D>();
     
     [Header("Effects")]
     [SerializeField] private Color disabledCheckpointColor = Color.white;
@@ -55,8 +55,8 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
     
     [Button] private void AddCheckpoint() {
         GameObject newCheckpoint = Instantiate(checkpointPrefab, transform.position, Quaternion.identity);
-        checkpointList.Add(newCheckpoint);
-        SeCheckpointColor(newCheckpoint, disabledCheckpointColor);
+        checkpointList.Add(newCheckpoint.GetComponent<Checkpoint2D>());
+        SeCheckpointColor(newCheckpoint.GetComponent<Checkpoint2D>(), disabledCheckpointColor);
         newCheckpoint.name = "Checkpoint " + checkpointList.Count;
         RenameCheckpoints();
         
@@ -78,22 +78,21 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
     [Button] private void FindAllCheckpoints() {
 
         // Find all the checkpoints in the scene
-        checkpointList = GameObject.FindGameObjectsWithTag("Checkpoint").ToList();
+        checkpointList = FindObjectsByType<Checkpoint2D>(FindObjectsSortMode.None).ToList();
         Debug.Log($"Found {checkpointList.Count} checkpoints in the scene.");
 
         // Set the color for each checkpoint
-        foreach (GameObject checkpoint in checkpointList) {
+        foreach (Checkpoint2D checkpoint in checkpointList) {
 
             SeCheckpointColor(checkpoint, disabledCheckpointColor);
         }
     }
     
 
-    public void ActivateCheckpoint(GameObject checkpoint) {
+    public void ActivateCheckpoint(Checkpoint2D checkpoint) {
 
         if (activeCheckpoint == checkpoint) return; // If the active checkpoint is the same as the new one do nothing
-
-        // CameraController2D.Instance?.ShakeCamera(0.4f,0.2f);
+        
         DeactivateLastCheckpoint();
         activeCheckpoint = checkpoint;
         SpawnParticleEffect(activateVfx, activeCheckpoint.transform.position, activeCheckpoint.transform.rotation, activeCheckpoint.transform);
@@ -101,12 +100,14 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
         SoundManager.Instance?.PlaySoundFX("Checkpoint Set");
     }
 
-
+    public void DeactivateCheckpoint(Checkpoint2D checkpoint)
+    {
+        if (activeCheckpoint  == checkpoint) DeactivateLastCheckpoint();
+    }
     private void DeactivateLastCheckpoint() {
 
         if (!activeCheckpoint) return; // If there is no active checkpoint then do nothing
-
-
+        
         SpawnParticleEffect(deactivateVfx, activeCheckpoint.transform.position, activeCheckpoint.transform.rotation, activeCheckpoint.transform);
         SeCheckpointColor(activeCheckpoint, disabledCheckpointColor);
         activeCheckpoint = null;
@@ -114,9 +115,9 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
     }
     
     
-    private void SeCheckpointColor(GameObject checkpoint, Color color) {
+    private void SeCheckpointColor(Checkpoint2D checkpoint, Color color) {
 
-        checkpoint.GetComponent<SpriteRenderer>().color = color;
+        checkpoint.spriteRenderer.color = color;
     }
     
     
@@ -129,11 +130,12 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
     }
     
 #if UNITY_EDITOR
-    private List<GameObject> previousList = new List<GameObject>();
+    private List<Checkpoint2D> previousList = new List<Checkpoint2D>();
+    private bool isProcessingDestroy = false;
 
     public void OnBeforeSerialize()
     {
-        if (Application.isPlaying) return;
+        if (Application.isPlaying || isProcessingDestroy) return;
         
         // Find objects that were in the previous list but not in the current list
         foreach (var prevCheckpoint in previousList)
@@ -143,19 +145,21 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
                 // Schedule destruction for next frame
                 EditorApplication.delayCall += () =>
                 {
+                    isProcessingDestroy = true;
                     if (prevCheckpoint != null)
                     {
                         Undo.RecordObject(this, "Delete Checkpoint");
-                        DestroyImmediate(prevCheckpoint);
+                        DestroyImmediate(prevCheckpoint.gameObject);
                         EditorUtility.SetDirty(this);
                         EditorSceneManager.MarkSceneDirty(gameObject.scene);
                     }
+                    isProcessingDestroy = false;
                 };
             }
         }
 
         // Update previous list
-        previousList = new List<GameObject>(checkpointList);
+        previousList = new List<Checkpoint2D>(checkpointList);
     }
 
     public void OnAfterDeserialize()
@@ -174,17 +178,16 @@ public class CheckpointManager2D : MonoBehaviour, ISerializationCallbackReceiver
     {
         if (Application.isPlaying) return;
 
-        var managers = FindObjectsOfType<CheckpointManager2D>();
-        foreach (var manager in managers)
+        var manager = FindAnyObjectByType<CheckpointManager2D>();
+        if (manager != null && manager.checkpointList != null)
         {
-            if (manager != null && manager.checkpointList != null)
+            // Check both for null component and null gameObject
+            if (manager.checkpointList.RemoveAll(checkpoint => 
+                checkpoint == null || checkpoint.gameObject == null) > 0)
             {
-                if (manager.checkpointList.RemoveAll(checkpoint => checkpoint == null) > 0)
-                {
-                    manager.RenameCheckpoints();
-                    EditorUtility.SetDirty(manager);
-                    EditorSceneManager.MarkSceneDirty(manager.gameObject.scene);
-                }
+                manager.RenameCheckpoints();
+                EditorUtility.SetDirty(manager);
+                EditorSceneManager.MarkSceneDirty(manager.gameObject.scene);
             }
         }
     }

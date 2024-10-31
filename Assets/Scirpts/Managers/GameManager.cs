@@ -150,7 +150,7 @@ public class GameManager : MonoBehaviour
                     CameraController2D.Instance.SetTarget(hit.collider.transform.parent.parent);
                 }
                 else if (hit.collider.CompareTag("Checkpoint")) {
-                    CheckpointManager2D.Instance.ActivateCheckpoint(hit.collider.gameObject);
+                    CheckpointManager2D.Instance.ActivateCheckpoint(hit.collider.gameObject.GetComponent<Checkpoint2D>());
                 }
                 else {
                     Debug.Log("Clicked on: " + hit.collider.gameObject.name);
@@ -161,16 +161,26 @@ public class GameManager : MonoBehaviour
 
     private void ToggleDebugText() {
         showDebugInfo = !showDebugInfo;
+        if (!playerDebugText) { GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>(); }
+        if (!cameraDebugText) { GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>(); }
+        if (!cam) { cam = Camera.main;}
     }
 
-    private void UpdateDebugTextInfo() {
-        
-        PlayerController2D.Instance.UpdateDebugText(playerDebugText, showDebugInfo);
-        CameraController2D.Instance.UpdateDebugText(cameraDebugText, showDebugInfo);
+    private void UpdateDebugTextInfo()
+    {
+        if (playerDebugText)
+        {
+            PlayerController2D.Instance.UpdateDebugText(playerDebugText, showDebugInfo);
+        }
+
+        if (cam && cameraDebugText)
+        {
+            CameraController2D.Instance.UpdateDebugText(cameraDebugText, showDebugInfo);
+        }
     }
-    
-    
-    
+
+
+
     private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
     private void UpdateFpsText() {
 

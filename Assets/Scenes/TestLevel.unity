@@ -4824,6 +4824,14 @@ PrefabInstance:
       propertyPath: 'waypoints.Array.data[1]'
       value: 
       objectReference: {fileID: 164219311}
+    - target: {fileID: 8128294100542856461, guid: 507b2188880dee841a47d5daf04ca42a, type: 3}
+      propertyPath: 'waypoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128294100542856461, guid: 507b2188880dee841a47d5daf04ca42a, type: 3}
+      propertyPath: 'waypoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -5630,6 +5638,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1670163257725275681, guid: 74c581e14f6c86049a0b9dbae06efcfc, type: 3}
+      propertyPath: maxYLevelBoundary
+      value: 45.16
+      objectReference: {fileID: 0}
     - target: {fileID: 3481788716422525820, guid: 74c581e14f6c86049a0b9dbae06efcfc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5879,12 +5891,16 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
+      propertyPath: groundRunVfx
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: showDebugText
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6449356787988531081, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 6449356787988531081, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_LocalPosition.y

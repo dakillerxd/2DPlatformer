@@ -1,14 +1,15 @@
+using System;
 using VInspector;
 using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using Unity.VisualScripting;
 
 
 public class PlayerController2D : Entity2D
 {
     public static PlayerController2D Instance { get; private set; }
-
 
     [Tab("Player Settings")]
     [Header("Health")]
@@ -420,7 +421,6 @@ public class PlayerController2D : Entity2D
             } 
         }
     }
-
     
     private void HandleWallSlide() {
 
@@ -625,65 +625,91 @@ public class PlayerController2D : Entity2D
     //------------------------------------
     
     #region Gravity function
-    private void HandleGravity()
-    {
-        if (!isGrounded && !isWallSliding) // Apply gravity when not grounded
-        {
-            // Apply gravity and apply the fall multiplier if the player is falling
-            float gravityMultiplier = rigidBody.linearVelocity.y > 0 ? 1f : fallMultiplier; 
-            rigidBody.linearVelocity = new Vector2 ( rigidBody.linearVelocity.x, Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, gravityForce * gravityMultiplier * Time.fixedDeltaTime));
 
+  // private void HandleGravity() {
+  //     
+  //     
+  //     // Calculate forces
+  //     float gravityMultiplier = rigidBody.linearVelocity.y > 0 ? 1f : fallMultiplier;
+  //     float appliedGravity = gravityForce * gravityMultiplier;
+  //     float maxVelocityY = maxFallSpeed;
+  //     float newVelocityY = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime);
+  //
+  //     // Set max fall speed depending on state
+  //     if (isGrounded) {  maxVelocityY = 0; } 
+  //     else if (!isGrounded && !isWallSliding) { maxVelocityY = maxFallSpeed; }
+  //     
+  //     // Speed checks
+  //     isFastFalling = rigidBody.linearVelocityY <= -7;
+  //     atMaxFallSpeed = rigidBody.linearVelocityY <= -maxFallSpeed;
+  //     
+  //     // Check for landing
+  //     if (isGrounded && rigidBody.linearVelocityY < 0) {  // Check if moving downward
+  //
+  //         rigidBody.linearVelocityY = 0;
+  //         Debug.Log("Landed");
+  //         if (isFastFalling) { 
+  //             
+  //             rigidBody.linearVelocityY = jumpForce/2;
+  //             if (atMaxFallSpeed && canTakeFallDamage) {
+  //                 DamageHealth(maxFallDamage, false, "Ground");
+  //             }
+  //             isFastFalling = false;
+  //             atMaxFallSpeed = false;
+  //         }
+  //     }
+  //     
+  //     // Apply gravity
+  //     // rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocityY, maxVelocityY,  appliedGravity * Time.fixedDeltaTime);
+  //     
+  //     rigidBody.linearVelocityY = Mathf.Clamp(newVelocityY, -maxVelocityY, maxVelocityY);
+  //     
+  // }
 
-            // Cap fall speed
-            if (!isWallSliding)
-            {
-
-                isFastFalling = rigidBody.linearVelocity.y < -(maxFallSpeed/2);
-
-
-                if (rigidBody.linearVelocity.y < -maxFallSpeed) {
-
-                    atMaxFallSpeed = true;
-                    rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, -maxFallSpeed);
-                    if (CameraController2D.Instance?.isShaking == false) { CameraController2D.Instance.ShakeCamera( 1f, 4f,2,2); } // shake camera when at max fall speed
-
-                } else { atMaxFallSpeed = false; }
-            }
-
-        } else { // Apply gravity when grounded
-
-            // const float groundGravityForce = 0.1f;
-            // rigidBody.linearVelocity += groundGravityForce * Time.fixedDeltaTime * Vector2.down;
-
-            // Check for landing at fast falling
-            if (isFastFalling) {
-
-                if (CameraController2D.Instance?.isShaking == true) { // Stop camera shake
-                    CameraController2D.Instance.StopCameraShake();
-                }
-
-                rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, jumpForce/2); // Make the player bop
-                isFastFalling = false;
-            }
-
-            // Check for landing at max speed
-            if (atMaxFallSpeed) {
-
-                if (canTakeFallDamage) { DamageHealth(maxFallDamage, false, "Ground");} // Take damage 
-                
-
-                if (CameraController2D.Instance?.isShaking == true) { // Stop camera shake
-                    CameraController2D.Instance.StopCameraShake();
-                }
-
-                rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, jumpForce); // Make the player bop
-                atMaxFallSpeed = false;
-                isFastFalling = false;
-            }
+      private void HandleGravity() {
+        if (!isGrounded && !isWallSliding) {
+            HandleAirGravity();
+        } else {
+            HandleGroundedGravity();
         }
     }
 
+    private void HandleAirGravity() {
 
+        float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
+        float appliedGravity = gravityForce * gravityMultiplier;
+        
+        rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, appliedGravity * Time.fixedDeltaTime);
+        
+        CheckFallSpeed();
+    }
+
+    private void CheckFallSpeed() {
+        
+        isFastFalling = rigidBody.linearVelocityY < -(maxFallSpeed/2); // Check if fast falling
+        
+        if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
+            atMaxFallSpeed = true;
+            rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
+        }
+    }
+
+    private void HandleGroundedGravity() {
+        
+        if (isFastFalling) {
+            
+            rigidBody.linearVelocityY = jumpForce/2;
+            
+            if (atMaxFallSpeed && canTakeFallDamage) {
+                DamageHealth(maxFallDamage, false, "Ground");
+            }
+            atMaxFallSpeed = false;
+            isFastFalling = false;
+        }
+        // const float groundGravityForce = 0.1f;
+        // rigidBody.linearVelocity += groundGravityForce * Time.fixedDeltaTime * Vector2.down;
+    }
+  
     #endregion Gravity functions
     
     //------------------------------------
@@ -721,11 +747,11 @@ public class PlayerController2D : Entity2D
     private void OnCollisionEnter2D(Collision2D collision) {
         
         if (collision.contactCount == 0) return;
+        collision.gameObject.TryGetComponent<SoftObject2D>(out softObject);
         
         switch (collision.gameObject.tag) {
             case "Platform":
                     collision.gameObject.TryGetComponent<Rigidbody2D>(out groundObjectRigidbody);
-                    collision.gameObject.TryGetComponent<SoftObject2D>(out softObject);
                     onGroundObject = true; 
             break;
             case "Enemy":
@@ -761,6 +787,7 @@ public class PlayerController2D : Entity2D
                 DamageHealth(1, true, collision.gameObject.name);
 
             break;
+            
         }
     }
 
@@ -772,7 +799,7 @@ public class PlayerController2D : Entity2D
                 onGroundObject = false;
             }
         }
-        
+        softObject = null;
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -782,7 +809,6 @@ public class PlayerController2D : Entity2D
                 
                 SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
                 RespawnFromCheckpoint();
-
             break;
         }
     }
@@ -807,6 +833,7 @@ public class PlayerController2D : Entity2D
 
         Respawn(CheckpointManager2D.Instance.playerSpawnPoint);
     }
+    
     
     
     private void Respawn(Vector2 position) {

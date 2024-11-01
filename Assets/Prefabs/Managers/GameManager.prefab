@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb380c64ecb614448f81d01b0b27485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGameState: 0
+  currentGameState: 1
   currentGameDifficulty: 0
   quitGameKey: 282
   restartSceneKey: 283
@@ -53,3 +53,6 @@ MonoBehaviour:
   vSync: 0
   showFps: 1
   showDebugInfo: 1
+  fpsText: {fileID: 0}
+  playerDebugText: {fileID: 0}
+  cameraDebugText: {fileID: 0}

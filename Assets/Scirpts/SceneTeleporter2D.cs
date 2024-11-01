@@ -1,24 +1,23 @@
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using CustomAttribute;
-public class SceneTeleporter2D : MonoBehaviour
+using System.Collections;
+using VInspector;
+
+public class SceneTeleporter2D : MonoBehaviour 
 {
     [Header("Settings")]
-    [SerializeField] private bool goToNextLevel = false;
-    [SerializeField] private SceneField sceneToLoad;
+    [SerializeField] private bool goToNextLevel = true;
+    [DisableIf("goToNextLevel")][SerializeField] private SceneField sceneToLoad;
+    private bool activated = false;
 
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            if (goToNextLevel)
-            {
-                GoToNextLevel();
-            }
-            GoToSelectedLevel();
-            
+        if (activated) return;
+        if (other.CompareTag("Player")) {
+
+            StartCoroutine(PlayAnimationAndTeleport());
         }
     }
 
@@ -30,5 +29,34 @@ public class SceneTeleporter2D : MonoBehaviour
     
     private void GoToNextLevel() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+    
+    private IEnumerator PlayAnimationAndTeleport()
+    {
+
+        activated = true;
+        PlayerController2D.Instance.PlayAnimation("TeleportIn");
+        PlayerController2D.Instance.SetPlayerState(PlayerState.Frozen);
+
+        // Wait until the animation enters the state
+        while (!PlayerController2D.Instance.animator.GetCurrentAnimatorStateInfo(0).IsName("Anim_PlayerTeleportIn"))
+        {
+            yield return null;
+        }
+
+        // Wait until the animation finishes
+        while (PlayerController2D.Instance.animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+        {
+            yield return null;
+        }
+        
+        if (goToNextLevel)
+        {
+            GoToNextLevel();
+        }
+        else
+        {
+            GoToSelectedLevel();
+        }
     }
 }

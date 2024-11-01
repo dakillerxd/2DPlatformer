@@ -24343,7 +24343,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.6, y: 0.6}
   m_EdgeRadius: 0
 --- !u!114 &6815104843284206713
 MonoBehaviour:
@@ -24446,8 +24446,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f3f5114e94b224c8dcfb45aa9f18e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goToNextLevel: 1
   sceneToLoad:
-    m_SceneAsset: {fileID: 0}
+    m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
     m_SceneName: Level1
 --- !u!1 &7681721073895704929
 GameObject:

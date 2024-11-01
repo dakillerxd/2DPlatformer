@@ -5,13 +5,21 @@ using TMPro;
 using System.Text;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
+public enum PlayerState {
+    Controllable,
+    Frozen,
+}
 
 public class PlayerController2D : Entity2D
 {
     public static PlayerController2D Instance { get; private set; }
 
     [Tab("Player Settings")]
+    public PlayerState currentPlayerState = PlayerState.Controllable;
+    private string logText;
     [Header("Health")]
     [SerializeField] private int maxHealth = 2;
     [SerializeField] private bool canTakeFallDamage;
@@ -67,7 +75,7 @@ public class PlayerController2D : Entity2D
     private bool isTouchingPlatform;
     private bool isTouchingWall;
     public bool isGrounded { get; private set; }
-    public bool isOnPlatform { get; private set; }
+    private bool isOnPlatform;
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
@@ -133,10 +141,11 @@ public class PlayerController2D : Entity2D
 
     [Tab("References")]
     [Header("Components")]
-    [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] public Rigidbody2D rigidBody;
     [SerializeField] public Collider2D collBody;
     [SerializeField] public Collider2D collFeet;
+    [SerializeField] public Animator animator;
+    [SerializeField] private SpriteRenderer[] spriteRenderers;
 
     [Header("VFX")]
     [SerializeField] private ParticleSystem hurtVfx;
@@ -150,6 +159,11 @@ public class PlayerController2D : Entity2D
     [SerializeField] private ParticleSystem bleedVfx;
     [SerializeField] private ParticleSystem wallSlideVfx;
     [SerializeField] private ParticleSystem healVfx;
+    
+    [Header("Colors")]
+    [SerializeField] private Color hurtColor = Color.red;
+    [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
+    private  Color defaultColor = Color.white;
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -179,37 +193,30 @@ public class PlayerController2D : Entity2D
             Instance = this;
        }
     }
- 
 
     private void Start() {
-        currentHealth = maxHealth;
-        remainingDashes = maxDashes;
-        isDashCooldownRunning = false;
-        deaths = 0;
-        groundObjectLastVelocityX = 0;
-        PlayVfxEffect(spawnVfx, true);
-        CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
-    }
-
-
-    private void Update() {
-
-        if (Input.GetKeyDown(KeyCode.R)) { RespawnFromCheckpoint();}
         
+        CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
+        RespawnFromSpawnPoint();
+    }
+    
+    private void Update() {
+        if (!CanPlay()) { return; }
+        
+        if (Input.GetKeyDown(KeyCode.R)) { RespawnFromCheckpoint();}
         CheckForInput();
         HandleDropDown();
         CountTimers();
         CoyoteTimeCheck();
         CheckFaceDirection();
     }
-
-
+    
     private void FixedUpdate() {
+        if (!CanPlay()) { return; }
 
         CollisionChecks();
         HandleGravity();
         HandleMovement();
-        
         HandleJump();
         HandleRunning();
         HandleWallSlide();
@@ -242,7 +249,7 @@ public class PlayerController2D : Entity2D
         // If grounded use ground friction else use air friction
         if (isGrounded)
         {
-            return isOnPlatform ? groundFriction*3 : groundFriction; // If on a platform multiply the ground friction
+            return isOnPlatform || isDashing ? groundFriction*3 : groundFriction; // If on a platform multiply the ground friction
         }
 
         return airFriction;
@@ -304,6 +311,7 @@ public class PlayerController2D : Entity2D
 
         if (dropDownInput) {
             rigidBody.linearVelocityY = jumpForce/3;
+            PlayAnimation("DropDown");
             softObject.StartDropDownCooldown();
             softObject = null;
         }
@@ -325,9 +333,11 @@ public class PlayerController2D : Entity2D
         if (isRunningOnGround) { // When on ground
             PlayVfxEffect(peakMoveSpeedVfx, false);
             PlayVfxEffect(groundRunVfx, false);
+            // PlayAnimation("Run");
             
         } else {
             StopVfxEffect(groundRunVfx, false);
+            // PlayAnimation("Idle");
         }
         
         if (isRunningOnAir) { // When in the air
@@ -364,6 +374,7 @@ public class PlayerController2D : Entity2D
             // Play effects
             PlayVfxEffect(dashVfx, false);
             StopVfxEffect(wallSlideVfx, true);
+            PlayAnimation("Dash");
             SoundManager.Instance?.PlaySoundFX("Player Dash");
 
             // Dash
@@ -372,6 +383,7 @@ public class PlayerController2D : Entity2D
             TurnInvincible();
             TurnStunLocked(0.1f);
             rigidBody.linearVelocityX += dashForce * dashDirection;
+            if (isGrounded) { rigidBody.linearVelocityY += 1f; }
             dashRequested = false;
             StartCoroutine(DashCooldown());
         }
@@ -525,12 +537,22 @@ public class PlayerController2D : Entity2D
             isJumpCut = false;
         }
     }
+    
     private void ExecuteJump(int jumpCost, string side) {
 
         // Play effects
-        if (!isGrounded) {PlayVfxEffect(airJumpVfx, true); SoundManager.Instance?.PlaySoundFX("Player Air Jump"); };  // CameraController2D.Instance?.ShakeCamera(0.2f,0.1f);
-        if (isGrounded) { SoundManager.Instance?.PlaySoundFX("Player Jump");}
-
+        if (!isGrounded) {
+            PlayVfxEffect(airJumpVfx, true); 
+            PlayAnimation("AirJump");
+            SoundManager.Instance?.PlaySoundFX("Player Air Jump");
+        } 
+        if (isGrounded) {
+            PlayAnimation("Jump");
+            SoundManager.Instance?.PlaySoundFX("Player Jump");
+        }
+        
+        
+        
         // Jump
         if (side == "Right") {
             rigidBody.linearVelocity = new Vector2(jumpForce, jumpForce);
@@ -653,9 +675,10 @@ public class PlayerController2D : Entity2D
     }
     private void HandleGroundedGravity() {
         
-        if (isFastFalling) { // Check if landed
+        if (isFastFalling && isGrounded && !isDashing) { // Check if landed
             
             rigidBody.linearVelocityY = -1 * (fallSpeed/3); // Bop the player
+            PlayAnimation("Land");
             
             if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
                 DamageHealth(maxFallDamage, false, "Ground");
@@ -664,6 +687,7 @@ public class PlayerController2D : Entity2D
             atMaxFallSpeed = false;
             isFastFalling = false;
         }
+        
         
         // if (isOnPlatform) { // Apply content gravity when on a platform
         //     const float groundGravityForce = 0.1f;
@@ -804,48 +828,31 @@ public class PlayerController2D : Entity2D
     
     #region Health/Checkpoint functions //------------------------------------
     
-    [Button] private void RespawnFromCheckpoint() {
+    [Button] public void RespawnFromCheckpoint() {
 
-            if (CheckpointManager2D.Instance.activeCheckpoint) {
-                Respawn(CheckpointManager2D.Instance.activeCheckpoint.transform.position);
-            } else { RespawnFromSpawnPoint();}
+        deaths += 1;
+        if (CheckpointManager2D.Instance.activeCheckpoint) {
+            Respawn(CheckpointManager2D.Instance.activeCheckpoint.transform.position);
+        } else { RespawnFromSpawnPoint();}
 
         
     }
     [Button] private void RespawnFromSpawnPoint() {
 
+        deaths = 0;
         Respawn(CheckpointManager2D.Instance.playerSpawnPoint);
     }
     private void Respawn(Vector2 position) {
-
-        // Reset stats/states
-        deaths += 1;
-        transform.position = position;
-        rigidBody.linearVelocity = new Vector2(0, 0);
-        remainingDashes = maxDashes;
-        remainingJumps = maxJumps;
-        wasRunning = false;
-        isDashCooldownRunning = false;
-        TurnInvincible(2f);
-        TurnStunLocked(0.5f);
-        HealToFullHealth();
-
-        // Play effects
-        PlayVfxEffect(spawnVfx, false);
-        SoundManager.Instance?.PlaySoundFX("Player Spawn");
-        if (CameraController2D.Instance?.isShaking == true) { // Stop camera shake
-            CameraController2D.Instance.StopCameraShake();
-        }
         
-
-        // Debug.Log("Respawned");
+        SetPlayerState(PlayerState.Frozen);
+        Teleport(position, false);
+        PlayAnimation("TeleportOut");
+        
     }
     public void Teleport(Vector2 position, bool keepMomentum) {
         
         CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
         transform.position = position;
-        PlayVfxEffect(spawnVfx, false);
-        SoundManager.Instance?.PlaySoundFX("Player Teleport");
 
         if (!keepMomentum) {
             rigidBody.linearVelocity = new Vector2(0, 0);
@@ -854,10 +861,26 @@ public class PlayerController2D : Entity2D
             StopVfxEffect(jumpVfx, true);
             StopVfxEffect(dashVfx, true);
             StopVfxEffect(wallSlideVfx, true);
-            Push(new Vector2(jumpForce, jumpForce));
-            TurnStunLocked(0.2f);
         }
     }
+
+    private void CheckIfDead(string cause = "") {
+
+        if (currentHealth <= 0) { // Dead
+
+            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+            {
+                spriteRenderer.color = Color.clear;
+            }
+            PlayAnimation("Death");
+            SetPlayerState(PlayerState.Frozen);
+            StopVfxEffect(bleedVfx,true);
+            SpawnVfxEffect(deathVfx);
+            SoundManager.Instance?.PlaySoundFX("Player Death");
+            logText = "Death by: " + cause;
+        }
+    }
+    
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
         if (currentHealth > 0 && !isInvincible) {
             
@@ -867,67 +890,20 @@ public class PlayerController2D : Entity2D
             SpawnVfxEffect(hurtVfx);
             SoundManager.Instance.PlaySoundFX("Player Hurt");
             if (currentHealth == 1 && currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
+            logText = "Damaged by: " + cause;
             // CameraController2D.Instance?.ShakeCamera(0.4f,1f);
-            // Debug.Log("Damaged by: " + cause);
         } 
         CheckIfDead(cause);
     }
-    private void Push(Vector2 pushForce) {
-        
-        if (currentHealth > 0 && !isInvincible) {
-            
-            // Reset current velocity before applying push
-            rigidBody.linearVelocity = Vector2.zero;
-            // Apply a consistent impulse force
-            rigidBody.AddForce(pushForce, ForceMode2D.Impulse);
-            // Clamp the resulting velocity to prevent excessive speed
-            float maxPushSpeed = 4f;
-            // Push the player
-            rigidBody.linearVelocity = Vector2.ClampMagnitude(rigidBody.linearVelocity, maxPushSpeed);
+    
 
-            SoundManager.Instance?.PlaySoundFX("Player Pushed");
-
-        }
-    }
-    private void CheckIfDead(string cause = "") {
-
-        if (currentHealth <= 0) {
-
-            SpawnVfxEffect(deathVfx);
-            SoundManager.Instance?.PlaySoundFX("Player Death");
-
-            // Debug.Log("Death by: " + cause);
-
-            RespawnFromCheckpoint();
-        }
-    }
     private void HealToFullHealth() {
         if (currentHealth == maxHealth) return;
-        currentHealth = maxHealth;
-        SpawnVfxEffect(healVfx);
         StopVfxEffect(bleedVfx, true);
+        SpawnVfxEffect(healVfx);
+        currentHealth = maxHealth;
     }
-    private void TurnStunLocked(float stunLockDuration = 0.1f) {
-        
-        StartCoroutine(StuckLock(stunLockDuration));
-    }
-    private void UnStuckLock() {
-
-        isStunLocked = false;
-        stunLockTime = 0f;
-    }
-    private IEnumerator StuckLock(float stunLockDuration) {
-        
-        isStunLocked = true;
-        stunLockTime = stunLockDuration;
-
-        while (isStunLocked && stunLockTime > 0) {
-            stunLockTime -= Time.deltaTime;
-            yield return null;
-        }
-
-        UnStuckLock();
-    }
+    
     private void TurnInvincible(float invincibilityDuration = 0.5f) {
 
         StartCoroutine(Invisible(invincibilityDuration));
@@ -936,13 +912,18 @@ public class PlayerController2D : Entity2D
 
         isInvincible = false;
         isDashing = false;
-        spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        
+        foreach (SpriteRenderer sr in spriteRenderers) {
+            sr.color = defaultColor;
+        }
     }
     private IEnumerator Invisible(float invincibilityDuration) {
         
         isInvincible = true;
-        spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
         invincibilityTime = invincibilityDuration;
+        foreach (SpriteRenderer sr in spriteRenderers) {
+            sr.color = invincibilityColor;
+        }
 
         while (isInvincible && invincibilityTime > 0) {
             invincibilityTime -= Time.deltaTime;
@@ -1001,6 +982,42 @@ public class PlayerController2D : Entity2D
             verticalInput = 0;
         }
     }
+    private void Push(Vector2 pushForce) {
+        
+        if (currentHealth > 0 && !isInvincible) {
+            
+            // Reset current velocity before applying push
+            rigidBody.linearVelocity = Vector2.zero;
+            // Apply a consistent impulse force
+            rigidBody.AddForce(pushForce, ForceMode2D.Impulse);
+            // Clamp the resulting velocity to prevent excessive speed
+            float maxPushSpeed = 4f;
+            // Push the player
+            rigidBody.linearVelocity = Vector2.ClampMagnitude(rigidBody.linearVelocity, maxPushSpeed);
+
+        }
+    }
+    private void TurnStunLocked(float stunLockDuration = 0.1f) {
+        
+        StartCoroutine(StuckLock(stunLockDuration));
+    }
+    private void UnStuckLock() {
+
+        isStunLocked = false;
+        stunLockTime = 0f;
+    }
+    private IEnumerator StuckLock(float stunLockDuration) {
+        
+        isStunLocked = true;
+        stunLockTime = stunLockDuration;
+
+        while (isStunLocked && stunLockTime > 0) {
+            stunLockTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        UnStuckLock();
+    }
     private void CheckFaceDirection() {
 
         if (isWallSliding) return; // Only flip the player based on input if he is not wall sliding
@@ -1049,7 +1066,36 @@ public class PlayerController2D : Entity2D
         }
     }
     private bool CanMove() {
-        return !isStunLocked;
+        return !isStunLocked && currentPlayerState == PlayerState.Controllable;
+        
+    }
+
+    private bool CanPlay() {
+        return currentPlayerState == PlayerState.Controllable && GameManager.Instance.currentGameState == GameStates.GamePlay;
+    }
+    public void SetPlayerState(PlayerState state) {
+        currentPlayerState = state;
+        
+        switch (state) {
+            case PlayerState.Controllable:
+                rigidBody.linearVelocity = Vector2.zero;
+                remainingJumps = maxJumps;
+                remainingDashes = maxDashes;
+                groundObjectLastVelocityX = 0;
+                isDashCooldownRunning = false;
+                fallSpeed = 0;
+                wasRunning = false;
+                HealToFullHealth();
+                SoundManager.Instance?.PlaySoundFX("Player Spawn");
+                PlayVfxEffect(spawnVfx, true);
+                FlipPlayer("Right");
+                
+                break;
+            case PlayerState.Frozen:
+                rigidBody.linearVelocity = Vector2.zero;
+                
+                break;
+        }
     }
     
     #endregion Other functions
@@ -1075,10 +1121,13 @@ public class PlayerController2D : Entity2D
         if (!effect) return;
         Instantiate(effect, transform.position, Quaternion.identity);
     }
-    private bool IsVfxPlaying(ParticleSystem effect) {
-        if (!effect) return false;
-        return  effect.isPlaying;
+    public void PlayAnimation(string animationName) {
+        
+        if (!animator) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName(animationName)) return;
+        animator.SetTrigger(animationName);
     }
+    
     
     #endregion Sfx/Vfx functions
     
@@ -1119,9 +1168,9 @@ public class PlayerController2D : Entity2D
                 debugStringBuilder.AppendFormat("\nCollisions:\n");
                 debugStringBuilder.AppendFormat("Grounded: {0}\n", isGrounded);
                 debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
-                debugStringBuilder.AppendFormat("Touching Wall Wall on Right: {0}\n", isTouchingWallOnRight);
-                debugStringBuilder.AppendFormat("Touching Wall Wall on Left: {0}\n", isTouchingWallOnLeft);
-                if (groundObjectRigidbody) {
+                debugStringBuilder.AppendFormat("Touching Wall on Right: {0}\n", isTouchingWallOnRight);
+                debugStringBuilder.AppendFormat("Touching Wall on Left: {0}\n", isTouchingWallOnLeft);
+                if (groundObjectRigidbody && groundObjectMomentum != 0) {
                     debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX, groundObjectMomentum);
                 }
 
@@ -1131,6 +1180,8 @@ public class PlayerController2D : Entity2D
                 debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", Input.GetButtonDown("Jump"), variableJumpHeldDuration, variableJumpMaxHoldDuration);
                 debugStringBuilder.AppendFormat("Dash: {0}\n", Input.GetButtonDown("Dash"));
                 debugStringBuilder.AppendFormat("Drop Down: {0}\n", dropDownInput);
+                
+                debugStringBuilder.AppendFormat("\n{0}\n", logText);
 
                 textObject.text = debugStringBuilder.ToString();
             }

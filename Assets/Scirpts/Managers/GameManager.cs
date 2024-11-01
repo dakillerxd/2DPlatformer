@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("Game Settings")]
-    public GameStates currentGameState = GameStates.None;
+    public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
 
     [Header("Debug")]

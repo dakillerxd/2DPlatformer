@@ -4,8 +4,8 @@ using VInspector;
 using System.Collections.Generic;
 using System.Linq;
 
-public class WaypointMovement2D : MonoBehaviour
-{
+public class WaypointMovement2D : MonoBehaviour {
+    
     [Header("Settings")]
     [SerializeField] private float maxSpeed = 5f;
     [SerializeField, Range(0, 100)] private float accelerationPercent = 100f;
@@ -41,9 +41,9 @@ public class WaypointMovement2D : MonoBehaviour
         waypoint.name = "Waypoint " + (waypoints.Count);
         RenameWaypoints();
     
-        // #if UNITY_EDITOR
-        // UnityEditor.Selection.activeGameObject = waypoint;
-        // #endif
+        #if UNITY_EDITOR
+        UnityEditor.Selection.activeGameObject = waypoint;
+        #endif
     }
 
     [Button] private void RemoveAllWaypoints() {

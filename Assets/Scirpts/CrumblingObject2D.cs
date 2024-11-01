@@ -11,7 +11,7 @@ public class CrumblingObject2D : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float timeUntilBroken = 3f;
     [SerializeField] private float breakDuration = 3f;
-    [SerializeField] private Color brokenColor;
+    [SerializeField] [Range(0f, 1f)] private float brokenAlpha;
 
     [Header("State")]
     private bool isBroken = false;
@@ -19,13 +19,11 @@ public class CrumblingObject2D : MonoBehaviour
     [Header("References")]
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D coll;
-    private Color startingColor;
 
     private void Start()
     {
         if (!coll) { coll = GetComponent<Collider2D>(); }
         if (!spriteRenderer) { spriteRenderer = GetComponent<SpriteRenderer>(); }
-        startingColor = spriteRenderer.color;
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
@@ -57,14 +55,14 @@ public class CrumblingObject2D : MonoBehaviour
     private void Break() {
         isBroken = true;
         coll.enabled = false;
-        spriteRenderer.color = brokenColor;
+        spriteRenderer.color = new Color(1f, 1f, 1f, brokenAlpha);;
         StartCoroutine(CountDownToUnBreak());
     }
 
     private void UnBreak() {
         isBroken = false;
         coll.enabled = true;
-        spriteRenderer.color = startingColor;
+        spriteRenderer.color = new Color(1f, 1f, 1f, 1f);;
     }
 
 }

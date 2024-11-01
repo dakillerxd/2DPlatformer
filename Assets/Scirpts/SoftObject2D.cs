@@ -9,6 +9,7 @@ using System.Collections;
 [RequireComponent(typeof(Collider2D))]
 public class SoftObject2D : MonoBehaviour {
 
+    [SerializeField] private float dropDownCooldown = 0.3f;
     private SpriteRenderer  spriteRenderer;
     private PlatformEffector2D effector;
     private Collider2D collider2d;
@@ -25,7 +26,7 @@ public class SoftObject2D : MonoBehaviour {
     private IEnumerator DropDownCooldown( ) {
 
         collider2d.enabled = false;
-        float time = 0.3f;
+        float time = dropDownCooldown;
         
         while (time > 0) {
             time -= Time.deltaTime;

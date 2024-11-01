@@ -58,13 +58,16 @@ public class PlayerController2D : Entity2D
     [SerializeField] public float maxFallSpeed = 20f;
     [HideInInspector] public bool isFastFalling;
     [HideInInspector] public bool atMaxFallSpeed;
+    [HideInInspector] public float fallSpeed;
     
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
-    [HideInInspector] public bool isGrounded;
-    [HideInInspector] public bool isOnPlatform;
+    private bool isTouchingGround;
+    private bool isTouchingPlatform;
     private bool isTouchingWall;
+    public bool isGrounded { get; private set; }
+    public bool isOnPlatform { get; private set; }
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
@@ -147,7 +150,6 @@ public class PlayerController2D : Entity2D
     [SerializeField] private ParticleSystem bleedVfx;
     [SerializeField] private ParticleSystem wallSlideVfx;
     [SerializeField] private ParticleSystem healVfx;
-    
     [EndTab]
 
     // ----------------------------------------------------------------------
@@ -218,9 +220,10 @@ public class PlayerController2D : Entity2D
     }
 
 
-    //------------------------------------
     
-    #region Movement function
+    
+    #region Movement function //------------------------------------
+    
     private void HandleMovement() {
         
         // Get the ground object momentum
@@ -295,24 +298,22 @@ public class PlayerController2D : Entity2D
         groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectMomentumDecayRate);
         return groundObjectLastVelocityX;
     }
-
     private void HandleDropDown() { 
         
         if (!isOnPlatform || !softObject) return;
 
         if (dropDownInput) {
+            rigidBody.linearVelocityY = jumpForce/3;
             softObject.StartDropDownCooldown();
             softObject = null;
         }
     }
     
-
-    
     #endregion Movement function
     
-    //------------------------------------
     
-    #region Abilitis functions
+    
+    #region Abilitis functions //------------------------------------
 
     private void HandleRunning() {
         if (!runAbility) return;
@@ -351,7 +352,6 @@ public class PlayerController2D : Entity2D
             rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
         }
     }
-
     private void HandleDashing() {
 
 
@@ -376,8 +376,6 @@ public class PlayerController2D : Entity2D
             StartCoroutine(DashCooldown());
         }
     }
-
-
     private IEnumerator DashCooldown() {
 
         if (isDashCooldownRunning) { yield break;} // Exit if already running
@@ -397,7 +395,6 @@ public class PlayerController2D : Entity2D
 
         isDashCooldownRunning = false;
     }
-
     private void HandleStepClimbing() {
         
         if (!autoClimbStepsAbility) return; // Only check if you can climb steps
@@ -421,7 +418,6 @@ public class PlayerController2D : Entity2D
             } 
         }
     }
-    
     private void HandleWallSlide() {
 
         // Check if wall sliding
@@ -472,9 +468,10 @@ public class PlayerController2D : Entity2D
 
     #endregion Abilitis functions
     
-    //------------------------------------
     
-    #region Jump functions
+    
+    #region Jump functions //------------------------------------
+    
     private void HandleJump() {
         
         if (jumpInputUp && !isJumpCut) { 
@@ -528,8 +525,6 @@ public class PlayerController2D : Entity2D
             isJumpCut = false;
         }
     }
-
-
     private void ExecuteJump(int jumpCost, string side) {
 
         // Play effects
@@ -555,7 +550,6 @@ public class PlayerController2D : Entity2D
         coyoteJumpTime = 0;
         canCoyoteJump = false;
     }
-
     private void HandleWallJump () {
 
         if (!wallJumpAbility) return;
@@ -579,7 +573,6 @@ public class PlayerController2D : Entity2D
             variableJumpHeldDuration = 0;
         }
     }
-
     private void ExecuteWallJump(string side) {
         
         // Effects
@@ -599,7 +592,6 @@ public class PlayerController2D : Entity2D
         isJumping = true;
         TurnStunLocked();
     }
-
     private void CoyoteTimeCheck() {
 
         // Reset coyote jump
@@ -617,63 +609,27 @@ public class PlayerController2D : Entity2D
             }
         }
     }
-
-
-
+    
     #endregion Jump functions
 
-    //------------------------------------
     
-    #region Gravity function
+    
+    #region Gravity function //------------------------------------
 
-  // private void HandleGravity() {
-  //     
-  //     
-  //     // Calculate forces
-  //     float gravityMultiplier = rigidBody.linearVelocity.y > 0 ? 1f : fallMultiplier;
-  //     float appliedGravity = gravityForce * gravityMultiplier;
-  //     float maxVelocityY = maxFallSpeed;
-  //     float newVelocityY = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime);
-  //
-  //     // Set max fall speed depending on state
-  //     if (isGrounded) {  maxVelocityY = 0; } 
-  //     else if (!isGrounded && !isWallSliding) { maxVelocityY = maxFallSpeed; }
-  //     
-  //     // Speed checks
-  //     isFastFalling = rigidBody.linearVelocityY <= -7;
-  //     atMaxFallSpeed = rigidBody.linearVelocityY <= -maxFallSpeed;
-  //     
-  //     // Check for landing
-  //     if (isGrounded && rigidBody.linearVelocityY < 0) {  // Check if moving downward
-  //
-  //         rigidBody.linearVelocityY = 0;
-  //         Debug.Log("Landed");
-  //         if (isFastFalling) { 
-  //             
-  //             rigidBody.linearVelocityY = jumpForce/2;
-  //             if (atMaxFallSpeed && canTakeFallDamage) {
-  //                 DamageHealth(maxFallDamage, false, "Ground");
-  //             }
-  //             isFastFalling = false;
-  //             atMaxFallSpeed = false;
-  //         }
-  //     }
-  //     
-  //     // Apply gravity
-  //     // rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocityY, maxVelocityY,  appliedGravity * Time.fixedDeltaTime);
-  //     
-  //     rigidBody.linearVelocityY = Mathf.Clamp(newVelocityY, -maxVelocityY, maxVelocityY);
-  //     
-  // }
-
-      private void HandleGravity() {
-        if (!isGrounded && !isWallSliding) {
-            HandleAirGravity();
-        } else {
-            HandleGroundedGravity();
-        }
+    private void HandleGravity() {
+        
+          if (!isTouchingGround && !isWallSliding)
+          {
+              // In air
+              HandleAirGravity();
+              CheckFallSpeed();
+          }
+          else
+          {
+              // On ground
+              HandleGroundedGravity();
+          }
     }
-
     private void HandleAirGravity() {
 
         float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
@@ -681,10 +637,12 @@ public class PlayerController2D : Entity2D
         
         rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, appliedGravity * Time.fixedDeltaTime);
         
-        CheckFallSpeed();
+        //float newVelocityY = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime); 
+        //rigidBody.linearVelocityY = newVelocityY; 
     }
-
     private void CheckFallSpeed() {
+
+        fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
         
         isFastFalling = rigidBody.linearVelocityY < -(maxFallSpeed/2); // Check if fast falling
         
@@ -693,52 +651,79 @@ public class PlayerController2D : Entity2D
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }
     }
-
     private void HandleGroundedGravity() {
         
-        if (isFastFalling) {
+        if (isFastFalling) { // Check if landed
             
-            rigidBody.linearVelocityY = jumpForce/2;
+            rigidBody.linearVelocityY = -1 * (fallSpeed/3); // Bop the player
             
-            if (atMaxFallSpeed && canTakeFallDamage) {
+            if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
                 DamageHealth(maxFallDamage, false, "Ground");
             }
+            
             atMaxFallSpeed = false;
             isFastFalling = false;
         }
-        // const float groundGravityForce = 0.1f;
-        // rigidBody.linearVelocity += groundGravityForce * Time.fixedDeltaTime * Vector2.down;
+        
+        // if (isOnPlatform) { // Apply content gravity when on a platform
+        //     const float groundGravityForce = 0.1f;
+        //     rigidBody.linearVelocityY += groundGravityForce * Time.fixedDeltaTime;
+        // }
+ 
     }
-  
-    #endregion Gravity functions
     
-    //------------------------------------
+    #endregion Gravity functions 
     
-    #region Collision functions
+    
+    
+    #region Collision functions //------------------------------------
 
     private void CollisionChecks() {
 
+        // Check if touching
+        LayerMask combinedGroundMask = groundLayer | platformLayer;
+        isTouchingGround = collFeet.IsTouchingLayers(combinedGroundMask);
+        isTouchingPlatform = collFeet.IsTouchingLayers(platformLayer);
+        isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
         
-        LayerMask combinedMask = groundLayer | platformLayer;
         
-        // Check if on grounded
-        isGrounded = collFeet.IsTouchingLayers(combinedMask);
-
+        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.02f, 0);
+        Vector2 checkCenter = collFeet.bounds.center + new Vector3(0,0);
+        // Debug visualization
+        Vector2 halfSize = checkSize * 0.5f;
+        Vector2 topLeft = checkCenter + new Vector2(-halfSize.x, halfSize.y);
+        Vector2 topRight = checkCenter + new Vector2(halfSize.x, halfSize.y);
+        Vector2 bottomLeft = checkCenter + new Vector2(-halfSize.x, -halfSize.y);
+        Vector2 bottomRight = checkCenter + new Vector2(halfSize.x, -halfSize.y);
+        Color color = Color.red;
+        Debug.DrawLine(topLeft, topRight, color);
+        Debug.DrawLine(topRight, bottomRight, color);
+        Debug.DrawLine(bottomRight, bottomLeft, color);
+        Debug.DrawLine(bottomLeft, topLeft, color);
+        
+        
+        // Check if on ground
+        if (isTouchingGround) {
+            bool isOverlapping = Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
+            isGrounded = isOverlapping;
+        }
+        
         // Check if on platform
-        isOnPlatform = collFeet.IsTouchingLayers(platformLayer);
-        
+        if (isTouchingPlatform) {
+            bool isOverlapping = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
+            isOnPlatform = isOverlapping;
+        }
         
         // Check if touching a wall
-        isTouchingWall = collBody.IsTouchingLayers(combinedMask);
         if (isTouchingWall) {
 
             // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedMask );
+            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask );
             Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
             isTouchingWallOnRight = hitRight;
 
             // Check collision with walls on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedMask);
+            RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
             Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
             isTouchingWallOnLeft = hitLeft;
         }
@@ -815,11 +800,10 @@ public class PlayerController2D : Entity2D
     
     #endregion Collision functions
     
-    //------------------------------------
     
-    #region Health/Checkpoint functions
     
-
+    #region Health/Checkpoint functions //------------------------------------
+    
     [Button] private void RespawnFromCheckpoint() {
 
             if (CheckpointManager2D.Instance.activeCheckpoint) {
@@ -828,14 +812,10 @@ public class PlayerController2D : Entity2D
 
         
     }
-
     [Button] private void RespawnFromSpawnPoint() {
 
         Respawn(CheckpointManager2D.Instance.playerSpawnPoint);
     }
-    
-    
-    
     private void Respawn(Vector2 position) {
 
         // Reset stats/states
@@ -860,8 +840,6 @@ public class PlayerController2D : Entity2D
 
         // Debug.Log("Respawned");
     }
-
-
     public void Teleport(Vector2 position, bool keepMomentum) {
         
         CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
@@ -880,7 +858,6 @@ public class PlayerController2D : Entity2D
             TurnStunLocked(0.2f);
         }
     }
-
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
         if (currentHealth > 0 && !isInvincible) {
             
@@ -895,7 +872,6 @@ public class PlayerController2D : Entity2D
         } 
         CheckIfDead(cause);
     }
-
     private void Push(Vector2 pushForce) {
         
         if (currentHealth > 0 && !isInvincible) {
@@ -913,7 +889,6 @@ public class PlayerController2D : Entity2D
 
         }
     }
-
     private void CheckIfDead(string cause = "") {
 
         if (currentHealth <= 0) {
@@ -926,7 +901,6 @@ public class PlayerController2D : Entity2D
             RespawnFromCheckpoint();
         }
     }
-
     private void HealToFullHealth() {
         if (currentHealth == maxHealth) return;
         currentHealth = maxHealth;
@@ -937,13 +911,11 @@ public class PlayerController2D : Entity2D
         
         StartCoroutine(StuckLock(stunLockDuration));
     }
-
     private void UnStuckLock() {
 
         isStunLocked = false;
         stunLockTime = 0f;
     }
-
     private IEnumerator StuckLock(float stunLockDuration) {
         
         isStunLocked = true;
@@ -956,21 +928,16 @@ public class PlayerController2D : Entity2D
 
         UnStuckLock();
     }
-
-
-
     private void TurnInvincible(float invincibilityDuration = 0.5f) {
 
         StartCoroutine(Invisible(invincibilityDuration));
     }
-    
     private void TurnVulnerable() {
 
         isInvincible = false;
         isDashing = false;
         spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
     }
-
     private IEnumerator Invisible(float invincibilityDuration) {
         
         isInvincible = true;
@@ -987,9 +954,9 @@ public class PlayerController2D : Entity2D
 
     #endregion Health/Checkpoint functions
 
-    //------------------------------------
+    
 
-    #region Other functions
+    #region Other functions //------------------------------------
 
     private void CheckForInput() {
 
@@ -1034,9 +1001,6 @@ public class PlayerController2D : Entity2D
             verticalInput = 0;
         }
     }
-
-
-
     private void CheckFaceDirection() {
 
         if (isWallSliding) return; // Only flip the player based on input if he is not wall sliding
@@ -1047,7 +1011,6 @@ public class PlayerController2D : Entity2D
             FlipPlayer("Left");
         }
     }
-    
     private void FlipPlayer(string side) {
     
         if (isFacingRight && side == "Right" || !isFacingRight && side == "Left") return; // Only flip the player if he is not already facing the wanted direction
@@ -1065,8 +1028,6 @@ public class PlayerController2D : Entity2D
             transform.Rotate(0f, 180f, 0f);
         }
     }
-
-
     private void CountTimers() {
 
         // Jump buffer timer
@@ -1087,22 +1048,21 @@ public class PlayerController2D : Entity2D
             dashBufferTimer += Time.deltaTime;
         }
     }
-    
     private bool CanMove() {
         return !isStunLocked;
     }
     
     #endregion Other functions
     
-    //------------------------------------
     
-    #region Vfx functions
+    
+    #region Vfx functions //------------------------------------
+    
     private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
         
         if (!effect) return;
         if (forcePlay) {effect.Play();} else { if (!effect.isPlaying) { effect.Play(); } }
     }
-
     private void StopVfxEffect(ParticleSystem effect, bool clear) {
         if (!effect) return;
         
@@ -1111,12 +1071,10 @@ public class PlayerController2D : Entity2D
             effect.Stop(); 
         }
     }
-
     private void SpawnVfxEffect(ParticleSystem effect) {
         if (!effect) return;
         Instantiate(effect, transform.position, Quaternion.identity);
     }
-
     private bool IsVfxPlaying(ParticleSystem effect) {
         if (!effect) return false;
         return  effect.isPlaying;
@@ -1124,9 +1082,9 @@ public class PlayerController2D : Entity2D
     
     #endregion Sfx/Vfx functions
     
-    //------------------------------------
     
-    #region Debugging functions
+    
+    #region Debugging functions //------------------------------------
 
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject, bool showDebugText) {
@@ -1142,8 +1100,8 @@ public class PlayerController2D : Entity2D
                 debugStringBuilder.AppendFormat("Deaths: {0}\n\n", deaths);
                 debugStringBuilder.AppendFormat("Jumps: {0} / {1}\n", remainingJumps, maxJumps);
                 debugStringBuilder.AppendFormat("Dashes: {0} / {1} ({2:0.0} / {3:0.0})\n", remainingDashes, maxDashes, dashCooldownTimer, dashCooldownDuration);
-                debugStringBuilder.AppendFormat("Velocity: {0:0.0}\n", rigidBody.linearVelocity);
-                debugStringBuilder.AppendFormat("Move Speed: ({0:0.0},{1:0.0})\n", moveSpeed, groundObjectMomentum);
+                debugStringBuilder.AppendFormat("Velocity: ({0:0.0},{1:0.0})\n", rigidBody.linearVelocityX, rigidBody.linearVelocityY);
+                debugStringBuilder.AppendFormat("Move Speed: ({0:0.0},{1:0.0})\n", moveSpeed, fallSpeed);
 
                 debugStringBuilder.AppendFormat("\nStates:\n");
                 debugStringBuilder.AppendFormat("Facing Right: {0}\n", isFacingRight);
@@ -1161,11 +1119,10 @@ public class PlayerController2D : Entity2D
                 debugStringBuilder.AppendFormat("\nCollisions:\n");
                 debugStringBuilder.AppendFormat("Grounded: {0}\n", isGrounded);
                 debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
-                debugStringBuilder.AppendFormat("Touching Wall: {0}\n", isTouchingWall);
-                debugStringBuilder.AppendFormat("Wall on Right: {0}\n", isTouchingWallOnRight);
-                debugStringBuilder.AppendFormat("Wall on Left: {0}\n", isTouchingWallOnLeft);
+                debugStringBuilder.AppendFormat("Touching Wall Wall on Right: {0}\n", isTouchingWallOnRight);
+                debugStringBuilder.AppendFormat("Touching Wall Wall on Left: {0}\n", isTouchingWallOnLeft);
                 if (groundObjectRigidbody) {
-                    debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX);
+                    debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX, groundObjectMomentum);
                 }
 
                 debugStringBuilder.AppendFormat("\nInputs:\n");

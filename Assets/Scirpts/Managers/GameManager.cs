@@ -34,9 +34,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Min(0)] private int vSync = 0;
     [SerializeField] private bool showFps;
     [SerializeField] private bool showDebugInfo;
-    private TextMeshProUGUI fpsText;
-    private TextMeshProUGUI playerDebugText;
-    private TextMeshProUGUI cameraDebugText;
+    [SerializeField] private TextMeshProUGUI fpsText;
+    [SerializeField] private TextMeshProUGUI playerDebugText;
+    [SerializeField] private TextMeshProUGUI cameraDebugText;
     private Camera cam;
 
     
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         fpsText = GameObject.Find("FpsText").GetComponent<TextMeshProUGUI>();
         playerDebugText = GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
         cameraDebugText = GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>();
-        cam = Camera.main;
+        cam = CameraController2D.Instance.GetComponent<Camera>();
     }
     
     
@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
         showDebugInfo = !showDebugInfo;
         if (!playerDebugText) { GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>(); }
         if (!cameraDebugText) { GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>(); }
-        if (!cam) { cam = Camera.main;}
+        if (!cam) { cam = CameraController2D.Instance.GetComponent<Camera>();}
     }
 
     private void UpdateDebugTextInfo()

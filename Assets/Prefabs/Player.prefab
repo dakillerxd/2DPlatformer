@@ -280,7 +280,6 @@ MonoBehaviour:
   groundFriction: 0.15
   airFriction: 0.03
   movementThreshold: 0.1
-  objectVelocityDecayRate: 0.5
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.5
@@ -292,22 +291,20 @@ MonoBehaviour:
   maxFallSpeed: 20
   isFastFalling: 0
   atMaxFallSpeed: 0
+  fallSpeed: 0
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   platformLayer:
     serializedVersion: 2
     m_Bits: 128
-  isGrounded: 0
-  isOnPlatform: 0
   wallCheckDistance: 0.02
-  showDebugText: 0
-  showFpsText: 1
+  objectMomentumDecayRate: 0.5
   runAbility: 1
   runSpeed: 5
   airRunSpeed: 6
   runningThreshold: 3
-  autoClimbStepsAbility: 1
+  autoClimbStepsAbility: 0
   stepHeight: 0.12
   stepWidth: 0.1
   stepCheckDistance: 0.05
@@ -339,7 +336,7 @@ MonoBehaviour:
   jumpVfx: {fileID: 0}
   airJumpVfx: {fileID: 5789889679916270293}
   peakMoveSpeedVfx: {fileID: 4562808088674882018}
-  groundRunVfx: {fileID: 1539653092228042522}
+  groundRunVfx: {fileID: 0}
   deathVfx: {fileID: 5936299839186477038, guid: 7d4c0534cb4d9dc4982b85547abfe92b, type: 3}
   spawnVfx: {fileID: 0}
   dashVfx: {fileID: 6133111000707265534}
@@ -756,11 +753,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
---- !u!198 &1539653092228042522 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 2874383928776749439, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
-  m_PrefabInstance: {fileID: 3656411213430128229}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7567345570664528681 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}

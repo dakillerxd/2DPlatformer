@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7239564406554024694, guid: e86e1cbf76f1dbd47974558b8e9e85f6, type: 3}
       propertyPath: maxYLevelBoundary
-      value: 10
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 7239564406554024694, guid: e86e1cbf76f1dbd47974558b8e9e85f6, type: 3}
       propertyPath: minXLevelBoundary

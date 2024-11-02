@@ -2,78 +2,74 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
+using VInspector;
+using Image = UnityEngine.UIElements.Image;
+
 
 public class UIManager : MonoBehaviour
 {   
     public static UIManager Instance { get; private set; }
 
-    [Header("UI Screens")]
-    [SerializeField] private  GameObject gameplayUI;
+    
+    [Tab("UI Settings")] // ----------------------------------------------------------------------
+    [Header("Screens")]
+    [SerializeField] private  GameObject gamePlayUI;
     [SerializeField] private  GameObject pauseScreenUI;
-    [SerializeField] private  GameObject gameoverUI;
-
-    [Header("Gameplay UI")]
+    [SerializeField] private  GameObject gameOverUI;
+    
+    [Header("Debug")]
+    public TextMeshProUGUI playerDebugText;
+    public TextMeshProUGUI cameraDebugText;
+    public TextMeshProUGUI fpsText;
+    
+    [Tab("UI Gameplay")] // ----------------------------------------------------------------------
+    [Header("Time")]
     [SerializeField] private TMP_Text[] timerTexts;
-    [SerializeField] private  Animation clockAnimation;
     [SerializeField] private  Color timerWarningColor = Color.red;
     private Color timerOriginalColor;
+    
+    [Header("Score")]
     [SerializeField] private  TMP_Text[] scoreTexts;
-    [SerializeField] private  Animation scoreAnimation;
-    [SerializeField] private  TMP_Text[] ammoTexts;
-    [SerializeField] private  Animation ammoAnimation;
 
-    [Header("Pause Screen")]
+    [Header("Abilities")] 
+    [SerializeField] private  Color abilityUnlocked = Color.white;
+    [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
+    [SerializeField] private RawImage run;
+    [SerializeField] private RawImage wallSlide;
+    [SerializeField] private RawImage wallJump;
+    [SerializeField] private RawImage dash;
+
+    [Tab("UI Pause")] // ----------------------------------------------------------------------
     [SerializeField] private GameObject panelMain;
     [SerializeField] private GameObject panelOptions;
     [SerializeField] private  TMP_Text pauseTimeText;
     [SerializeField] private  TMP_Text pauseScoreText;
     [SerializeField] private  TMP_Text pauseAmmoText;
-
-
-    [Header("Game Over Screen")]
+    
+    [Tab("UI Game Over")] // ----------------------------------------------------------------------
     [SerializeField] private  TMP_Text gameOverTimeText;
     [SerializeField] private  TMP_Text gameOverScoreText;
     [SerializeField] private  TMP_Text gameOverTitleText;
     [SerializeField] private  TMP_Text gameOverMessageText;
-    [SerializeField] private List<string> loseMessages = new List<string>
-    {
-        "You didn't teach enough students. Try again!",
-        "The bell rang before you could finish. Better luck next time!",
-        "Looks like you need to brush up on your teaching skills.",
-        "Not quite there yet. Give it another shot!"
-    };
-    [SerializeField] private List<string> winMessages = new List<string>
-    {
-        "You taught enough students. Well done!",
-        "Great job! Your students learned a lot today.",
-        "You're a natural teacher. Keep up the good work!",
-        "Success! Your classroom management skills are impressive."
-    };
-    [SerializeField] private List<string> perfectWinMessages = new List<string>
-    {
-        "You taught all the students! Outstanding job!",
-        "Perfect score! You're the teacher of the year!",
-        "Incredible! Every student is now a little genius thanks to you.",
-        "Flawless victory! Your teaching skills are unmatched!"
-    };
-    
+    [SerializeField] private List<string> loseMessages = new List<string> { "1!", "2", };
+    [SerializeField] private List<string> winMessages;
+    [SerializeField] private List<string> perfectWinMessages;
+
     
 
+    private void Awake() {
+        if (Instance != null && Instance != this) {
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
             Destroy(gameObject);
+
+        } else {
+
+            Instance = this;
         }
     }
 
-    void Start() 
-    {
+    private void Start() {
         if (timerTexts.Length > 0)
         {
             foreach (var timerText in timerTexts)
@@ -81,23 +77,35 @@ public class UIManager : MonoBehaviour
                 timerOriginalColor = timerText.color;
             }
         }
+    }
 
+    public void UpdateDebugText() {
+        
+        if (playerDebugText)
+        {
+            PlayerController2D.Instance.UpdateDebugText(playerDebugText);
+        }
+
+        if (cameraDebugText)
+        {
+            CameraController2D.Instance.UpdateDebugText(cameraDebugText);
+        }
     }
 
 
-    public void UpdateUI() 
-    {
-        gameplayUI.SetActive(false);
+    public void UpdateUI() {
+        
+        gamePlayUI.SetActive(false);
         pauseScreenUI.SetActive(false);
-        gameoverUI.SetActive(false);
+        gameOverUI.SetActive(false);
 
         switch (GameManager.Instance.currentGameState)
         {
             case GameStates.GamePlay:
-                gameplayUI.SetActive(true);
+                gamePlayUI.SetActive(true);
+                UpdateAbilitiesUI();
                 UpdateScoreUI();
                 UpdateTimeUI();
-                UpdateAmmoUI();
                 break;
             case GameStates.Paused:
                 pauseScreenUI.SetActive(true);
@@ -105,7 +113,7 @@ public class UIManager : MonoBehaviour
                 UpdatePauseScreenInfo();
                 break;
             case GameStates.GameOver:
-                gameoverUI.SetActive(true);
+                gameOverUI.SetActive(true);
                 UpdateGameOverInfo();
                 break;
         }
@@ -117,6 +125,15 @@ public class UIManager : MonoBehaviour
 
 #region  Gameplay UI
 
+    public void UpdateAbilitiesUI() {
+        // Set abilities color
+        run.color = PlayerController2D.Instance.runAbility ? abilityUnlocked : abilityLocked;
+        wallSlide.color = PlayerController2D.Instance.wallSlideAbility ? abilityUnlocked : abilityLocked;
+        wallJump.color = PlayerController2D.Instance.wallJumpAbility ? abilityUnlocked : abilityLocked;
+        dash.color = PlayerController2D.Instance.dashAbility ? abilityUnlocked : abilityLocked;
+    }
+    
+    
     public void UpdateScoreUI()
     {
         if (scoreTexts.Length > 0)
@@ -126,11 +143,8 @@ public class UIManager : MonoBehaviour
                 studentsText.text = ScoreManager.Instance.currentScore.ToString();
             }
         }
-
-        PlayScoreUpdateAnimation();
     }
-
-
+    
     public void UpdateTimeUI() 
     {
         if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy)
@@ -161,57 +175,10 @@ public class UIManager : MonoBehaviour
         }
 
     }
-
-    public void UpdateAmmoUI()
-    {
-        if (ammoTexts.Length > 0)
-        {
-            if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy) {
-
-                foreach (var weaponAmmoText in ammoTexts)
-                {
-                    weaponAmmoText.text = "∞";
-                    weaponAmmoText.color = Color.yellow;
-                }
-
-            }
-            else {
-
-                foreach (var weaponAmmoText in ammoTexts)
-                {
-                    // weaponAmmoText.text = WeaponHandController.Instance.CurrentAmmo.ToString();
-                    weaponAmmoText.color = timerOriginalColor;
-                }
-
-            }
-        }
-    }
-
-
-
-    public void PlayTimerAnimation(string name) {
-        clockAnimation?.Play(name);
-    }
-
-    public void PlayAmmoAnimation(string name) {
-        ammoAnimation?.Play(name);
-    }
-
-
-    public void PlayScoreUpdateAnimation() {
-        scoreAnimation?.Play();
-    }
-
-
-
-
+    
+    
 
 #endregion
-
-
-
-
-
 
 #region Pause Screen
     private void UpdatePauseScreenInfo()
@@ -278,8 +245,6 @@ public class UIManager : MonoBehaviour
 
 
 #endregion
-
-
 
 #region GameOver UI
 

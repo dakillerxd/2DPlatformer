@@ -52,7 +52,4 @@ MonoBehaviour:
   targetFPS: 120
   vSync: 0
   showFps: 1
-  showDebugInfo: 1
-  fpsText: {fileID: 0}
-  playerDebugText: {fileID: 0}
-  cameraDebugText: {fileID: 0}
+  showDebugInfo: 0

@@ -13,20 +13,17 @@ public enum PlayerState {
     Frozen,
 }
 
-public class PlayerController2D : Entity2D
-{
+public class PlayerController2D : Entity2D {
+    
     public static PlayerController2D Instance { get; private set; }
 
-    [Tab("Player Settings")]
+    [Tab("Player Settings")] // ----------------------------------------------------------------------
     public PlayerState currentPlayerState = PlayerState.Controllable;
     private string logText;
     [Header("Health")]
     [SerializeField] private int maxHealth = 2;
     [SerializeField] private bool canTakeFallDamage;
-        [ShowIf("canTakeFallDamage")]
-        [SerializeField] private int maxFallDamage = 1;
-        [EndIf]
-
+    [ShowIf("canTakeFallDamage")][SerializeField] private int maxFallDamage = 1;[EndIf]
     private int currentHealth;
     private int deaths;
     private bool isInvincible;
@@ -71,6 +68,8 @@ public class PlayerController2D : Entity2D
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
+    [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
+    [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     private bool isTouchingGround;
     private bool isTouchingPlatform;
     private bool isTouchingWall;
@@ -78,20 +77,17 @@ public class PlayerController2D : Entity2D
     private bool isOnPlatform;
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
-    [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
     private bool onGroundObject;
     private Rigidbody2D groundObjectRigidbody;
     private SoftObject2D softObject;
     private float groundObjectLastVelocityX;
     private float groundObjectMomentum;
-    [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     [EndTab]
+    
 
-    // ----------------------------------------------------------------------
-
-    [Tab("Player Abilities")]
+    [Tab("Player Abilities")] // ----------------------------------------------------------------------
     [Header("Running")]
-    [SerializeField] private bool runAbility = true;
+    [SerializeField] public bool runAbility = true;
     [SerializeField] private float runSpeed = 5f;
     [SerializeField] private float airRunSpeed = 6f;
     [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
@@ -99,27 +95,27 @@ public class PlayerController2D : Entity2D
     private bool isRunning;
 
     [Header("Climb Steps")]
-    [SerializeField] private bool autoClimbStepsAbility = true;
+    [SerializeField] public bool autoClimbStepsAbility = true;
     [SerializeField] [Range(0, 1f)] private float stepHeight = 0.12f;
     [SerializeField] [Range(0, 1f)] private float stepWidth = 0.1f;
     [SerializeField] [Range(0, 1f)] private float stepCheckDistance = 0.05f;
     [SerializeField] private LayerMask stepLayer;
     
     [Header("Wall Slide")]
-    [SerializeField] private bool wallSlideAbility = true;
+    [SerializeField] public bool wallSlideAbility = true;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float maxWallSlideSpeed = 3f;
     [SerializeField] [Range(0, 1f)] private float wallSlideStickStrength = 0.3f;
     [HideInInspector] public bool isWallSliding;
 
     [Header("Wall Jump")]
-    [SerializeField] private bool wallJumpAbility = true;
+    [SerializeField] public bool wallJumpAbility = true; 
     [SerializeField] private bool wallJumpResetsJumps = false;
     [SerializeField] private float wallJumpVerticalForce = 5f;
     [SerializeField] private float wallJumpHorizontalForce = 4f;
 
     [Header("Dash")]
-    [SerializeField] private bool dashAbility = true;
+    [SerializeField] public bool dashAbility = true;
     [SerializeField] private float dashForce = 10f;
     [SerializeField] private float dashPushForce = 10f;
     [SerializeField] private int maxDashes = 1;
@@ -132,14 +128,12 @@ public class PlayerController2D : Entity2D
     private bool isDashCooldownRunning;
 
     [Header("Fast Drop")]
-    [SerializeField] private bool fastDropAbility = true;
+    [SerializeField] public bool fastDropAbility = true;
     [SerializeField] [Range(0, 1f)] private float fastFallAcceleration = 0.2f;
     private bool isFastDropping;
-    [EndTab]
     
-    // ----------------------------------------------------------------------
 
-    [Tab("References")]
+    [Tab("References")] // ----------------------------------------------------------------------
     [Header("Components")]
     [SerializeField] public Rigidbody2D rigidBody;
     [SerializeField] public Collider2D collBody;
@@ -164,11 +158,10 @@ public class PlayerController2D : Entity2D
     [SerializeField] private Color hurtColor = Color.red;
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
     private  Color defaultColor = Color.white;
-    [EndTab]
 
-    // ----------------------------------------------------------------------
+    
 
-    [Header("Input")]
+    [Header("Input")] // ----------------------------------------------------------------------
     [HideInInspector] public float horizontalInput;
     [HideInInspector] public float verticalInput;
     private bool jumpInputDownRequested;
@@ -177,10 +170,7 @@ public class PlayerController2D : Entity2D
     private bool dashRequested;
     private bool runInput;
     private bool dropDownInput;
-
-
-
-
+    
     
     private void Awake() {
 
@@ -197,6 +187,7 @@ public class PlayerController2D : Entity2D
     private void Start() {
         
         CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
+        UIManager.Instance.UpdateAbilitiesUI();
         RespawnFromSpawnPoint();
     }
     
@@ -225,8 +216,6 @@ public class PlayerController2D : Entity2D
         HandleStepClimbing();
         HandleFastDrop();
     }
-
-
     
     
     #region Movement function //------------------------------------
@@ -1102,7 +1091,7 @@ public class PlayerController2D : Entity2D
     
     
     
-    #region Vfx functions //------------------------------------
+    #region Vfx/Animations functions //------------------------------------
     
     private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
         
@@ -1136,11 +1125,7 @@ public class PlayerController2D : Entity2D
     #region Debugging functions //------------------------------------
 
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
-    public void UpdateDebugText(TextMeshProUGUI textObject, bool showDebugText) {
-
-        if (textObject) {
-            textObject.enabled = showDebugText;
-            if (showDebugText) {  
+    public void UpdateDebugText(TextMeshProUGUI textObject) {
 
                 debugStringBuilder.Clear();
                 
@@ -1184,8 +1169,6 @@ public class PlayerController2D : Entity2D
                 debugStringBuilder.AppendFormat("\n{0}\n", logText);
 
                 textObject.text = debugStringBuilder.ToString();
-            }
-        }
     }
     
     #endregion Debugging functions

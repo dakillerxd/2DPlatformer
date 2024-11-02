@@ -34,9 +34,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] [Min(0)] private int vSync = 0;
     [SerializeField] private bool showFps;
     [SerializeField] private bool showDebugInfo;
-    [SerializeField] private TextMeshProUGUI fpsText;
-    [SerializeField] private TextMeshProUGUI playerDebugText;
-    [SerializeField] private TextMeshProUGUI cameraDebugText;
     private Camera cam;
 
     
@@ -55,16 +52,11 @@ public class GameManager : MonoBehaviour
     private void Start() {
         QualitySettings.vSyncCount = vSync;
         Application.targetFrameRate = targetFPS;
-        fpsText = GameObject.Find("FpsText").GetComponent<TextMeshProUGUI>();
-        playerDebugText = GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
-        cameraDebugText = GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>();
-        cam = CameraController2D.Instance.GetComponent<Camera>();
     }
     
     
     private void Update() {
-        UpdateFpsText();
-        UpdateDebugTextInfo();
+        UpdateTextInfo();
         HandleTargetSelection();
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
@@ -161,45 +153,34 @@ public class GameManager : MonoBehaviour
 
     private void ToggleDebugText() {
         showDebugInfo = !showDebugInfo;
-        if (!playerDebugText) { GameObject.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>(); }
-        if (!cameraDebugText) { GameObject.Find("CameraDebugText").GetComponent<TextMeshProUGUI>(); }
-        if (!cam) { cam = CameraController2D.Instance.GetComponent<Camera>();}
+        UIManager.Instance.playerDebugText.enabled = showDebugInfo;
+        UIManager.Instance.cameraDebugText.enabled = showDebugInfo;
     }
 
-    private void UpdateDebugTextInfo()
-    {
-        if (playerDebugText)
-        {
-            PlayerController2D.Instance.UpdateDebugText(playerDebugText, showDebugInfo);
-        }
-
-        if (cam && cameraDebugText)
-        {
-            CameraController2D.Instance.UpdateDebugText(cameraDebugText, showDebugInfo);
+    private void UpdateTextInfo() {
+        
+        if (showFps) { UpdateFpsText(); }
+        
+        if (showDebugInfo) {
+            PlayerController2D.Instance.UpdateDebugText(UIManager.Instance.playerDebugText);
+            if (!cam) { cam = Camera.main;}
+            CameraController2D.Instance.UpdateDebugText(UIManager.Instance.cameraDebugText);
         }
     }
-
-
-
+    
     private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
     private void UpdateFpsText() {
 
-        if (fpsText) {
-            fpsText.enabled = showFps;
-            if (showFps) {  
+        fpsStringBuilder.Clear();
 
-                fpsStringBuilder.Clear();
+        float deltaTime = 0.0f;
+        deltaTime += Time.unscaledDeltaTime - deltaTime;
+        float fps = 1.0f / deltaTime;
 
-                float deltaTime = 0.0f;
-                deltaTime += Time.unscaledDeltaTime - deltaTime;
-                float fps = 1.0f / deltaTime;
+        fpsStringBuilder.AppendFormat("FPS: {0}\n", (int)fps);
+        fpsStringBuilder.AppendFormat("VSync: {0}\n", QualitySettings.vSyncCount);
 
-                fpsStringBuilder.AppendFormat("FPS: {0}\n", (int)fps);
-                fpsStringBuilder.AppendFormat("VSync: {0}\n", QualitySettings.vSyncCount);
-
-                fpsText.text = fpsStringBuilder.ToString();
-            }
-        }
+        UIManager.Instance.fpsText.text = fpsStringBuilder.ToString();
     }
 
     

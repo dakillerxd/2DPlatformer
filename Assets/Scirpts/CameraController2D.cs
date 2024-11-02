@@ -281,33 +281,23 @@ public class CameraController2D : MonoBehaviour
 
     #region Debugging functions
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
-    public void UpdateDebugText(TextMeshProUGUI textObject, bool showDebugText) {
+    public void UpdateDebugText(TextMeshProUGUI textObject) {
         
-        if (textObject) {
-            textObject.enabled = showDebugText;
-            if (showDebugText) {         
+        debugStringBuilder.Clear();
+        
+        debugStringBuilder.AppendFormat("Camera:\n");
+        debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", shakeOffset.x, shakeOffset.y);
+        debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", currentZoom, minZoom, maxZoom);
+
+        debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
+        debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", targetPosition.x, targetPosition.y);
+        debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", targetOffset.x, targetOffset.y);
+
+        debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
+        debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
+        debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYLevelBoundary, maxYLevelBoundary);
                 
-                debugStringBuilder.Clear();
-        
-                debugStringBuilder.AppendFormat("Camera:\n");
-                debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", shakeOffset.x, shakeOffset.y);
-                debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", currentZoom, minZoom, maxZoom);
-
-                debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-                debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", targetPosition.x, targetPosition.y);
-                debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", targetOffset.x, targetOffset.y);
-
-
-                debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
-                debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
-                debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", minYLevelBoundary, maxYLevelBoundary);
-
-
-        
-
-
-                textObject.text = debugStringBuilder.ToString(); }
-        }
+        textObject.text = debugStringBuilder.ToString(); 
 
 
     }

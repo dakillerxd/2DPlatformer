@@ -238,6 +238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 003a5d876b1d3c4439ed68ecfdce9534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentPlayerState: 0
   maxHealth: 2
   canTakeFallDamage: 0
   maxFallDamage: 1
@@ -302,6 +303,7 @@ MonoBehaviour:
   animator: {fileID: 631767106991630361}
   spriteRenderers:
   - {fileID: 4743390106982236867}
+  - {fileID: 6138145497957891696}
   hurtVfx: {fileID: 5060159489429807464, guid: 2fe82b81a05eb4c499f6106eab7c6bcc, type: 3}
   jumpVfx: {fileID: 0}
   airJumpVfx: {fileID: 5789889679916270293}
@@ -462,7 +464,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7bd5d2c87986af24e9101d89e74c0e65, type: 3}
+  m_Sprite: {fileID: 1304837503652038735, guid: d0c5a2d2524be1d499cb380bc3901d8e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -489,7 +491,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5456902685513578049
 Transform:
   m_ObjectHideFlags: 0
@@ -499,7 +501,7 @@ Transform:
   m_GameObject: {fileID: 4819790430579151037}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.095, y: 0.055, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -548,8 +550,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7bd5d2c87986af24e9101d89e74c0e65, type: 3}
+  m_SortingOrder: 1
+  m_Sprite: {fileID: 2029563368909846659, guid: 6e99f61a8ad1e744cbfca9a893405f0b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -659,8 +661,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5456902685513578049}
   - {fileID: 8123881546023184429}
+  - {fileID: 5456902685513578049}
   m_Father: {fileID: 6449356787988531081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8348743168451648775

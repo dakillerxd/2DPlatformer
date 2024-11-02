@@ -79,16 +79,6 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
     source: {fileID: 0}
-  - name: Player Teleport
-    volume: 1
-    pitch: 1
-    stereoPan: 0
-    spatialBlend: 0
-    reverbZoneMix: 1
-    loop: 0
-    clips:
-    - {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
-    source: {fileID: 0}
   - name: Player Hurt
     volume: 1
     pitch: 1
@@ -137,6 +127,16 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
+    source: {fileID: 0}
+  - name: Teleport
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
     source: {fileID: 0}
   - name: Checkpoint Set
     volume: 1

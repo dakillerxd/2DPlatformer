@@ -31,6 +31,7 @@ public class Portal2D : MonoBehaviour
                 StartCooldown();
                 StartCooldownForConnectedPortal();
                 player.Teleport(connectedPortal.transform.position, keepMomentum);
+                SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
                 break;
         }
     }

@@ -82,12 +82,12 @@ public class UIManager : MonoBehaviour
         
         if (playerDebugText)
         {
-            PlayerController2D.Instance.UpdateDebugText(playerDebugText);
+            PlayerController2D.Instance?.UpdateDebugText(playerDebugText);
         }
 
         if (cameraDebugText)
         {
-            CameraController2D.Instance.UpdateDebugText(cameraDebugText);
+            CameraController2D.Instance?.UpdateDebugText(cameraDebugText);
         }
     }
 
@@ -97,6 +97,8 @@ public class UIManager : MonoBehaviour
         gamePlayUI.SetActive(false);
         pauseScreenUI.SetActive(false);
         gameOverUI.SetActive(false);
+
+
 
         switch (GameManager.Instance.currentGameState)
         {
@@ -108,12 +110,12 @@ public class UIManager : MonoBehaviour
                 break;
             case GameStates.Paused:
                 pauseScreenUI.SetActive(true);
-                ShowPanelMain();
-                UpdatePauseScreenInfo();
+                // ShowPanelMain();
+                // UpdatePauseScreenInfo();
                 break;
             case GameStates.GameOver:
                 gameOverUI.SetActive(true);
-                UpdateGameOverInfo();
+                // UpdateGameOverInfo();
                 break;
         }
 
@@ -210,23 +212,7 @@ public class UIManager : MonoBehaviour
 
             pauseScoreText.text = ScoreManager.Instance.currentScore.ToString();
         }
-
-        if (pauseAmmoText != null)
-        {
-            if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy) {
-
-                pauseAmmoText.text = "∞";
-                pauseAmmoText.color = Color.yellow;
-
-            }
-            else {
-                
-                // int currentAmmo = WeaponHandController.Instance.CurrentAmmo;
-                // int maxAmmo = WeaponHandController.Instance.MaxAmmo;
-                // pauseAmmoText.text = $"{currentAmmo} / {maxAmmo}";
-
-            }
-        }
+        
 
     }
 

@@ -53,6 +53,10 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
+        // Set settings
+        QualitySettings.vSyncCount = vSync;
+        Application.targetFrameRate = targetFPS;
+        
         // Check that all managers are instanced
         if (InputManager.Instance == null) { Instantiate(inputManager); }
         if (SoundManager.Instance == null) { Instantiate(soundManager); }
@@ -62,8 +66,7 @@ public class GameManager : MonoBehaviour
     }
     
     private void Start() {
-        QualitySettings.vSyncCount = vSync;
-        Application.targetFrameRate = targetFPS;
+        UIManager.Instance.UpdateUI();
     }
     
     
@@ -73,43 +76,40 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
+        if (InputManager.TogglePauseWasPressed) { TogglePause(); }
     }
-
-    private void OnValidate()
-    {
-        if (!Application.isPlaying) return;
-        QualitySettings.vSyncCount = vSync;
-        Application.targetFrameRate = targetFPS;
-        UIManager.Instance.fpsText.enabled = showFps;
-        UIManager.Instance.playerDebugText.enabled = showDebugInfo;
-        UIManager.Instance.cameraDebugText.enabled = showDebugInfo; 
-
-    }
+    
 
 
     #region GameStates
 
     private void TogglePause() {
-        
-        if (currentGameState != GameStates.GamePlay) return;
 
-        switch (currentGameState) 
-        {
+        if (currentGameState == GameStates.GamePlay) {
+            SetGameState(GameStates.Paused);
+        } else if (currentGameState == GameStates.Paused) {
+            SetGameState(GameStates.GamePlay);
+        }
+    }
+    
+    
+    private void SetGameState(GameStates state) {
+        currentGameState = state;
+        UIManager.Instance.UpdateUI();
+        
+        switch (state) {
             case GameStates.GamePlay:
-                currentGameState = GameStates.Paused;
-                Time.timeScale = 0;
-                
-                break;
-            case GameStates.Paused:
-                currentGameState = GameStates.GamePlay;
                 Time.timeScale = 1;
                 
                 break;
+            case GameStates.Paused:
+                Time.timeScale = 0;
+                
+                break;
         }
-
     }
-    private void SetGameDifficulty(GameDifficulty gameMode)
-    {
+    
+    private void SetGameDifficulty(GameDifficulty gameMode) {
         currentGameDifficulty = gameMode;
 
         switch(gameMode)
@@ -125,23 +125,6 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 Debug.LogError("Invalid Game Mode, Setting Normal");
-                break;
-        }
-    }
-    private void SetGameState(GameStates state) {
-        currentGameState = state;
-        
-        switch (state) 
-        {
-            case GameStates.GamePlay:
-                currentGameState = GameStates.Paused;
-                Time.timeScale = 0;
-                
-                break;
-            case GameStates.Paused:
-                currentGameState = GameStates.GamePlay;
-                Time.timeScale = 1;
-                
                 break;
         }
     }

@@ -157,7 +157,7 @@ MonoBehaviour:
   verticalOffsetStrength: 1
   horizontalOffsetStrength: 1
   isShaking: 0
-  useBoundaries: 1
+  useBoundaries: 0
   minXLevelBoundary: 0
   maxXLevelBoundary: 0
   minYLevelBoundary: 0
@@ -166,5 +166,3 @@ MonoBehaviour:
   zoomSpeed: 2
   minZoom: 2
   maxZoom: 5
-  showDebugText: 0
-  debugText: {fileID: 0}

@@ -39,6 +39,15 @@ public class PlayerController2D : Entity2D {
     private bool isMoving;
     private float moveSpeed;
     
+    [Header("Climb Steps")]
+    [SerializeField] public bool autoClimbSteps;
+    [ShowIf("autoClimbSteps")]
+    [SerializeField] [Range(0, 1f)] private float stepHeight = 0.12f;
+    [SerializeField] [Range(0, 1f)] private float stepWidth = 0.1f;
+    [SerializeField] [Range(0, 1f)] private float stepCheckDistance = 0.05f;
+    [SerializeField] private LayerMask stepLayer;
+    [EndIf]
+    
     [Header("Jump")]
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
@@ -69,7 +78,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
-    [SerializeField] [Range(0, 3f)] private float ledgCheckDistance = 0.02f;
+    [SerializeField] [Range(0, 3f)] private float ledgeCheckDistance = 0.02f;
     [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     private bool isTouchingGround;
     private bool isTouchingPlatform;
@@ -85,7 +94,6 @@ public class PlayerController2D : Entity2D {
     private SoftObject2D softObject;
     private float groundObjectLastVelocityX;
     private float groundObjectMomentum;
-    [EndTab]
     
 
     [Tab("Player Abilities")] // ----------------------------------------------------------------------
@@ -96,13 +104,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
     private bool wasRunning;
     private bool isRunning;
-
-    [Header("Climb Steps")]
-    [SerializeField] public bool autoClimbStepsAbility = true;
-    [SerializeField] [Range(0, 1f)] private float stepHeight = 0.12f;
-    [SerializeField] [Range(0, 1f)] private float stepWidth = 0.1f;
-    [SerializeField] [Range(0, 1f)] private float stepCheckDistance = 0.05f;
-    [SerializeField] private LayerMask stepLayer;
     
     [Header("Wall Slide")]
     [SerializeField] public bool wallSlideAbility = true;
@@ -149,6 +150,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private ParticleSystem jumpVfx;
     [SerializeField] private ParticleSystem airJumpVfx;
     [SerializeField] private ParticleSystem peakMoveSpeedVfx;
+    [SerializeField] private ParticleSystem peakFallSpeedVfx;
     [SerializeField] private ParticleSystem groundRunVfx;
     [SerializeField] private ParticleSystem deathVfx;
     [SerializeField] private ParticleSystem spawnVfx;
@@ -195,11 +197,10 @@ public class PlayerController2D : Entity2D {
     private void Update() {
         if (!CanPlay()) { return; }
         
-        if (Input.GetKeyDown(KeyCode.R)) { RespawnFromCheckpoint();}
         CheckForInput();
         HandleDropDown();
-        CountTimers();
-        CoyoteTimeCheck();
+        DashTimer();
+        JumpChecks();
         CheckFaceDirection();
     }
     
@@ -209,17 +210,17 @@ public class PlayerController2D : Entity2D {
         CollisionChecks();
         HandleGravity();
         HandleMovement();
+        HandleStepClimbing();
         HandleJump();
         HandleRunning();
         HandleWallSlide();
         HandleWallJump();
         HandleDashing();
-        HandleStepClimbing();
         HandleFastDrop();
     }
     
     
-    #region Movement function //------------------------------------
+    #region Movement functions //------------------------------------
     
     private void HandleMovement() {
         
@@ -307,99 +308,9 @@ public class PlayerController2D : Entity2D {
         }
     }
     
-    #endregion Movement function
-    
-    
-    
-    #region Abilitis functions //------------------------------------
-
-    private void HandleRunning() {
-        if (!runAbility) return;
-        
-        
-        bool isRunningOnGround = runInput && isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
-        bool isRunningOnAir = wasRunning && !isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
-        
-        if (isRunningOnGround) { // When on ground
-            PlayVfxEffect(peakMoveSpeedVfx, false);
-            PlayVfxEffect(groundRunVfx, false);
-            // PlayAnimation("Run");
-            
-        } else {
-            StopVfxEffect(groundRunVfx, false);
-            // PlayAnimation("Idle");
-        }
-        
-        if (isRunningOnAir) { // When in the air
-            PlayVfxEffect(peakMoveSpeedVfx, false);
-        }
-
-        if (!isRunningOnAir && !isRunningOnGround) {
-            StopVfxEffect(groundRunVfx, false);
-            StopVfxEffect(peakMoveSpeedVfx, false);
-        }
-    
-    }
-    private void HandleFastDrop() {
-
-        if (!fastDropAbility) return;
-        if (isGrounded && !atMaxFallSpeed) return;
-
-        isFastDropping = verticalInput < 0;
-
-        if (isFastDropping) {
-
-            rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
-        }
-    }
-    private void HandleDashing() {
-
-
-        if (!dashAbility) return; // Return if not allowed to dash
-
-        if (dashRequested && remainingDashes > 0) {
-
-            int dashDirection = isFacingRight ? 1 : -1;
-
-            // Play effects
-            PlayVfxEffect(dashVfx, false);
-            StopVfxEffect(wallSlideVfx, true);
-            PlayAnimation("Dash");
-            SoundManager.Instance?.PlaySoundFX("Player Dash");
-
-            // Dash
-            isDashing = true;
-            remainingDashes --;
-            TurnInvincible();
-            TurnStunLocked(0.1f);
-            rigidBody.linearVelocityX += dashForce * dashDirection;
-            if (isGrounded) { rigidBody.linearVelocityY += 1f; }
-            dashRequested = false;
-            StartCoroutine(DashCooldown());
-        }
-    }
-    private IEnumerator DashCooldown() {
-
-        if (isDashCooldownRunning) { yield break;} // Exit if already running
-        isDashCooldownRunning = true;
-
-        while (remainingDashes < maxDashes) {
-            dashCooldownTimer = dashCooldownDuration;
-
-            while (dashCooldownTimer > 0) {
-                dashCooldownTimer -= Time.deltaTime;
-                yield return null;
-            }
-
-            dashCooldownTimer = 0;
-            remainingDashes++;
-        }
-
-        isDashCooldownRunning = false;
-    }
     private void HandleStepClimbing() {
         
-        if (!autoClimbStepsAbility) return; // Only check if you can climb steps
+        if (!autoClimbSteps) return; // Only check if you can climb steps
         
         if (isGrounded || isDashing) { // Check for steps when grounded or dashing
             
@@ -420,72 +331,15 @@ public class PlayerController2D : Entity2D {
             } 
         }
     }
-    private void HandleWallSlide() {
-
-        // Check if wall sliding
-        if (wallSlideAbility && isTouchingWall && !isGrounded && rigidBody.linearVelocity.y < 0) { 
-            isWallSliding = true;
-        } else {
-            isWallSliding = false;
-        }
-
-        // Play wall slide effect
-        if (isWallSliding) { PlayVfxEffect(wallSlideVfx, false); }
-        else { StopVfxEffect(wallSlideVfx, false); }
-        
-        
-        
-        if (isWallSliding) { 
-
-            // Make the player face the opposite direction from the wall
-            if (isTouchingWallOnLeft && !isFacingRight) { 
-                FlipPlayer("Right");
-            } else if (isTouchingWallOnRight && isFacingRight) {
-                FlipPlayer("Left");
-            }
-
-            // Set slide speed
-            float slideSpeed = wallSlideSpeed;
-            float maxSlideSpeed = maxWallSlideSpeed;
-
-            // Accelerate slide if fast dropping
-            if (isFastDropping) {
-                slideSpeed *= 1.5f;
-                maxSlideSpeed *= 1.5f;
-            }
-
-
-            // Lerp the fall speed
-            float newYVelocity = Mathf.Lerp(rigidBody.linearVelocity.y, -maxSlideSpeed, slideSpeed  * Time.fixedDeltaTime);
-            rigidBody.linearVelocity = new Vector2 ( rigidBody.linearVelocity.x, newYVelocity);
-
-            if (rigidBody.linearVelocity.y < -maxSlideSpeed) { // Clamp fall speed
-
-                rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, -maxSlideSpeed);
-
-            }
-            
-        }   
-    }
-
-    #endregion Abilitis functions
     
+    #endregion Movement functions
     
     
     #region Jump functions //------------------------------------
     
     private void HandleJump() {
         
-        if (jumpInputUp && !isJumpCut) { 
-            
-            // Only Cut jump height if button is released early AND we're still in upward motion
-            if (isJumping && rigidBody.linearVelocity.y > 0) {
-                rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y * variableJumpMultiplier);
-                isJumpCut = true;
-            }
-            jumpInputHeld = false;
-            variableJumpHeldDuration = 0;
-        }
+
 
         if (jumpInputDownRequested) { // Jump
 
@@ -533,13 +387,14 @@ public class PlayerController2D : Entity2D {
         // Play effects
         if (!isGrounded) {
             PlayVfxEffect(airJumpVfx, true); 
-            PlayAnimation("AirJump");
+            // PlayAnimation("AirJump");
             SoundManager.Instance?.PlaySoundFX("Player Air Jump");
         } 
         if (isGrounded) {
             PlayAnimation("Jump");
             SoundManager.Instance?.PlaySoundFX("Player Jump");
         }
+        StopVfxEffect(peakFallSpeedVfx, true);
         
         
         
@@ -562,6 +417,196 @@ public class PlayerController2D : Entity2D {
         coyoteJumpTime = 0;
         canCoyoteJump = false;
     }
+    
+    private void JumpChecks() {
+
+        // Jump buffer timer
+        if (holdJumpDownTimer <= holdJumpDownBuffer) {
+
+            holdJumpDownTimer += Time.deltaTime;
+        }
+        
+        // Variable jump timer
+        if (jumpInputHeld && variableJumpHeldDuration <= variableJumpMaxHoldDuration) {
+
+            variableJumpHeldDuration += Time.deltaTime;
+        }
+        
+        // Only Cut jump height if button is released early in upward motion
+        if (jumpInputUp && !isJumpCut) {  
+            if (isJumping && rigidBody.linearVelocity.y > 0) {
+                rigidBody.linearVelocityY *=  variableJumpMultiplier;
+                isJumpCut = true;
+            }
+            jumpInputHeld = false;
+            variableJumpHeldDuration = 0;
+        }
+        
+        // Reset coyote jump
+        if (isGrounded) {
+            canCoyoteJump = true;
+            coyoteJumpTime = coyoteJumpBuffer;
+        }
+
+        // Update coyote time
+        if (canCoyoteJump) {
+            if (coyoteJumpTime > 0) {
+                coyoteJumpTime -= Time.deltaTime;
+            } else {
+                canCoyoteJump = false;
+            }
+        }
+    }
+    #endregion Jump functions
+
+      
+    #region Abilitis functions //------------------------------------
+
+    private void HandleRunning() {
+        if (!runAbility) return;
+        
+        
+        bool isRunningOnGround = runInput && isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
+        bool isRunningOnAir = wasRunning && !isGrounded && !isWallSliding && (moveSpeed > runningThreshold || moveSpeed < -runningThreshold);
+        
+        if (isRunningOnGround) { // When on ground
+            PlayVfxEffect(peakMoveSpeedVfx, false);
+            PlayVfxEffect(groundRunVfx, false);
+            // PlayAnimation("Run");
+            
+        } else {
+            StopVfxEffect(groundRunVfx, false);
+            StopVfxEffect(peakMoveSpeedVfx, false);
+            // PlayAnimation("Idle");
+        }
+        
+        // if (isRunningOnAir) { // When in the air
+        //     PlayVfxEffect(peakMoveSpeedVfx, false);
+        // }
+        //
+        // if (!isRunningOnAir && !isRunningOnGround) {
+        //     StopVfxEffect(groundRunVfx, false);
+        //     StopVfxEffect(peakMoveSpeedVfx, false);
+        // }
+    
+    }
+    private void HandleFastDrop() {
+
+        if (!fastDropAbility) return;
+        if (isGrounded && !atMaxFallSpeed) return;
+
+        isFastDropping = verticalInput < 0;
+
+        if (isFastDropping) {
+
+            rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
+        }
+    }
+    private void HandleDashing() {
+
+
+        if (!dashAbility) return; // Return if not allowed to dash
+
+        if (dashRequested && remainingDashes > 0) {
+
+            int dashDirection = isFacingRight ? 1 : -1;
+
+            // Play effects
+            PlayVfxEffect(dashVfx, false);
+            StopVfxEffect(wallSlideVfx, true);
+            StopVfxEffect(peakFallSpeedVfx, true);
+            PlayAnimation("Dash");
+            SoundManager.Instance?.PlaySoundFX("Player Dash");
+
+            // Dash
+            isDashing = true;
+            remainingDashes --;
+            TurnInvincible();
+            TurnStunLocked(0.1f);
+            rigidBody.linearVelocityX += dashForce * dashDirection;
+            if (isGrounded) { rigidBody.linearVelocityY += 1f; }
+            dashRequested = false;
+            StartCoroutine(DashCooldown());
+        }
+    }
+    private IEnumerator DashCooldown() {
+
+        if (isDashCooldownRunning) { yield break;} // Exit if already running
+        isDashCooldownRunning = true;
+
+        while (remainingDashes < maxDashes) {
+            dashCooldownTimer = dashCooldownDuration;
+
+            while (dashCooldownTimer > 0) {
+                dashCooldownTimer -= Time.deltaTime;
+                yield return null;
+            }
+
+            dashCooldownTimer = 0;
+            remainingDashes++;
+        }
+
+        isDashCooldownRunning = false;
+    }
+    
+    private void DashTimer() {
+
+        // Dash buffer timer
+        if (dashBufferTimer <= holdDashRequestTime) {
+
+            dashBufferTimer += Time.deltaTime;
+        }
+    }
+    
+
+    private void HandleWallSlide() {
+
+        // Check if wall sliding
+        if (wallSlideAbility && isTouchingWall && !isGrounded && rigidBody.linearVelocity.y < 0) { 
+            isWallSliding = true;
+        } else {
+            isWallSliding = false;
+        }
+
+        // Play wall slide effect
+        if (isWallSliding) { PlayVfxEffect(wallSlideVfx, false);}
+        else { StopVfxEffect(wallSlideVfx, false); }
+        
+        
+        
+        if (isWallSliding) { 
+
+            // Make the player face the opposite direction from the wall
+            if (isTouchingWallOnLeft && !isFacingRight) { 
+                FlipPlayer("Right");
+            } else if (isTouchingWallOnRight && isFacingRight) {
+                FlipPlayer("Left");
+            }
+
+            // Set slide speed
+            float slideSpeed = wallSlideSpeed;
+            float maxSlideSpeed = maxWallSlideSpeed;
+
+            // Accelerate slide if fast dropping
+            if (isFastDropping) {
+                slideSpeed *= 1.5f;
+                maxSlideSpeed *= 1.5f;
+            }
+
+
+            // Lerp the fall speed
+            float newYVelocity = Mathf.Lerp(rigidBody.linearVelocity.y, -maxSlideSpeed, slideSpeed  * Time.fixedDeltaTime);
+            rigidBody.linearVelocity = new Vector2 ( rigidBody.linearVelocity.x, newYVelocity);
+
+            if (rigidBody.linearVelocity.y < -maxSlideSpeed) { // Clamp fall speed
+
+                rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, -maxSlideSpeed);
+
+            }
+            
+        }   
+    }
+    
     private void HandleWallJump () {
 
         if (!wallJumpAbility) return;
@@ -604,26 +649,8 @@ public class PlayerController2D : Entity2D {
         isJumping = true;
         TurnStunLocked();
     }
-    private void CoyoteTimeCheck() {
 
-        // Reset coyote jump
-        if (isGrounded) {
-            canCoyoteJump = true;
-            coyoteJumpTime = coyoteJumpBuffer;
-        }
-
-        // Update coyote time
-        if (canCoyoteJump) {
-            if (coyoteJumpTime > 0) {
-                coyoteJumpTime -= Time.deltaTime;
-            } else {
-                canCoyoteJump = false;
-            }
-        }
-    }
-    
-    #endregion Jump functions
-
+    #endregion Abilitis functions
     
     
     #region Gravity function //------------------------------------
@@ -640,6 +667,7 @@ public class PlayerController2D : Entity2D {
           {
               // On ground
               HandleGroundedGravity();
+              StopVfxEffect(peakFallSpeedVfx, true);
           }
     }
     private void HandleAirGravity() {
@@ -663,11 +691,14 @@ public class PlayerController2D : Entity2D {
         fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
         
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
+        if (atMaxFallSpeed) { PlayVfxEffect(peakFallSpeedVfx, false); }
         
+        atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
-            atMaxFallSpeed = true;
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }
+        
+        
     }
     private void HandleGroundedGravity() {
         
@@ -683,17 +714,9 @@ public class PlayerController2D : Entity2D {
             atMaxFallSpeed = false;
             isFastFalling = false;
         }
-        
-        
-        // if (isOnPlatform) { // Apply content gravity when on a platform
-        //     const float groundGravityForce = 0.1f;
-        //     rigidBody.linearVelocityY += groundGravityForce * Time.fixedDeltaTime;
-        // }
- 
     }
     
     #endregion Gravity functions 
-    
     
     
     #region Collision functions //------------------------------------
@@ -731,14 +754,14 @@ public class PlayerController2D : Entity2D {
         // Ledge checks
         if (isGrounded) {
             // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
             ledgeOnRight = !hitRight;
             
 
             // Check collision with walls on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
             ledgeOnLeft = !hitLeft;
         }
         
@@ -833,7 +856,6 @@ public class PlayerController2D : Entity2D {
     }
     
     #endregion Collision functions
-    
     
     
     #region Health/Checkpoint functions //------------------------------------
@@ -948,54 +970,9 @@ public class PlayerController2D : Entity2D {
     }
 
     #endregion Health/Checkpoint functions
-
     
 
     #region Other functions //------------------------------------
-    // private void CheckForInput() {
-    //
-    //     if (CanMove()) { // Only check for input if the player can move
-    //
-    //         // Check for horizontal input
-    //         horizontalInput = Input.GetAxis("Horizontal");
-    //
-    //         // Check for vertical input
-    //         verticalInput = Input.GetAxis("Vertical");
-    //
-    //
-    //         // Check for jump inputs
-    //         jumpInputHeld = Input.GetButton("Jump");
-    //         jumpInputUp = Input.GetButtonUp("Jump");
-    //
-    //         if (Input.GetButtonDown("Jump")) {
-    //             jumpInputDownRequested = true;
-    //             holdJumpDownTimer = 0f;
-    //
-    //             // Only reset jump cut when starting a new jump
-    //             if (isGrounded || canCoyoteJump || remainingJumps > 0) {
-    //                 isJumpCut = false;
-    //             }
-    //         }
-    //         
-    //         // Check for run input
-    //         if (runAbility) { runInput = Input.GetButton("Run"); }
-    //
-    //         // Check for dash input
-    //         if (dashAbility && remainingDashes > 0 && Input.GetButtonDown("Dash")) {
-    //             dashRequested = true;
-    //             dashBufferTimer = 0f;
-    //         }
-    //         
-    //         // Check for drop down input
-    //         dropDownInput = verticalInput < -0.2 && Input.GetButtonDown("Crouch");
-    //
-    //     } else { // Set inputs to 0 if the player cannot move
-    //
-    //         horizontalInput = 0;
-    //         verticalInput = 0;
-    //     }
-    // }
-    
     private void CheckForInput() {
 
         if (CanMove()) { // Only check for input if the player can move
@@ -1032,6 +1009,9 @@ public class PlayerController2D : Entity2D {
             
             // Check for drop down input
             dropDownInput = verticalInput <= -1 && InputManager.JumpWasPressed;
+            
+            // Check for restart input
+            if (InputManager.RestartWasPressed) { RespawnFromCheckpoint(); }
 
         } else { // Set inputs to 0 if the player cannot move
 
@@ -1105,26 +1085,7 @@ public class PlayerController2D : Entity2D {
             transform.Rotate(0f, 180f, 0f);
         }
     }
-    private void CountTimers() {
 
-        // Jump buffer timer
-        if (holdJumpDownTimer <= holdJumpDownBuffer) {
-
-            holdJumpDownTimer += Time.deltaTime;
-        }
-
-        // Variable jump timer
-        if (jumpInputHeld && variableJumpHeldDuration <= variableJumpMaxHoldDuration) {
-
-            variableJumpHeldDuration += Time.deltaTime;
-        }
-
-        // Dash buffer timer
-        if (dashBufferTimer <= holdDashRequestTime) {
-
-            dashBufferTimer += Time.deltaTime;
-        }
-    }
     private bool CanMove() {
         return !isStunLocked && currentPlayerState == PlayerState.Controllable;
         
@@ -1153,17 +1114,18 @@ public class PlayerController2D : Entity2D {
                 StopVfxEffect(jumpVfx, true);
                 StopVfxEffect(dashVfx, true);
                 StopVfxEffect(wallSlideVfx, true);
+                StopVfxEffect(peakFallSpeedVfx, true);
                 
                 break;
             case PlayerState.Frozen:
                 rigidBody.linearVelocity = Vector2.zero;
+                StopVfxEffect(peakFallSpeedVfx, true);
                 
                 break;
         }
     }
     
     #endregion Other functions
-    
     
     
     #region Vfx/Animations functions //------------------------------------
@@ -1195,7 +1157,6 @@ public class PlayerController2D : Entity2D {
     
     
     #endregion Sfx/Vfx functions
-    
     
     
     #region Debugging functions //------------------------------------

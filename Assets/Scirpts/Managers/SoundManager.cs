@@ -40,13 +40,6 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         SetupSounds();
     }
-
-    private void OnValidate()
-    {
-        if (!Application.isPlaying) return;
-        ResetAllSoundsSettings();
-
-    }
     
     
 

@@ -7,15 +7,15 @@ using System.Linq;
 public class WaypointMovement2D : MonoBehaviour {
     
     [Header("Settings")]
-    [SerializeField] private float maxSpeed = 5f;
+    [SerializeField] private bool loop = true;
+    [SerializeField, Min(0)] private float maxSpeed = 2f;
     [SerializeField, Range(0, 100)] private float accelerationPercent = 100f;
     [SerializeField, Range(0, 100)] private float decelerationPercent = 100f;
-    [SerializeField] private float decelerationDistance = 1f;
-    [SerializeField] private bool loop = true;
-    [SerializeField] private float waitTime = 0.5f;
+    [SerializeField, Min(0)] private float decelerationRadius = 1.3f;
+    [SerializeField, Range(0, 10)] private float waypointWaitTime;
     [SerializeField] private List<GameObject> waypoints = new List<GameObject>();
     private int currentWaypointIndex;
-    private float waitTimer;
+    private float waypointWaitTimer;
     
     
     [Header("References")]
@@ -74,9 +74,9 @@ public class WaypointMovement2D : MonoBehaviour {
         
         if (waypoints.Count <= 1) return;
         
-        if (waitTimer > 0)
+        if (waypointWaitTimer > 0)
         {
-            waitTimer -= Time.fixedDeltaTime;
+            waypointWaitTimer -= Time.fixedDeltaTime;
             objectRigidBody.linearVelocity = Vector2.zero;
             return;
         }
@@ -87,9 +87,9 @@ public class WaypointMovement2D : MonoBehaviour {
         
         // Calculate speed based on distance
         float targetSpeed = maxSpeed;
-        if (decelerationPercent > 0 && distanceToTarget < decelerationDistance)
+        if (decelerationPercent > 0 && distanceToTarget < decelerationRadius)
         {
-            float decelerationFactor = distanceToTarget / decelerationDistance;
+            float decelerationFactor = distanceToTarget / decelerationRadius;
             targetSpeed = Mathf.Lerp(0, maxSpeed, decelerationFactor);
         }
 
@@ -97,7 +97,7 @@ public class WaypointMovement2D : MonoBehaviour {
         Vector2 desiredVelocity = directionToTarget * targetSpeed;
         
         // Apply acceleration or deceleration based on percentages
-        float currentRate = distanceToTarget < decelerationDistance ? 
+        float currentRate = distanceToTarget < decelerationRadius ? 
             decelerationPercent / 100f * 15f : // Base deceleration rate of 15
             accelerationPercent / 100f * 10f;  // Base acceleration rate of 10
 
@@ -111,7 +111,7 @@ public class WaypointMovement2D : MonoBehaviour {
         if (distanceToTarget < 0.1f)
         {
             objectRigidBody.linearVelocity = Vector2.zero;
-            waitTimer = waitTime;
+            waypointWaitTimer = waypointWaitTime;
             
             if (loop)
             {
@@ -243,7 +243,7 @@ public class WaypointMovement2D : MonoBehaviour {
         Gizmos.color = new Color(1, 1, 0, 0.3f); // Semi-transparent yellow
         foreach (var waypoint in waypoints)
         {
-            Gizmos.DrawWireSphere(waypoint.transform.position, decelerationDistance);
+            Gizmos.DrawWireSphere(waypoint.transform.position, decelerationRadius);
         }
     }
 #endif

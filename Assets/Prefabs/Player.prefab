@@ -255,9 +255,12 @@ MonoBehaviour:
   maxJumps: 2
   holdJumpDownBuffer: 0.2
   coyoteJumpBuffer: 0.1
-  gravityForce: 0.5
-  fallMultiplier: 4
+  lerpGravity: 0
+  gravityForce: 12
+  fallMultiplier: 2
   maxFallSpeed: 20
+  fastFallSpeed: 10
+  fastFallBopMultiplier: 3.5
   isFastFalling: 0
   atMaxFallSpeed: 0
   fallSpeed: 0

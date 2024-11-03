@@ -56,11 +56,14 @@ public class PlayerController2D : Entity2D {
     private bool canCoyoteJump;
     private float coyoteJumpTime;
     private float variableJumpHeldDuration;
-    
-    [Header("Gravity")]
+
+    [Header("Gravity")] 
+    [SerializeField] private bool lerpGravity;
     [SerializeField] private float gravityForce = 0.5f;
     [SerializeField] private float fallMultiplier = 4f; // Gravity multiplayer when the payer is falling
     [SerializeField] public float maxFallSpeed = 20f;
+    [SerializeField] private float fastFallSpeed = 10f; // The speed at which the player bobs after a fall
+    [SerializeField] [Min(0)] private float fastFallBopDiminisher = 4f;
     [HideInInspector] public bool isFastFalling;
     [HideInInspector] public bool atMaxFallSpeed;
     [HideInInspector] public float fallSpeed;
@@ -69,11 +72,14 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
+    [SerializeField] [Range(0, 3f)] private float ledgCheckDistance = 0.02f;
     [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
     private bool isTouchingGround;
     private bool isTouchingPlatform;
     private bool isTouchingWall;
     public bool isGrounded { get; private set; }
+    private bool ledgeOnLeft;
+    private bool ledgeOnRight;
     private bool isOnPlatform;
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
@@ -645,17 +651,23 @@ public class PlayerController2D : Entity2D {
 
         float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
         float appliedGravity = gravityForce * gravityMultiplier;
+        float fallSpeed = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime); 
         
-        rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, appliedGravity * Time.fixedDeltaTime);
-        
-        //float newVelocityY = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime); 
-        //rigidBody.linearVelocityY = newVelocityY; 
+
+        if (!lerpGravity) {
+            
+            rigidBody.linearVelocityY = fallSpeed; // Values 9.8, 2
+            
+        } else {
+            rigidBody.linearVelocityY = Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, appliedGravity * Time.fixedDeltaTime); // Values 0.5, 4
+        }
+
     }
     private void CheckFallSpeed() {
 
         fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
         
-        isFastFalling = rigidBody.linearVelocityY < -(maxFallSpeed/2); // Check if fast falling
+        isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
         
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
             atMaxFallSpeed = true;
@@ -666,7 +678,7 @@ public class PlayerController2D : Entity2D {
         
         if (isFastFalling && isGrounded && !isDashing) { // Check if landed
             
-            rigidBody.linearVelocityY = -1 * (fallSpeed/3); // Bop the player
+            rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
             PlayAnimation("Land");
             
             if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
@@ -719,6 +731,22 @@ public class PlayerController2D : Entity2D {
         if (isTouchingGround) {
             bool isOverlapping = Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
             isGrounded = isOverlapping;
+        }
+        
+        // Ledge checks
+        if (isGrounded) {
+            // Check collision with walls on the right
+            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            ledgeOnRight = !hitRight;
+            
+
+            // Check collision with walls on the left
+            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            ledgeOnRight = !hitLeft;
+            
+            Debug.Log(ledgeOnRight + " " + ledgeOnLeft);
         }
         
         // Check if on platform
@@ -850,6 +878,10 @@ public class PlayerController2D : Entity2D {
             StopVfxEffect(jumpVfx, true);
             StopVfxEffect(dashVfx, true);
             StopVfxEffect(wallSlideVfx, true);
+            StopVfxEffect(bleedVfx, true);
+            StopVfxEffect(healVfx, true);
+            StopVfxEffect(hurtVfx, true);
+            StopVfxEffect(deathVfx, true);
         }
     }
 
@@ -1106,6 +1138,7 @@ public class PlayerController2D : Entity2D {
             effect.Stop(); 
         }
     }
+    
     private void SpawnVfxEffect(ParticleSystem effect) {
         if (!effect) return;
         Instantiate(effect, transform.position, Quaternion.identity);

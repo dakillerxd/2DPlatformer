@@ -46,10 +46,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGameState: 1
   currentGameDifficulty: 0
+  inputManager: {fileID: 6668247925252254685, guid: 11d09469762d9de4590abaad657a7eef, type: 3}
+  soundManager: {fileID: 8169659688527411552, guid: 29762c76c6068794ab6c06aa1576adc5, type: 3}
+  uiManager: {fileID: 3659276992571845032, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
   quitGameKey: 282
   restartSceneKey: 283
   toggleDebugText: 284
   targetFPS: 120
   vSync: 0
   showFps: 1
-  showDebugInfo: 0
+  showDebugInfo: 1

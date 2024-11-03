@@ -499,10 +499,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6282327043550573817}
-  - component: {fileID: 3659276992571845032}
   - component: {fileID: 5835107275165851516}
   - component: {fileID: 6547951497096118699}
   - component: {fileID: 3289545372645429217}
+  - component: {fileID: 3659276992571845032}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -530,45 +530,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &3659276992571845032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290578843868501004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aba03ef684a8144dac9807382c8760b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gamePlayUI: {fileID: 8432465031915193621}
-  pauseScreenUI: {fileID: 0}
-  gameOverUI: {fileID: 0}
-  playerDebugText: {fileID: 5870075069382840003}
-  cameraDebugText: {fileID: 731938032923394786}
-  fpsText: {fileID: 889990527183701017}
-  timerTexts: []
-  timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
-  scoreTexts: []
-  abilityUnlocked: {r: 1, g: 1, b: 1, a: 1}
-  abilityLocked: {r: 1, g: 1, b: 1, a: 0.2}
-  run: {fileID: 3202862567887938639}
-  wallSlide: {fileID: 543975597861873282}
-  wallJump: {fileID: 6869155328715559161}
-  dash: {fileID: 1771471836054641635}
-  panelMain: {fileID: 0}
-  panelOptions: {fileID: 0}
-  pauseTimeText: {fileID: 0}
-  pauseScoreText: {fileID: 0}
-  pauseAmmoText: {fileID: 0}
-  gameOverTimeText: {fileID: 0}
-  gameOverScoreText: {fileID: 0}
-  gameOverTitleText: {fileID: 0}
-  gameOverMessageText: {fileID: 0}
-  loseMessages: []
-  winMessages: []
-  perfectWinMessages: []
 --- !u!223 &5835107275165851516
 Canvas:
   m_ObjectHideFlags: 0
@@ -632,6 +593,45 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &3659276992571845032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8290578843868501004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aba03ef684a8144dac9807382c8760b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gamePlayUI: {fileID: 8432465031915193621}
+  pauseScreenUI: {fileID: 0}
+  gameOverUI: {fileID: 0}
+  playerDebugText: {fileID: 5870075069382840003}
+  cameraDebugText: {fileID: 731938032923394786}
+  fpsText: {fileID: 889990527183701017}
+  timerTexts: []
+  timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
+  scoreTexts: []
+  abilityUnlocked: {r: 1, g: 1, b: 1, a: 1}
+  abilityLocked: {r: 1, g: 1, b: 1, a: 0.2}
+  run: {fileID: 3202862567887938639}
+  wallSlide: {fileID: 543975597861873282}
+  wallJump: {fileID: 6869155328715559161}
+  dash: {fileID: 1771471836054641635}
+  panelMain: {fileID: 0}
+  panelOptions: {fileID: 0}
+  pauseTimeText: {fileID: 0}
+  pauseScoreText: {fileID: 0}
+  pauseAmmoText: {fileID: 0}
+  gameOverTimeText: {fileID: 0}
+  gameOverScoreText: {fileID: 0}
+  gameOverTitleText: {fileID: 0}
+  gameOverMessageText: {fileID: 0}
+  loseMessages: []
+  winMessages: []
+  perfectWinMessages: []
 --- !u!1 &8432465031915193621
 GameObject:
   m_ObjectHideFlags: 0

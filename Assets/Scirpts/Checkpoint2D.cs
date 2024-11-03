@@ -32,6 +32,7 @@ public class Checkpoint2D : MonoBehaviour
     [Button] private void ActivateCheckpoint() {
         
         CheckpointManager2D.Instance.ActivateCheckpoint(this);
+        PlayerController2D.Instance.HealToFullHealth();
     }
 
     private void DeactivateCheckpoint() {

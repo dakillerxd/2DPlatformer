@@ -1,12 +1,9 @@
-using System;
 using VInspector;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 using System.Text;
 using System.Collections;
-using Unity.VisualScripting;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 public enum PlayerState {
     Controllable,
@@ -180,14 +177,12 @@ public class PlayerController2D : Entity2D {
     
     private void Awake() {
 
-       if (Instance != null && Instance != this) {
-
+        if (Instance != null && Instance != this) 
+        {
             Destroy(gameObject);
-
-       } else {
-
-            Instance = this;
-       }
+            return;
+        }
+        Instance = this;
     }
 
     private void Start() {
@@ -744,9 +739,7 @@ public class PlayerController2D : Entity2D {
             // Check collision with walls on the left
             RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
             Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
-            ledgeOnRight = !hitLeft;
-            
-            Debug.Log(ledgeOnRight + " " + ledgeOnLeft);
+            ledgeOnLeft = !hitLeft;
         }
         
         // Check if on platform
@@ -918,7 +911,7 @@ public class PlayerController2D : Entity2D {
     }
     
 
-    private void HealToFullHealth() {
+    public void HealToFullHealth() {
         if (currentHealth == maxHealth) return;
         StopVfxEffect(bleedVfx, true);
         SpawnVfxEffect(healVfx);
@@ -959,23 +952,66 @@ public class PlayerController2D : Entity2D {
     
 
     #region Other functions //------------------------------------
-
+    // private void CheckForInput() {
+    //
+    //     if (CanMove()) { // Only check for input if the player can move
+    //
+    //         // Check for horizontal input
+    //         horizontalInput = Input.GetAxis("Horizontal");
+    //
+    //         // Check for vertical input
+    //         verticalInput = Input.GetAxis("Vertical");
+    //
+    //
+    //         // Check for jump inputs
+    //         jumpInputHeld = Input.GetButton("Jump");
+    //         jumpInputUp = Input.GetButtonUp("Jump");
+    //
+    //         if (Input.GetButtonDown("Jump")) {
+    //             jumpInputDownRequested = true;
+    //             holdJumpDownTimer = 0f;
+    //
+    //             // Only reset jump cut when starting a new jump
+    //             if (isGrounded || canCoyoteJump || remainingJumps > 0) {
+    //                 isJumpCut = false;
+    //             }
+    //         }
+    //         
+    //         // Check for run input
+    //         if (runAbility) { runInput = Input.GetButton("Run"); }
+    //
+    //         // Check for dash input
+    //         if (dashAbility && remainingDashes > 0 && Input.GetButtonDown("Dash")) {
+    //             dashRequested = true;
+    //             dashBufferTimer = 0f;
+    //         }
+    //         
+    //         // Check for drop down input
+    //         dropDownInput = verticalInput < -0.2 && Input.GetButtonDown("Crouch");
+    //
+    //     } else { // Set inputs to 0 if the player cannot move
+    //
+    //         horizontalInput = 0;
+    //         verticalInput = 0;
+    //     }
+    // }
+    
     private void CheckForInput() {
 
         if (CanMove()) { // Only check for input if the player can move
 
             // Check for horizontal input
-            horizontalInput = Input.GetAxis("Horizontal");
+            horizontalInput = InputManager.Movement.x;
 
             // Check for vertical input
-            verticalInput = Input.GetAxis("Vertical");
+            verticalInput = InputManager.Movement.y;
 
 
             // Check for jump inputs
-            jumpInputHeld = Input.GetButton("Jump");
-            jumpInputUp = Input.GetButtonUp("Jump");
+            jumpInputHeld = InputManager.JumpIsHeld;
+            jumpInputUp = InputManager.JumpWasReleased;
 
-            if (Input.GetButtonDown("Jump")) {
+            if (verticalInput > -1 && InputManager.JumpWasPressed) {
                 jumpInputDownRequested = true;
                 holdJumpDownTimer = 0f;
 
@@ -986,16 +1022,16 @@ public class PlayerController2D : Entity2D {
             }
             
             // Check for run input
-            if (runAbility) { runInput = Input.GetButton("Run"); }
+            if (runAbility) { runInput = InputManager.RunIsHeld; }
 
             // Check for dash input
-            if (dashAbility && remainingDashes > 0 && Input.GetButtonDown("Dash")) {
+            if (dashAbility && remainingDashes > 0 && InputManager.DashWasPressed) {
                 dashRequested = true;
                 dashBufferTimer = 0f;
             }
             
             // Check for drop down input
-            dropDownInput = verticalInput < -0.2 && Input.GetButtonDown("Crouch");
+            dropDownInput = verticalInput <= -1 && InputManager.JumpWasPressed;
 
         } else { // Set inputs to 0 if the player cannot move
 
@@ -1003,6 +1039,9 @@ public class PlayerController2D : Entity2D {
             verticalInput = 0;
         }
     }
+    
+    
+    
     private void Push(Vector2 pushForce) {
         
         if (currentHealth > 0 && !isInvincible) {
@@ -1109,7 +1148,11 @@ public class PlayerController2D : Entity2D {
                 HealToFullHealth();
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
                 PlayVfxEffect(spawnVfx, true);
-                FlipPlayer("Right");
+                StopVfxEffect(groundRunVfx, true);
+                StopVfxEffect(peakMoveSpeedVfx, true);
+                StopVfxEffect(jumpVfx, true);
+                StopVfxEffect(dashVfx, true);
+                StopVfxEffect(wallSlideVfx, true);
                 
                 break;
             case PlayerState.Frozen:
@@ -1176,28 +1219,28 @@ public class PlayerController2D : Entity2D {
                 debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", isStunLocked, stunLockTime);
                 debugStringBuilder.AppendFormat("Running: {0}\n", wasRunning);
                 debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
+                debugStringBuilder.AppendFormat("Jumping: {0}\n", isJumping);
                 debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);
                 debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", isFastDropping);
                 debugStringBuilder.AppendFormat("Coyote Jumping: {0} ({1:0.0} / {2:0.0})\n",canCoyoteJump, coyoteJumpTime,coyoteJumpBuffer);
-                debugStringBuilder.AppendFormat("Jumping: {0}\n", isJumping);
                 debugStringBuilder.AppendFormat("Fast Falling: {0}\n", isFastFalling);
                 debugStringBuilder.AppendFormat("At Max Fall Speed: {0}\n", atMaxFallSpeed);
 
                 debugStringBuilder.AppendFormat("\nCollisions:\n");
                 debugStringBuilder.AppendFormat("Grounded: {0}\n", isGrounded);
                 debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
-                debugStringBuilder.AppendFormat("Touching Wall on Right: {0}\n", isTouchingWallOnRight);
-                debugStringBuilder.AppendFormat("Touching Wall on Left: {0}\n", isTouchingWallOnLeft);
+                debugStringBuilder.AppendFormat("Touching Wall on Right: {0}, Left: {1}\n", isTouchingWallOnRight, isTouchingWallOnLeft);
+                debugStringBuilder.AppendFormat("Ledge on Right: {0}, Left: {1}\n", ledgeOnRight, ledgeOnLeft);
                 if (groundObjectRigidbody && groundObjectMomentum != 0) {
                     debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX, groundObjectMomentum);
                 }
 
-                debugStringBuilder.AppendFormat("\nInputs:\n");
-                debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");
-                debugStringBuilder.AppendFormat("Run: {0}\n", runInput);
-                debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", Input.GetButtonDown("Jump"), variableJumpHeldDuration, variableJumpMaxHoldDuration);
-                debugStringBuilder.AppendFormat("Dash: {0}\n", Input.GetButtonDown("Dash"));
-                debugStringBuilder.AppendFormat("Drop Down: {0}\n", dropDownInput);
+                // debugStringBuilder.AppendFormat("\nInputs:\n");
+                // debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");
+                // debugStringBuilder.AppendFormat("Run: {0}\n", runInput);
+                // debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", InputManager.JumpWasPressed, variableJumpHeldDuration, variableJumpMaxHoldDuration);
+                // debugStringBuilder.AppendFormat("Dash: {0}\n", InputManager.DashWasPressed);
+                // debugStringBuilder.AppendFormat("Drop Down: {0}\n", dropDownInput);
                 
                 debugStringBuilder.AppendFormat("\n{0}\n", logText);
 

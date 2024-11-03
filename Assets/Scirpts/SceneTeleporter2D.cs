@@ -35,6 +35,7 @@ public class SceneTeleporter2D : MonoBehaviour
     {
 
         activated = true;
+        SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
         PlayerController2D.Instance.PlayAnimation("TeleportIn");
         PlayerController2D.Instance.SetPlayerState(PlayerState.Frozen);
 

@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 using CustomAttribute;
 using System.Text;
-using TMPro;
 using UnityEngine.SceneManagement;
+using VInspector;
 
 public enum GameStates {
     None,
@@ -26,11 +27,16 @@ public class GameManager : MonoBehaviour
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
 
+    [Header("Managers")]
+    public InputManager inputManager;
+    public SoundManager soundManager;
+    public UIManager uiManager;
+    
     [Header("Debug")]
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
-    [SerializeField] [Min(15)] private int targetFPS = 120;
+    [SerializeField] [Range(1,999)] private int targetFPS = 120;
     [SerializeField] [Min(0)] private int vSync = 0;
     [SerializeField] private bool showFps;
     [SerializeField] private bool showDebugInfo;
@@ -38,15 +44,21 @@ public class GameManager : MonoBehaviour
 
     
     private void Awake() {
-        if (Instance != null && Instance != this) {
-
+        
+        if (Instance != null && Instance != this) 
+        {
             Destroy(gameObject);
-
-        } else {
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        
+        // Check that all managers are instanced
+        if (InputManager.Instance == null) { Instantiate(inputManager); }
+        if (SoundManager.Instance == null) { Instantiate(soundManager); }
+        if (UIManager.Instance == null) { Instantiate(uiManager); }
+
+        
     }
     
     private void Start() {
@@ -61,6 +73,17 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
+    }
+
+    private void OnValidate()
+    {
+        if (!Application.isPlaying) return;
+        QualitySettings.vSyncCount = vSync;
+        Application.targetFrameRate = targetFPS;
+        UIManager.Instance.fpsText.enabled = showFps;
+        UIManager.Instance.playerDebugText.enabled = showDebugInfo;
+        UIManager.Instance.cameraDebugText.enabled = showDebugInfo; 
+
     }
 
 

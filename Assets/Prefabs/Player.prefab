@@ -260,7 +260,7 @@ MonoBehaviour:
   fallMultiplier: 2
   maxFallSpeed: 20
   fastFallSpeed: 10
-  fastFallBopMultiplier: 3.5
+  fastFallBopDiminisher: 4
   isFastFalling: 0
   atMaxFallSpeed: 0
   fallSpeed: 0
@@ -271,6 +271,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   wallCheckDistance: 0.02
+  ledgCheckDistance: 0.1
   objectMomentumDecayRate: 0.2
   runAbility: 1
   runSpeed: 5

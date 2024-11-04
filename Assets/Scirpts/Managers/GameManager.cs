@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using CustomAttribute;
 using System.Text;
 using UnityEngine.SceneManagement;
 using VInspector;
@@ -22,15 +21,11 @@ public enum GameDifficulty {
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-
-    [Header("Game Settings")]
+    
+    [Tab("GameManager")] // ----------------------------------------------------------------------
+    [Header("Settings")]
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
-
-    [Header("Managers")]
-    public InputManager inputManager;
-    public SoundManager soundManager;
-    public UIManager uiManager;
     
     [Header("Debug")]
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
@@ -38,10 +33,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
     [SerializeField] [Range(1,999)] private int targetFPS = 120;
     [SerializeField] [Min(0)] private int vSync = 0;
-    [SerializeField] private bool showFps;
-    [SerializeField] private bool showDebugInfo;
-    private Camera cam;
-
+    [SerializeField] public bool showDebugInfo = false;
+    [ReadOnly] public InputManager inputManager;
+    [ReadOnly] public SoundManager soundManager;
+    [ReadOnly] public UIManager uiManager;
+    [ReadOnly] public Camera cam;
+    
+    [Tab("References")] // ----------------------------------------------------------------------
+    public InputManager inputManagerPrefab;
+    public SoundManager soundManagerPrefab;
+    public UIManager uiManagerPrefab;
     
     private void Awake() {
         
@@ -52,20 +53,25 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+    
+    private void Start() {
+        // Check that all managers are instanced
+        if (InputManager.Instance == null) { Instantiate(inputManagerPrefab); }
+        if (SoundManager.Instance == null) { Instantiate(soundManagerPrefab); }
+        if (UIManager.Instance == null) { Instantiate(uiManagerPrefab); }
+        
+        // Set instances
+        inputManager = InputManager.Instance;
+        soundManager = SoundManager.Instance;
+        uiManager = UIManager.Instance;
         
         // Set settings
         QualitySettings.vSyncCount = vSync;
         Application.targetFrameRate = targetFPS;
         
-        // Check that all managers are instanced
-        if (InputManager.Instance == null) { Instantiate(inputManager); }
-        if (SoundManager.Instance == null) { Instantiate(soundManager); }
-        if (UIManager.Instance == null) { Instantiate(uiManager); }
-
-        
-    }
-    
-    private void Start() {
+        // Update UI
+        UIManager.Instance.ToggleDebugUI(showDebugInfo);
         UIManager.Instance.UpdateUI();
     }
     
@@ -159,35 +165,17 @@ public class GameManager : MonoBehaviour
 
     private void ToggleDebugText() {
         showDebugInfo = !showDebugInfo;
-        UIManager.Instance.playerDebugText.enabled = showDebugInfo;
-        UIManager.Instance.cameraDebugText.enabled = showDebugInfo;
+        UIManager.Instance.ToggleDebugUI(showDebugInfo);
     }
 
     private void UpdateTextInfo() {
         
-        if (showFps) { UpdateFpsText(); }
+        if (!showDebugInfo) return;
+        if (!cam) { cam = Camera.main;}
         
-        if (showDebugInfo) {
-            PlayerController2D.Instance.UpdateDebugText(UIManager.Instance.playerDebugText);
-            if (!cam) { cam = Camera.main;}
-            CameraController2D.Instance.UpdateDebugText(UIManager.Instance.cameraDebugText);
-        }
+        UIManager.Instance.UpdateDebugUI();
     }
     
-    private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
-    private void UpdateFpsText() {
-
-        fpsStringBuilder.Clear();
-
-        float deltaTime = 0.0f;
-        deltaTime += Time.unscaledDeltaTime - deltaTime;
-        float fps = 1.0f / deltaTime;
-
-        fpsStringBuilder.AppendFormat("FPS: {0}\n", (int)fps);
-        fpsStringBuilder.AppendFormat("VSync: {0}\n", QualitySettings.vSyncCount);
-
-        UIManager.Instance.fpsText.text = fpsStringBuilder.ToString();
-    }
 
     
     #endregion Debugging functions

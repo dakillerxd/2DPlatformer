@@ -249,13 +249,6 @@ MonoBehaviour:
   groundFriction: 0.15
   airFriction: 0.03
   movementThreshold: 0.1
-  autoClimbSteps: 0
-  stepHeight: 0.12
-  stepWidth: 0.1
-  stepCheckDistance: 0.05
-  stepLayer:
-    serializedVersion: 2
-    m_Bits: 64
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.3
@@ -280,27 +273,34 @@ MonoBehaviour:
   wallCheckDistance: 0.02
   ledgeCheckDistance: 0.02
   objectMomentumDecayRate: 0.2
+  autoClimbSteps: 0
+  stepHeight: 0.12
+  stepWidth: 0.1
+  stepCheckDistance: 0.05
+  stepLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  canFastDrop: 1
+  fastFallAcceleration: 0.2
   runAbility: 1
   runSpeed: 5
   airRunSpeed: 6
   runningThreshold: 3
-  wallSlideAbility: 1
+  wallSlideAbility: 0
   wallSlideSpeed: 2
   maxWallSlideSpeed: 3
   wallSlideStickStrength: 0.3
   isWallSliding: 0
-  wallJumpAbility: 1
+  wallJumpAbility: 0
   wallJumpResetsJumps: 0
   wallJumpVerticalForce: 5
   wallJumpHorizontalForce: 4
-  dashAbility: 1
+  dashAbility: 0
   dashForce: 10
   dashPushForce: 10
   maxDashes: 1
   dashCooldownDuration: 1
   holdDashRequestTime: 0.1
-  fastDropAbility: 1
-  fastFallAcceleration: 0.2
   rigidBody: {fileID: 2783392023027556574}
   collBody: {fileID: 6793365586128216939}
   collFeet: {fileID: 8767898529786398378}
@@ -448,7 +448,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 2e4cd44d120b19944823a94c38f330a4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -535,7 +535,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 2e4cd44d120b19944823a94c38f330a4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

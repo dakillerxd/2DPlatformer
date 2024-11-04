@@ -39,20 +39,13 @@ public class PlayerController2D : Entity2D {
     private bool isMoving;
     private float moveSpeed;
     
-    [Header("Climb Steps")]
-    [SerializeField] public bool autoClimbSteps;
-    [ShowIf("autoClimbSteps")]
-    [SerializeField] [Range(0, 1f)] private float stepHeight = 0.12f;
-    [SerializeField] [Range(0, 1f)] private float stepWidth = 0.1f;
-    [SerializeField] [Range(0, 1f)] private float stepCheckDistance = 0.05f;
-    [SerializeField] private LayerMask stepLayer;
-    [EndIf]
+
     
     [Header("Jump")]
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
     [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.5f; // Multiplier for jump cut height
-    [SerializeField] [Range(1, 5f)] private int maxJumps = 2;
+    [SerializeField] [Range(1, 5f)] public int maxJumps = 2;
     [SerializeField] [Range(0.1f, 1f)] private float holdJumpDownBuffer = 0.2f; // For how long the jump buffer will hold
     [SerializeField] [Range(0, 2f)] private float coyoteJumpBuffer = 0.1f; // For how long the coyote buffer will hold
     private bool isJumping;
@@ -95,6 +88,22 @@ public class PlayerController2D : Entity2D {
     private float groundObjectLastVelocityX;
     private float groundObjectMomentum;
     
+    [Header("Climb Steps")]
+    [SerializeField] public bool autoClimbSteps;
+    [ShowIf("autoClimbSteps")]
+    [SerializeField] [Range(0, 1f)] private float stepHeight = 0.12f;
+    [SerializeField] [Range(0, 1f)] private float stepWidth = 0.1f;
+    [SerializeField] [Range(0, 1f)] private float stepCheckDistance = 0.05f;
+    [SerializeField] private LayerMask stepLayer;
+    [EndIf]
+    
+    [Header("Fast Drop")]
+    [SerializeField] public bool canFastDrop = true;
+    [ShowIf("canFastDrop")]
+    [SerializeField] [Range(0, 1f)] private float fastFallAcceleration = 0.2f;
+    private bool isFastDropping;
+    [EndIf]
+    
 
     [Tab("Player Abilities")] // ----------------------------------------------------------------------
     [Header("Running")]
@@ -130,13 +139,7 @@ public class PlayerController2D : Entity2D {
     private float dashBufferTimer;
     private float dashCooldownTimer;
     private bool isDashCooldownRunning;
-
-    [Header("Fast Drop")]
-    [SerializeField] public bool fastDropAbility = true;
-    [SerializeField] [Range(0, 1f)] private float fastFallAcceleration = 0.2f;
-    private bool isFastDropping;
     
-
     [Tab("References")] // ----------------------------------------------------------------------
     [Header("Components")]
     [SerializeField] public Rigidbody2D rigidBody;
@@ -332,6 +335,19 @@ public class PlayerController2D : Entity2D {
         }
     }
     
+    private void HandleFastDrop() {
+
+        if (!canFastDrop) return;
+        if (isGrounded && !atMaxFallSpeed) return;
+
+        isFastDropping = verticalInput < 0;
+
+        if (isFastDropping) {
+
+            rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
+        }
+    }
+    
     #endregion Movement functions
     
     
@@ -436,6 +452,7 @@ public class PlayerController2D : Entity2D {
         if (jumpInputUp && !isJumpCut) {  
             if (isJumping && rigidBody.linearVelocity.y > 0) {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
+                SoundManager.Instance?.StopSoundFx("Player Jump");
                 isJumpCut = true;
             }
             jumpInputHeld = false;
@@ -490,18 +507,7 @@ public class PlayerController2D : Entity2D {
         // }
     
     }
-    private void HandleFastDrop() {
 
-        if (!fastDropAbility) return;
-        if (isGrounded && !atMaxFallSpeed) return;
-
-        isFastDropping = verticalInput < 0;
-
-        if (isFastDropping) {
-
-            rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
-        }
-    }
     private void HandleDashing() {
 
 

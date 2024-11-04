@@ -7,11 +7,11 @@ using VInspector;
 public class SceneTeleporter2D : MonoBehaviour 
 {
     [Header("Settings")]
+    [SerializeField] private bool activated = false;
     [SerializeField] private bool goToNextLevel = true;
     [DisableIf("goToNextLevel")][SerializeField] private SceneField sceneToLoad;
-    private bool activated = false;
-
-
+    
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (activated) return;

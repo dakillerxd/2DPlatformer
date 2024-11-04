@@ -2,9 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEngine.UIElements;
+using System.Text;
 using VInspector;
-using Image = UnityEngine.UIElements.Image;
 
 
 public class UIManager : MonoBehaviour
@@ -19,8 +18,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private  GameObject gameOverUI;
     
     [Header("Debug")]
-    public TextMeshProUGUI playerDebugText;
-    public TextMeshProUGUI cameraDebugText;
+    [SerializeField] private TextMeshProUGUI playerDebugText;
+    [SerializeField] private TextMeshProUGUI cameraDebugText;
     public TextMeshProUGUI fpsText;
     
     [Tab("UI Gameplay")] // ----------------------------------------------------------------------
@@ -36,6 +35,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private  Color abilityUnlocked = Color.white;
     [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
     [SerializeField] private RawImage run;
+    [SerializeField] private RawImage doubleJump;
     [SerializeField] private RawImage wallSlide;
     [SerializeField] private RawImage wallJump;
     [SerializeField] private RawImage dash;
@@ -78,18 +78,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void UpdateDebugText() {
-        
-        if (playerDebugText)
-        {
-            PlayerController2D.Instance?.UpdateDebugText(playerDebugText);
-        }
 
-        if (cameraDebugText)
-        {
-            CameraController2D.Instance?.UpdateDebugText(cameraDebugText);
-        }
-    }
 
 
     public void UpdateUI() {
@@ -97,25 +86,18 @@ public class UIManager : MonoBehaviour
         gamePlayUI.SetActive(false);
         pauseScreenUI.SetActive(false);
         gameOverUI.SetActive(false);
-
-
-
+        
         switch (GameManager.Instance.currentGameState)
         {
             case GameStates.GamePlay:
                 gamePlayUI.SetActive(true);
-                UpdateAbilitiesUI();
-                UpdateScoreUI();
-                UpdateTimeUI();
+                UpdateDebugUI();
                 break;
             case GameStates.Paused:
                 pauseScreenUI.SetActive(true);
-                // ShowPanelMain();
-                // UpdatePauseScreenInfo();
                 break;
             case GameStates.GameOver:
                 gameOverUI.SetActive(true);
-                // UpdateGameOverInfo();
                 break;
         }
 
@@ -124,11 +106,13 @@ public class UIManager : MonoBehaviour
 
 
 
-#region  Gameplay UI
+#region  Gameplay Screen
 
     public void UpdateAbilitiesUI() {
+        if (PlayerController2D.Instance == null) return;
         // Set abilities color
         run.color = PlayerController2D.Instance.runAbility ? abilityUnlocked : abilityLocked;
+        doubleJump.color = PlayerController2D.Instance.maxJumps > 1 ? abilityUnlocked : abilityLocked;
         wallSlide.color = PlayerController2D.Instance.wallSlideAbility ? abilityUnlocked : abilityLocked;
         wallJump.color = PlayerController2D.Instance.wallJumpAbility ? abilityUnlocked : abilityLocked;
         dash.color = PlayerController2D.Instance.dashAbility ? abilityUnlocked : abilityLocked;
@@ -231,7 +215,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
-#region GameOver UI
+#region GameOver Screen
 
 
     private void UpdateGameOverInfo()
@@ -279,6 +263,53 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
+#region Debug UI
+
+    public void ToggleDebugUI(bool state) {
+        
+        playerDebugText.enabled = state;
+        cameraDebugText.enabled = state;
+        fpsText.enabled = state;
+    }
+    
+    public void UpdateDebugUI() {
+
+        if (GameManager.Instance.showDebugInfo)
+        {
+            if (playerDebugText)
+            {
+                PlayerController2D.Instance?.UpdateDebugText(playerDebugText);
+            }
+
+            if (cameraDebugText)
+            {
+                CameraController2D.Instance?.UpdateDebugText(cameraDebugText);
+            }
+
+            if (fpsText)
+            {
+                UpdateFpsText();
+            }
+        }
+    }
+    
+    
+    private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
+    public void UpdateFpsText() {
+
+        fpsStringBuilder.Clear();
+
+        float deltaTime = 0.0f;
+        deltaTime += Time.unscaledDeltaTime - deltaTime;
+        float fps = 1.0f / deltaTime;
+
+        fpsStringBuilder.AppendFormat("FPS: {0}\n", (int)fps);
+        fpsStringBuilder.AppendFormat("VSync: {0}\n", QualitySettings.vSyncCount);
+
+        fpsText.text = fpsStringBuilder.ToString();
+    }
+
+#endregion
 
 
 }

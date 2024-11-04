@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     
     private void Update() {
         UpdateTextInfo();
-        HandleTargetSelection();
+        // HandleTargetSelection();
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }

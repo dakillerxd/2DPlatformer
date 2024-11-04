@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8847533817581333548}
   - component: {fileID: 6869155328715559161}
   m_Layer: 0
-  m_Name: WallJump
+  m_Name: WallJumpAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84,7 +84,7 @@ GameObject:
   - component: {fileID: 2463632233195270925}
   - component: {fileID: 1771471836054641635}
   m_Layer: 0
-  m_Name: Dash
+  m_Name: DashAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 8196142864040760844}
   - component: {fileID: 8584271605901718720}
   m_Layer: 0
-  m_Name: DoubleJump
+  m_Name: DoubleJumpAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 7bd5d2c87986af24e9101d89e74c0e65, type: 3}
+  m_Texture: {fileID: 2800000, guid: 0dab38d0b9d1c7543a427726c1b1d965, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 6663769216166537806}
   - component: {fileID: 543975597861873282}
   m_Layer: 0
-  m_Name: WallSlide
+  m_Name: WallSlideAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -574,7 +574,7 @@ GameObject:
   - component: {fileID: 2098427936967180428}
   - component: {fileID: 3202862567887938639}
   m_Layer: 0
-  m_Name: Run
+  m_Name: RunAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -587,7 +587,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6715351454951361122}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -761,12 +761,12 @@ MonoBehaviour:
   timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
   scoreTexts: []
   abilityUnlocked: {r: 1, g: 1, b: 1, a: 1}
-  abilityLocked: {r: 1, g: 1, b: 1, a: 0.2}
-  run: {fileID: 3202862567887938639}
-  doubleJump: {fileID: 8584271605901718720}
-  wallSlide: {fileID: 543975597861873282}
-  wallJump: {fileID: 6869155328715559161}
-  dash: {fileID: 1771471836054641635}
+  abilityLocked: {r: 1, g: 1, b: 1, a: 0.101960786}
+  run: {fileID: 6715351454951361122}
+  doubleJump: {fileID: 2606735452208349425}
+  wallSlide: {fileID: 5965422421507961315}
+  wallJump: {fileID: 1930450798848870283}
+  dash: {fileID: 2233304941858134934}
   panelMain: {fileID: 0}
   panelOptions: {fileID: 0}
   pauseTimeText: {fileID: 0}

@@ -38,10 +38,11 @@ public class CameraController2D : MonoBehaviour
 
     [Header("Zoom Settings")]
     [SerializeField] private bool allowZoomControl = true;
-    [SerializeField] private float zoomSpeed = 2f;
+    [SerializeField] private float currentZoom = 3f;
+    [SerializeField] private float zoomSpeed = 1f;
     [SerializeField] private float minZoom = 2f;
     [SerializeField] private float maxZoom = 5f;
-    private float currentZoom = 3f;
+
 
 
     private Camera cam;

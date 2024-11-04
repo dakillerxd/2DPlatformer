@@ -70,7 +70,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4
+  orthographic size: 2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -157,12 +157,13 @@ MonoBehaviour:
   verticalOffsetStrength: 1
   horizontalOffsetStrength: 1
   isShaking: 0
-  useBoundaries: 0
-  minXLevelBoundary: 0
-  maxXLevelBoundary: 0
-  minYLevelBoundary: 0
-  maxYLevelBoundary: 0
+  useBoundaries: 1
+  minXLevelBoundary: -3
+  maxXLevelBoundary: 78.2
+  minYLevelBoundary: -10.05
+  maxYLevelBoundary: 19.3
   allowZoomControl: 1
-  zoomSpeed: 4
+  currentZoom: 5
+  zoomSpeed: 2
   minZoom: 2
-  maxZoom: 5
+  maxZoom: 6

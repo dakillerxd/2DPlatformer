@@ -3,18 +3,17 @@ using VInspector;
 
 public class BackgroundController : MonoBehaviour
 {
-    private float startPos;
-    [SerializeField] private GameObject cam;
-    [SerializeField] private Vector2 parallaxEffect;
+    
+    [SerializeField] [Range(0f, 2f)] private float parallaxEffectX;
+    [SerializeField] [Range(0f, 2f)] private float parallaxEffectY;
     [SerializeField] private int orderInLayer;
+    private float startPos;
+    private GameObject cam;
     
     
     private void Start() {
-        
-        // Set starting position
         startPos = transform.position.x;
-        
-        
+        cam = Camera.main.gameObject;
         SetChildrenLayer();
     }
 
@@ -24,13 +23,13 @@ public class BackgroundController : MonoBehaviour
     }
 
     
-    
     private void MoveBasedOnCamera() {
         
         if (!cam) return; 
+        if (parallaxEffectY == 0 && parallaxEffectX == 0) return;
         
         // Calculate distance move based on cam movement
-        Vector2 distance = cam.transform.position * parallaxEffect;
+        Vector2 distance = cam.transform.position * new Vector2(parallaxEffectX, parallaxEffectY);
 
         // Move based of distance
         transform.position = new Vector3(startPos + distance.x, startPos + distance.y, transform.position.z);

@@ -248,11 +248,11 @@ MonoBehaviour:
   moveAcceleration: 15
   groundFriction: 0.15
   airFriction: 0.03
+  platformFriction: 0.03
   movementThreshold: 0.1
   jumpForce: 4
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.3
-  maxJumps: 2
   holdJumpDownBuffer: 0.2
   coyoteJumpBuffer: 0.1
   lerpGravity: 0
@@ -272,7 +272,7 @@ MonoBehaviour:
     m_Bits: 128
   wallCheckDistance: 0.02
   ledgeCheckDistance: 0.02
-  objectMomentumDecayRate: 0.2
+  objectMomentumDecayRate: 4
   autoClimbSteps: 0
   stepHeight: 0.12
   stepWidth: 0.1
@@ -286,6 +286,8 @@ MonoBehaviour:
   runSpeed: 5
   airRunSpeed: 6
   runningThreshold: 3
+  doubleJumpAbility: 0
+  maxAirJumps: 1
   wallSlideAbility: 0
   wallSlideSpeed: 2
   maxWallSlideSpeed: 3

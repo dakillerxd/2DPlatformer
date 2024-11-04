@@ -9,7 +9,7 @@ using System.Collections;
 [RequireComponent(typeof(Collider2D))]
 public class SoftObject2D : MonoBehaviour {
 
-    [SerializeField] private float dropDownCooldown = 0.3f;
+    [SerializeField] private float dropDownCooldown = 0.4f;
     private SpriteRenderer  spriteRenderer;
     private PlatformEffector2D effector;
     private Collider2D collider2d;

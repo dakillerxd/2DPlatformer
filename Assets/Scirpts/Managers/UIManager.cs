@@ -34,11 +34,11 @@ public class UIManager : MonoBehaviour
     [Header("Abilities")] 
     [SerializeField] private  Color abilityUnlocked = Color.white;
     [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
-    [SerializeField] private RawImage run;
-    [SerializeField] private RawImage doubleJump;
-    [SerializeField] private RawImage wallSlide;
-    [SerializeField] private RawImage wallJump;
-    [SerializeField] private RawImage dash;
+    [SerializeField] private GameObject run;
+    [SerializeField] private GameObject doubleJump;
+    [SerializeField] private GameObject wallSlide;
+    [SerializeField] private GameObject wallJump;
+    [SerializeField] private GameObject dash;
 
     [Tab("UI Pause")] // ----------------------------------------------------------------------
     [SerializeField] private GameObject panelMain;
@@ -77,9 +77,7 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-
-
-
+    
 
     public void UpdateUI() {
         
@@ -111,11 +109,12 @@ public class UIManager : MonoBehaviour
     public void UpdateAbilitiesUI() {
         if (PlayerController2D.Instance == null) return;
         // Set abilities color
-        run.color = PlayerController2D.Instance.runAbility ? abilityUnlocked : abilityLocked;
-        doubleJump.color = PlayerController2D.Instance.maxJumps > 1 ? abilityUnlocked : abilityLocked;
-        wallSlide.color = PlayerController2D.Instance.wallSlideAbility ? abilityUnlocked : abilityLocked;
-        wallJump.color = PlayerController2D.Instance.wallJumpAbility ? abilityUnlocked : abilityLocked;
-        dash.color = PlayerController2D.Instance.dashAbility ? abilityUnlocked : abilityLocked;
+        run.SetActive(PlayerController2D.Instance.runAbility); 
+        doubleJump.SetActive(PlayerController2D.Instance.doubleJumpAbility);
+        wallSlide.SetActive(PlayerController2D.Instance.wallSlideAbility);
+        wallJump.SetActive(PlayerController2D.Instance.wallJumpAbility);
+        dash.SetActive(PlayerController2D.Instance.dashAbility);
+
     }
     
     

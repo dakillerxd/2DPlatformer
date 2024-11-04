@@ -1,6 +1,5 @@
 using VInspector;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TMPro;
 using System.Text;
 using System.Collections;
@@ -35,6 +34,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] [Min(0.1f)] private float moveAcceleration = 15f; // How fast the player gets to max speed
     [SerializeField] [Min(0.01f)] private float groundFriction = 0.15f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)]private float airFriction = 0.03f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)]private float platformFriction = 0.5f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)]private float movementThreshold = 0.1f;
     private bool isMoving;
     private float moveSpeed;
@@ -45,12 +45,10 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
     [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.5f; // Multiplier for jump cut height
-    [SerializeField] [Range(1, 5f)] public int maxJumps = 2;
     [SerializeField] [Range(0.1f, 1f)] private float holdJumpDownBuffer = 0.2f; // For how long the jump buffer will hold
     [SerializeField] [Range(0, 2f)] private float coyoteJumpBuffer = 0.1f; // For how long the coyote buffer will hold
     private bool isJumping;
     private bool isJumpCut;
-    private int remainingJumps;
     private float holdJumpDownTimer;
     private bool canCoyoteJump;
     private float coyoteJumpTime;
@@ -72,7 +70,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckDistance = 0.02f;
-    [SerializeField] [Range(0f, 1f)] private float objectMomentumDecayRate = 0.5f; // 0 Keep momentum, 1 leave momentum
+    [SerializeField] private float movingRigidBodyVelocityXDecayRate = 4f; // 0 Keep momentum
     private bool isTouchingGround;
     private bool isTouchingPlatform;
     private bool isTouchingWall;
@@ -83,10 +81,10 @@ public class PlayerController2D : Entity2D {
     private bool isTouchingWallOnRight;
     private bool isTouchingWallOnLeft;
     private bool onGroundObject;
-    private Rigidbody2D groundObjectRigidbody;
+    private Rigidbody2D movingRigidbody;
+    private float movingRigidBodyLastVelocityX;
     private SoftObject2D softObject;
-    private float groundObjectLastVelocityX;
-    private float groundObjectMomentum;
+
     
     [Header("Climb Steps")]
     [SerializeField] public bool autoClimbSteps;
@@ -106,13 +104,18 @@ public class PlayerController2D : Entity2D {
     
 
     [Tab("Player Abilities")] // ----------------------------------------------------------------------
-    [Header("Running")]
+    [Header("Run")]
     [SerializeField] public bool runAbility = true;
     [SerializeField] private float runSpeed = 5f;
     [SerializeField] private float airRunSpeed = 6f;
     [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
     private bool wasRunning;
     private bool isRunning;
+    
+    [Header("Double Jump")]
+    [SerializeField] public bool doubleJumpAbility = true;
+    [SerializeField] [Range(1, 10f)] public int maxAirJumps = 1;
+    private int remainingAirJumps;
     
     [Header("Wall Slide")]
     [SerializeField] public bool wallSlideAbility = true;
@@ -228,22 +231,21 @@ public class PlayerController2D : Entity2D {
     private void HandleMovement() {
         
         // Get the ground object momentum
-        groundObjectMomentum = CalculateGroundObjectMomentum();
+        float targetMovingRigidBodyVelocity = CalculateMovingRigidBodyMomentum();
         
         // Get move speed and apply fiction
-        float baseMoveSpeed = rigidBody.linearVelocity.x - groundObjectMomentum;
+        float baseMoveSpeed = rigidBody.linearVelocity.x - targetMovingRigidBodyVelocity;
         moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateFriction());
         
         // Move
-        rigidBody.linearVelocityX = moveSpeed + groundObjectMomentum;
+        rigidBody.linearVelocityX = moveSpeed + targetMovingRigidBodyVelocity;
         isMoving = moveSpeed  > movementThreshold || moveSpeed < -movementThreshold;
     }
     private float CalculateFriction() {
         
         // If grounded use ground friction else use air friction
-        if (isGrounded)
-        {
-            return isOnPlatform || isDashing ? groundFriction*3 : groundFriction; // If on a platform multiply the ground friction
+        if (isGrounded) {
+            return isOnPlatform || isDashing ? platformFriction : groundFriction; // If on a platform multiply the ground friction
         }
 
         return airFriction;
@@ -284,24 +286,28 @@ public class PlayerController2D : Entity2D {
         
         return targetMoveSpeed;
     }
-    private float CalculateGroundObjectMomentum()
+    
+    private float CalculateMovingRigidBodyMomentum()
     {
-        if (!groundObjectRigidbody) return 0;
-    
-        float currentVelocity = groundObjectRigidbody.linearVelocityX;
-    
-        if (onGroundObject) {
-            groundObjectLastVelocityX = currentVelocity;
-            return currentVelocity;
+        if (!movingRigidbody) { return 0f; } // If there is no ground object return
+        if (onGroundObject) { return movingRigidbody.linearVelocityX; } // If on the ground object just get his velocity
+        
+        
+        // If we're very close to 0, just return 0 to prevent tiny floating point values
+        if (Mathf.Abs(movingRigidBodyLastVelocityX) < 0.01f) {
+            movingRigidBodyLastVelocityX = 0;
+            return 0f;
         }
-
-        // Lerp from the last velocity to 0
-        groundObjectLastVelocityX = Mathf.Lerp(groundObjectLastVelocityX, 0, objectMomentumDecayRate);
-        return groundObjectLastVelocityX;
+        
+        float targetMovingRigidBodyVelocity = Mathf.Lerp(movingRigidBodyLastVelocityX, 0f, movingRigidBodyVelocityXDecayRate * Time.fixedDeltaTime);
+        movingRigidBodyLastVelocityX = targetMovingRigidBodyVelocity;
+        return targetMovingRigidBodyVelocity ;
     }
+    
+    
     private void HandleDropDown() { 
         
-        if (!isOnPlatform || !softObject) return;
+        if (!softObject) return;
 
         if (dropDownInput) {
             rigidBody.linearVelocityY = jumpForce/3;
@@ -352,67 +358,118 @@ public class PlayerController2D : Entity2D {
     
     
     #region Jump functions //------------------------------------
-    
+    // private void HandleJump() {
+    //     
+    //     if (jumpInputDownRequested) { // Jump
+    //
+    //         if (holdJumpDownTimer > holdJumpDownBuffer) { // If past jump buffer than don't jump
+    //             jumpInputDownRequested = false;
+    //             return;
+    //         }
+    //         
+    //         string jumpDirection;
+    //         if (rigidBody.linearVelocity.x < 0 && horizontalInput > 0) {
+    //             jumpDirection = "Right";
+    //         } else if (rigidBody.linearVelocity.x > 0 && horizontalInput < 0){
+    //             jumpDirection = "Left";
+    //         } else {
+    //             jumpDirection = "None";
+    //         }
+    //         if (isGrounded || canCoyoteJump) { // Ground / Coyote jump
+    //             ExecuteJump(1, "None");
+    //         } else if (!(isGrounded && canCoyoteJump) && !isTouchingWall && remainingAirJumps > 1) { // Extra jump after coyote time passed
+    //             ExecuteJump(2, jumpDirection);
+    //         } else if (!(isGrounded && canCoyoteJump && isJumping) && !isTouchingWall && remainingAirJumps > 0) { // Extra jumps
+    //             ExecuteJump(1, jumpDirection);
+    //         }
+    //     }
+    //
+    //     // Reset jumps and jump cut state when grounded
+    //     if (isGrounded) { 
+    //         remainingAirJumps = maxAirJumps;
+    //         isJumpCut = false;
+    //         // Only reset isJumping if not actively jumping
+    //         if (rigidBody.linearVelocity.y <= 0) {
+    //             isJumping = false;
+    //         }
+    //     }
+    //
+    //     // Reset jump state and cut when falling
+    //     if (!isGrounded && rigidBody.linearVelocity.y <= 0) { 
+    //         isJumping = false;
+    //         isJumpCut = false;
+    //     }
+    // }
     private void HandleJump() {
+
         
-
-
-        if (jumpInputDownRequested) { // Jump
-
-            if (holdJumpDownTimer > holdJumpDownBuffer) { // If past jump buffer than don't jump
-                jumpInputDownRequested = false;
-                return;
-            }
-            
-            string jumpDirection;
-            if (rigidBody.linearVelocity.x < 0 && horizontalInput > 0) {
-                jumpDirection = "Right";
-            } else if (rigidBody.linearVelocity.x > 0 && horizontalInput < 0){
-                jumpDirection = "Left";
-            } else {
-                jumpDirection = "None";
-            }
-            if (isGrounded || canCoyoteJump) { // Ground / Coyote jump
-                ExecuteJump(1, "None");
-            } else if (!(isGrounded && canCoyoteJump) && !isTouchingWall && remainingJumps > 1) { // Extra jump after coyote time passed
-                ExecuteJump(2, jumpDirection);
-            } else if (!(isGrounded && canCoyoteJump && isJumping) && !isTouchingWall && remainingJumps > 0) { // Extra jumps
-                ExecuteJump(1, jumpDirection);
-            }
-        }
-
-        // Reset jumps and jump cut state when grounded
+        
         if (isGrounded) { 
-            remainingJumps = maxJumps;
+            // Reset jumps and jump cut state
+            remainingAirJumps = maxAirJumps;
             isJumpCut = false;
+            
+            // Reset coyote jump
+            canCoyoteJump = true;
+            coyoteJumpTime = coyoteJumpBuffer;
+            
             // Only reset isJumping if not actively jumping
             if (rigidBody.linearVelocity.y <= 0) {
                 isJumping = false;
             }
         }
-
+        
         // Reset jump state and cut when falling
         if (!isGrounded && rigidBody.linearVelocity.y <= 0) { 
             isJumping = false;
             isJumpCut = false;
         }
+        
+        if (jumpInputDownRequested) { // Jump requsted
+            
+            if (holdJumpDownTimer > holdJumpDownBuffer)
+            {
+                // If past jump buffer than don't jump
+                jumpInputDownRequested = false;
+                return;
+            }
+
+            string jumpDirection;
+            if (rigidBody.linearVelocity.x < 0 && horizontalInput > 0) {
+                jumpDirection = "Right";
+            } else if (rigidBody.linearVelocity.x > 0 && horizontalInput < 0) {
+                jumpDirection = "Left";
+            } else {
+                jumpDirection = "None";
+            }
+
+            if ((isGrounded || canCoyoteJump) && !isJumping) { // Ground jump
+                
+                if (canCoyoteJump && !isGrounded) { logText = $"Coyote Jumped: {coyoteJumpTime}";}
+                // Jump
+                ExecuteJump(0, "None");
+                PlayAnimation("Jump");
+                SoundManager.Instance?.PlaySoundFX("Player Jump");
+                
+                // Reset coyote state
+                coyoteJumpTime = 0;
+                canCoyoteJump = false;
+                
+            } else if (!isGrounded && !isTouchingWall && !canCoyoteJump && doubleJumpAbility && remainingAirJumps > 0) { // Double Jump
+                
+                // Jump
+                ExecuteJump(1, jumpDirection);
+                PlayVfxEffect(airJumpVfx, true); 
+                // PlayAnimation("AirJump");
+                SoundManager.Instance?.PlaySoundFX("Player Air Jump");
+            }
+        }
+        
     }
     
     private void ExecuteJump(int jumpCost, string side) {
-
-        // Play effects
-        if (!isGrounded) {
-            PlayVfxEffect(airJumpVfx, true); 
-            // PlayAnimation("AirJump");
-            SoundManager.Instance?.PlaySoundFX("Player Air Jump");
-        } 
-        if (isGrounded) {
-            PlayAnimation("Jump");
-            SoundManager.Instance?.PlaySoundFX("Player Jump");
-        }
+        
         StopVfxEffect(peakFallSpeedVfx, true);
-        
-        
         
         // Jump
         if (side == "Right") {
@@ -423,15 +480,11 @@ public class PlayerController2D : Entity2D {
             rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, jumpForce);
         }
         jumpInputDownRequested = false;
-        remainingJumps -= jumpCost;
+        remainingAirJumps -= jumpCost;
         isJumping = true;
         jumpInputHeld = true;
         isJumpCut = false;
         variableJumpHeldDuration = 0;
-
-        // Reset coyote state
-        coyoteJumpTime = 0;
-        canCoyoteJump = false;
     }
     
     private void JumpChecks() {
@@ -452,19 +505,13 @@ public class PlayerController2D : Entity2D {
         if (jumpInputUp && !isJumpCut) {  
             if (isJumping && rigidBody.linearVelocity.y > 0) {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
-                SoundManager.Instance?.StopSoundFx("Player Jump");
+                // SoundManager.Instance?.StopSoundFx("Player Jump");
                 isJumpCut = true;
             }
             jumpInputHeld = false;
             variableJumpHeldDuration = 0;
         }
         
-        // Reset coyote jump
-        if (isGrounded) {
-            canCoyoteJump = true;
-            coyoteJumpTime = coyoteJumpBuffer;
-        }
-
         // Update coyote time
         if (canCoyoteJump) {
             if (coyoteJumpTime > 0) {
@@ -632,7 +679,7 @@ public class PlayerController2D : Entity2D {
         }
         
         if (wallJumpResetsJumps && !isGrounded && isTouchingWall) { // Reset jumps
-            remainingJumps = maxJumps;
+            remainingAirJumps = maxAirJumps;
             variableJumpHeldDuration = 0;
         }
     }
@@ -650,6 +697,7 @@ public class PlayerController2D : Entity2D {
             rigidBody.linearVelocity = new Vector2(-wallJumpHorizontalForce, wallJumpVerticalForce);
             FlipPlayer("Left");
         }
+        logText = "Wall Jumped " + side;
         jumpInputDownRequested = false;
         variableJumpHeldDuration = 0;
         isJumping = true;
@@ -736,8 +784,8 @@ public class PlayerController2D : Entity2D {
         isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
         
         
-        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.02f, 0);
-        Vector2 checkCenter = collFeet.bounds.center + new Vector3(0,0);
+        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0);
+        Vector2 checkCenter = collFeet.bounds.center;
         // Debug visualization
         Vector2 halfSize = checkSize * 0.5f;
         Vector2 topLeft = checkCenter + new Vector2(-halfSize.x, halfSize.y);
@@ -796,11 +844,12 @@ public class PlayerController2D : Entity2D {
         
         if (collision.contactCount == 0) return;
         collision.gameObject.TryGetComponent<SoftObject2D>(out softObject);
+        collision.gameObject.TryGetComponent<Rigidbody2D>(out movingRigidbody);
+        onGroundObject = movingRigidbody; 
         
         switch (collision.gameObject.tag) {
             case "Platform":
-                    collision.gameObject.TryGetComponent<Rigidbody2D>(out groundObjectRigidbody);
-                    onGroundObject = true; 
+
             break;
             case "Enemy":
                 
@@ -843,8 +892,9 @@ public class PlayerController2D : Entity2D {
 
         if (other.gameObject.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
         {
-            if (rb == groundObjectRigidbody) {
+            if (rb == movingRigidbody) {
                 onGroundObject = false;
+                movingRigidBodyLastVelocityX = rb.linearVelocityX;
             }
         }
         softObject = null;
@@ -999,7 +1049,7 @@ public class PlayerController2D : Entity2D {
                 holdJumpDownTimer = 0f;
 
                 // Only reset jump cut when starting a new jump
-                if (isGrounded || canCoyoteJump || remainingJumps > 0) {
+                if (isGrounded || canCoyoteJump || remainingAirJumps > 0) {
                     isJumpCut = false;
                 }
             }
@@ -1106,9 +1156,9 @@ public class PlayerController2D : Entity2D {
         switch (state) {
             case PlayerState.Controllable:
                 rigidBody.linearVelocity = Vector2.zero;
-                remainingJumps = maxJumps;
+                remainingAirJumps = maxAirJumps;
                 remainingDashes = maxDashes;
-                groundObjectLastVelocityX = 0;
+                movingRigidBodyLastVelocityX = 0;
                 isDashCooldownRunning = false;
                 fallSpeed = 0;
                 wasRunning = false;
@@ -1175,7 +1225,7 @@ public class PlayerController2D : Entity2D {
                 debugStringBuilder.AppendFormat("Player:\n");
                 debugStringBuilder.AppendFormat("Health: {0} / {1}\n", currentHealth, maxHealth);
                 debugStringBuilder.AppendFormat("Deaths: {0}\n\n", deaths);
-                debugStringBuilder.AppendFormat("Jumps: {0} / {1}\n", remainingJumps, maxJumps);
+                debugStringBuilder.AppendFormat("Jumps: {0} / {1}\n", remainingAirJumps, maxAirJumps);
                 debugStringBuilder.AppendFormat("Dashes: {0} / {1} ({2:0.0} / {3:0.0})\n", remainingDashes, maxDashes, dashCooldownTimer, dashCooldownDuration);
                 debugStringBuilder.AppendFormat("Velocity: ({0:0.0},{1:0.0})\n", rigidBody.linearVelocityX, rigidBody.linearVelocityY);
                 debugStringBuilder.AppendFormat("Move Speed: ({0:0.0},{1:0.0})\n", moveSpeed, fallSpeed);
@@ -1198,9 +1248,8 @@ public class PlayerController2D : Entity2D {
                 debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
                 debugStringBuilder.AppendFormat("Touching Wall on Right: {0}, Left: {1}\n", isTouchingWallOnRight, isTouchingWallOnLeft);
                 debugStringBuilder.AppendFormat("Ledge on Right: {0}, Left: {1}\n", ledgeOnRight, ledgeOnLeft);
-                if (groundObjectRigidbody && groundObjectMomentum != 0) {
-                    debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", groundObjectRigidbody.gameObject.name, groundObjectRigidbody?.linearVelocityX, groundObjectMomentum);
-                }
+                debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", movingRigidbody, movingRigidbody?.linearVelocityX, movingRigidBodyLastVelocityX);
+                debugStringBuilder.AppendFormat("Soft Object: {0}\n", softObject);
 
                 // debugStringBuilder.AppendFormat("\nInputs:\n");
                 // debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");

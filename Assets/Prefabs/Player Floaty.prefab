@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: airFriction
-      value: 0.02
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: airRunSpeed
@@ -49,6 +49,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
+      propertyPath: groundFriction
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: moveAcceleration
       value: 0.5
       objectReference: {fileID: 0}
@@ -66,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6449356787988531081, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 69.5
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6449356787988531081, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_LocalPosition.y

@@ -52,6 +52,7 @@ public class PlayerController2D : Entity2D {
     private float _coyoteJumpTime;
     private float _variableJumpHeldDuration;
 
+    
     [Header("Gravity")] 
     [SerializeField] private bool lerpGravity;
     [SerializeField] private float gravityForce = 0.5f;
@@ -136,7 +137,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private float dashCooldownDuration = 1f;
     [SerializeField] [Range(0.1f, 1f)] private float holdDashRequestTime = 0.1f; // For how long the dash buffer will hold
     private int _remainingDashes;
-    private bool _isDashing;
+    public bool isDashing { get; private set; }
     private float _dashBufferTimer;
     private float _dashCooldownTimer;
     private bool _isDashCooldownRunning;
@@ -243,7 +244,7 @@ public class PlayerController2D : Entity2D {
         
         // If grounded use ground friction else use air friction
         if (isGrounded) {
-            return isOnPlatform || _isDashing ? platformFriction : groundFriction; // If on a platform multiply the ground friction
+            return isOnPlatform || isDashing ? platformFriction : groundFriction; // If on a platform multiply the ground friction
         }
 
         return airFriction;
@@ -266,14 +267,14 @@ public class PlayerController2D : Entity2D {
             if (isGrounded) { // On Ground
 
                 targetSpeed *= runAbility && _runInput ? runSpeed : walkSpeed;
-                wasRunning = runAbility && _runInput;
+                wasRunning = runAbility && _runInput && Mathf.Abs(_moveSpeed) > runningThreshold;
 
             } else{ // In air
 
                 if (_isTouchingWall) { wasRunning = false;}
 
                 targetSpeed *= runAbility && _runInput ? airRunSpeed : airWalkSpeed;
-                wasRunning = runAbility && _runInput;
+                wasRunning = runAbility && _runInput && Mathf.Abs(_moveSpeed) > runningThreshold;
             } 
         }
         
@@ -319,7 +320,7 @@ public class PlayerController2D : Entity2D {
         
         if (!autoClimbSteps) return; // Only check if you can climb steps
         
-        if (isGrounded || _isDashing) { // Check for steps when grounded or dashing
+        if (isGrounded || isDashing) { // Check for steps when grounded or dashing
             
             Vector2 moveDirection = new Vector2(rigidBody.linearVelocity.x, 0).normalized;
             if (moveDirection != Vector2.zero ) { // Moving horizontally
@@ -527,7 +528,7 @@ public class PlayerController2D : Entity2D {
             SoundManager.Instance?.PlaySoundFX("Player Dash");
 
             // Dash
-            _isDashing = true;
+            isDashing = true;
             _remainingDashes --;
             TurnInvincible();
             TurnStunLocked();
@@ -707,7 +708,7 @@ public class PlayerController2D : Entity2D {
     }
     private void HandleGroundedGravity() {
         
-        if (isFastFalling && isGrounded && !_isDashing) { // Check if landed
+        if (isFastFalling && isGrounded && !isDashing) { // Check if landed
             
             rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
             PlayAnimation("Land");
@@ -821,7 +822,7 @@ public class PlayerController2D : Entity2D {
                 }
 
                 // Damage and push the enemy if the player is dashing
-                if (_isDashing) {
+                if (isDashing) {
                     enemyCont.Push(-enemyDashForce);
                     // enemyCont.DamageHealth(1, true); 
                 }
@@ -859,7 +860,13 @@ public class PlayerController2D : Entity2D {
                 RespawnFromCheckpoint();
             break;
         }
+        
+        if (other.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary)) {
+            Debug.Log(other.name);
+            _activeBoundary = boundary;
+            SetBoundaries(boundary.GetMinXAreaBoundary(),boundary.GetMaxXAreaBoundary(),boundary.GetMinYAreaBoundary(),boundary.GetMaxYAreaBoundary());
     }
+    
     
     #endregion Collision functions
     
@@ -894,7 +901,7 @@ public class PlayerController2D : Entity2D {
 
         if (!keepMomentum) {
             rigidBody.linearVelocity = new Vector2(0, 0);
-            _isDashing = false;
+            isDashing = false;
             wasRunning = false;
             StopVfxEffect(jumpVfx, true);
             StopVfxEffect(dashVfx, true);
@@ -953,7 +960,7 @@ public class PlayerController2D : Entity2D {
     private void TurnVulnerable() {
 
         _isInvincible = false;
-        _isDashing = false;
+        isDashing = false;
         
         foreach (SpriteRenderer sr in spriteRenderers) {
             sr.color = _defaultColor;
@@ -1186,7 +1193,7 @@ public class PlayerController2D : Entity2D {
                 _debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", _isStunLocked, _stunLockTime);
                 _debugStringBuilder.AppendFormat("Jumping: {0}\n", _isJumping);
                 if (runAbility) _debugStringBuilder.AppendFormat("Running: {0}\n", wasRunning);
-                if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", _isDashing);
+                if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
                 if (wallSlideAbility) _debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);
                 if (canFastDrop) _debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", _isFastDropping);
                 _debugStringBuilder.AppendFormat("Coyote Jumping: {0} ({1:0.0} / {2:0.0})\n",_canCoyoteJump, _coyoteJumpTime,coyoteJumpBuffer);

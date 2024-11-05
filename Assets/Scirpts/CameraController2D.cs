@@ -10,12 +10,13 @@ using Random = UnityEngine.Random;
 public class CameraController2D : MonoBehaviour
 {
     public static CameraController2D Instance { get; private set; }
-
+    private Camera _camera;
 
     [Header("Target")]
     [SerializeField] private Transform target;
     [SerializeField] [Range(0f, 2f)] private float smoothFollowSpeed = 0.5f;
-    private Vector3 targetPosition;
+    private Vector3 _targetPosition;
+    private PlayerController2D _player;
 
 
     [Header("Target Offset")]
@@ -23,11 +24,12 @@ public class CameraController2D : MonoBehaviour
     [SerializeField] private bool horizontalOffset = true;
     [SerializeField] [Range(0f, 2f)] private float verticalOffsetStrength = 1f;
     [SerializeField] [Range(0f, 2f)] private float horizontalOffsetStrength = 1f;
-    private Vector3 targetOffset;
+    private Vector3 _targetOffset;
+    private Vector3 _currentVelocity;
 
     [Header("Shake Settings")]
     [HideInInspector] public bool isShaking;
-    private Vector3 shakeOffset;
+    private Vector3 _shakeOffset;
 
     [Header("Camera Boundaries")]
     [SerializeField] private bool useBoundaries;
@@ -38,16 +40,13 @@ public class CameraController2D : MonoBehaviour
 
     [Header("Zoom Settings")]
     [SerializeField] private bool allowZoomControl = true;
-    [SerializeField] private float currentZoom = 3f;
-    [SerializeField] private float zoomSpeed = 1f;
+    [SerializeField] private float targetZoom = 5f;
+    [SerializeField] private float zoomSpeed = 2f;
     [SerializeField] private float minZoom = 2f;
-    [SerializeField] private float maxZoom = 5f;
+    [SerializeField] private float maxZoom = 6f;
+    private float _zoomVelocity;
 
-
-
-    private Camera cam;
-    private Vector3 currentVelocity;
-    private float zoomVelocity;
+    
 
 
     private void Awake() {
@@ -64,28 +63,26 @@ public class CameraController2D : MonoBehaviour
 
 
     private void Start() {
-        cam = GetComponent<Camera>();
-        target = PlayerController2D.Instance.GetComponent<Transform>();
-        cam.orthographicSize = currentZoom;
-        isShaking = false;
+        _camera = GetComponent<Camera>();
+        _camera.orthographicSize = targetZoom;
+        PlayerController2D.Instance.TryGetComponent<PlayerController2D>(out _player);
+        
+        target = _player.transform;
     }
 
-    private void Update()
-    {
+    private void Update() {
         HandleZoomInput();
     }
 
 
-    private void LateUpdate()
-    {
+    private void LateUpdate() {
         FollowTarget();
         HandleZoom();
         ApplyShake();
-        
     }
 
 
-    #region Target
+#region Target
 
 
     public void SetTarget(Transform newTarget)
@@ -97,8 +94,8 @@ public class CameraController2D : MonoBehaviour
     {
         if (!target) return;
 
-        targetPosition = CalculateTargetPosition();
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
+        _targetPosition = CalculateTargetPosition();
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition, ref _currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
 
         if (useBoundaries) {
 
@@ -108,37 +105,34 @@ public class CameraController2D : MonoBehaviour
         transform.position = smoothedPosition;
     }
 
-    #endregion Target
+#endregion Target
 
-    #region Zoom
-    private void HandleZoomInput()
-    {
+#region Zoom
+
+    private void HandleZoomInput() {
         if (!allowZoomControl) return;
 
         float zoomInput = Input.GetAxis("Mouse ScrollWheel");
-        currentZoom -= zoomInput * zoomSpeed;
-        currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+        targetZoom = SetZoom(zoomInput * zoomSpeed);
     }
-    private void HandleZoom()
-    {
+    private void HandleZoom() {
         if (!allowZoomControl) return;
 
-        cam.orthographicSize = Mathf.SmoothDamp(cam.orthographicSize, currentZoom, ref zoomVelocity, smoothFollowSpeed, Mathf.Infinity, Time.fixedDeltaTime);
+        _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom, ref _zoomVelocity, smoothFollowSpeed, Mathf.Infinity, Time.fixedDeltaTime);
     }
 
-
-    public void SetZoom(float zoom)
-    {
-        currentZoom = Mathf.Clamp(zoom, minZoom, maxZoom);
+    private float SetZoom(float zoom) {
+        return targetZoom = Mathf.Clamp(zoom, minZoom, maxZoom);
     }
+    
+#endregion Zoom
 
-    #endregion Zoom
-
-    #region Boundaries
+#region Boundaries
+    
     private Vector3 HandleBoundaries(Vector3 position)
     {
-        float camHeight = cam.orthographicSize;
-        float camWidth = camHeight * cam.aspect;
+        float camHeight = _camera.orthographicSize;
+        float camWidth = camHeight * _camera.aspect;
 
         float minXBoundaryBoundary = minXLevelBoundary + camWidth;
         float maxXBoundaryBoundary = maxXLevelBoundary - camWidth;
@@ -163,14 +157,14 @@ public class CameraController2D : MonoBehaviour
 
  
 
-    #endregion Boundaries
+#endregion Boundaries
     
-    #region Shake
-    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f)
-    {
+#region Shake
+
+    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f) {
         if (!target) return;
         StartCoroutine(Shake(duration, magnitude, xShakeRange, yShakeRange));
-        // Debug.Log("Shaking camera for: " + duration + ", At: " + magnitude + ", yRange: " + yShakeRange + ", xRange: " + xShakeRange);
+
     }
 
     private IEnumerator Shake(float duration, float magnitude, float xShakeRange, float yShakeRange)
@@ -183,20 +177,20 @@ public class CameraController2D : MonoBehaviour
             float x = Random.Range(-xShakeRange, xShakeRange) * magnitude;
             float y = Random.Range(-yShakeRange, yShakeRange) * magnitude;
 
-            shakeOffset = new Vector3(x, y, 0);
+            _shakeOffset = new Vector3(x, y, 0);
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        shakeOffset = Vector3.zero;
+        _shakeOffset = Vector3.zero;
         isShaking = false;
     }
     private void ApplyShake()
     {
         if (isShaking)
         {
-            Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
+            Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition, ref _currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
 
             if (useBoundaries)
             {
@@ -210,69 +204,76 @@ public class CameraController2D : MonoBehaviour
 
     public void StopCameraShake() {
         isShaking = false;
-        shakeOffset = Vector3.zero;
+        _shakeOffset = Vector3.zero;
     }
-
-    #endregion Shake
     
-    #region Calculations
-    private Vector3 CalculateTargetOffset()
-    {
-        Vector3 offset = Vector3.zero;
+#endregion Shake
+    
+#region Calculations
 
-        if (target.CompareTag("Player"))
-        {
-            PlayerController2D player = target.GetComponent<PlayerController2D>();
+    private Vector3 CalculateTargetOffset() {
             
-            if (horizontalOffset) {
-                if (player.rigidBody.linearVelocity.x != 0 ) {
+        Vector3 offset = Vector3.zero;
+        if (!target.CompareTag("Player")) return offset;
+            
+                
+        if (horizontalOffset) {
+            if (_player.rigidBody.linearVelocity.x != 0 ) {
 
-                    if (player.isFacingRight) {
-                        offset.x = horizontalOffsetStrength + (player.rigidBody.linearVelocity.x/1.5f);
-                    } else {
-                        offset.x = -horizontalOffsetStrength + (player.rigidBody.linearVelocity.x/1.5f);
-                    }
-                }
-            }
-
-            if (verticalOffset) {
-                if (player.isGrounded) { // player is on the ground
-                    offset.y = 1f;
+                if (_player.isFacingRight) {
+                    offset.x = horizontalOffsetStrength + (_player.rigidBody.linearVelocity.x/1.5f);
                 } else {
-                    if (player.isWallSliding) { // Player is wall sliding
-                        offset.y = verticalOffsetStrength + player.rigidBody.linearVelocity.y;
-                        
-                    }  else { // Player is in the air
-                        if (!player.isWallSliding && player.rigidBody.linearVelocity.y > 0) { // Player is jumping
-                            offset.y = verticalOffsetStrength * player.rigidBody.linearVelocity.y;
-                            
-                        } else if (!player.isWallSliding && player.rigidBody.linearVelocity.y < 0 && player.rigidBody.linearVelocity.y > -7) { // Player is falling
-                            offset.y = -verticalOffsetStrength + Mathf.Clamp(player.rigidBody.linearVelocity.y/2f,-1,0);
-
-                        } else if (!player.isWallSliding && player.rigidBody.linearVelocity.y < -7) { // Player is fast falling
-                            offset.y = -verticalOffsetStrength + Mathf.Clamp(player.rigidBody.linearVelocity.y/2f,-10,0);
-
-                        }
-                    }
+                    offset.x = -horizontalOffsetStrength + (_player.rigidBody.linearVelocity.x/1.5f);
                 }
             }
         }
 
-        targetOffset = offset;
+        if (verticalOffset) {
+            if (_player.isGrounded) { // player is on the ground
+                offset.y = 1f;
+            } else {
+                if (_player.isWallSliding) { // Player is wall sliding
+                    offset.y = verticalOffsetStrength + _player.rigidBody.linearVelocity.y;
+                        
+                }  else { // Player is in the air
+                    if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y > 0) { // Player is jumping
+                        offset.y = verticalOffsetStrength * _player.rigidBody.linearVelocity.y;
+                            
+                    } else if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y < 0 && _player.rigidBody.linearVelocity.y > -7) { // Player is falling
+                        offset.y = -verticalOffsetStrength + Mathf.Clamp(_player.rigidBody.linearVelocity.y/2f,-1,0);
+
+                    } else if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y < -7) { // Player is fast falling
+                        offset.y = -verticalOffsetStrength + Mathf.Clamp(_player.rigidBody.linearVelocity.y/2f,-10,0);
+
+                    }
+                }
+            }
+        }
+            
+        _targetOffset = offset;
         return offset;
     }
 
-    private Vector3 CalculateTargetPosition()
-    {
+    private float CalculateTargetZoomOffset() {
+        
+        if (_player.isRunning || _player.wasRunning)
+        {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private Vector3 CalculateTargetPosition() {
         CalculateTargetOffset();
-        Vector3 basePosition = new Vector3(target.position.x, target.position.y, transform.position.z) + targetOffset;
-        return basePosition + shakeOffset;
+        Vector3 basePosition = new Vector3(target.position.x, target.position.y, transform.position.z) + _targetOffset;
+        return basePosition + _shakeOffset;
     }
 
 
-    #endregion Calculations
-
-    #region Debugging functions
+#endregion Calculations
+    
+#region Debugging functions
     private void OnDrawGizmos()
     {
         if (useBoundaries) {
@@ -291,12 +292,12 @@ public class CameraController2D : MonoBehaviour
         debugStringBuilder.Clear();
         
         debugStringBuilder.AppendFormat("Camera:\n");
-        debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", shakeOffset.x, shakeOffset.y);
-        debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", currentZoom, minZoom, maxZoom);
+        debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
+        debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", targetZoom, minZoom, maxZoom);
 
         debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-        debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", targetPosition.x, targetPosition.y);
-        debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", targetOffset.x, targetOffset.y);
+        debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", _targetPosition.x, _targetPosition.y);
+        debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", _targetOffset.x, _targetOffset.y);
 
         debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", useBoundaries);
         debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", minXLevelBoundary, maxXLevelBoundary);
@@ -307,6 +308,12 @@ public class CameraController2D : MonoBehaviour
 
     }
     
-    #endregion Debugging functions
+#endregion Debugging functions
+
 
 }
+
+
+
+    
+

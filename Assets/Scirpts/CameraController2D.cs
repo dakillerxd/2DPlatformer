@@ -65,7 +65,7 @@ public class CameraController2D : MonoBehaviour
 
     private void Start() {
         cam = GetComponent<Camera>();
-        target = GameObject.Find("Player").GetComponent<Transform>();
+        target = PlayerController2D.Instance.GetComponent<Transform>();
         cam.orthographicSize = currentZoom;
         isShaking = false;
     }
@@ -161,15 +161,7 @@ public class CameraController2D : MonoBehaviour
         maxYLevelBoundary = maxYBoundary;
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        if (useBoundaries) {
-            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
-            Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
-            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line
-            Debug.DrawLine(new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Top line
-        }
-    }
+ 
 
     #endregion Boundaries
     
@@ -281,6 +273,18 @@ public class CameraController2D : MonoBehaviour
     #endregion Calculations
 
     #region Debugging functions
+    private void OnDrawGizmos()
+    {
+        if (useBoundaries) {
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Left line
+            Debug.DrawLine(new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Right line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, minYLevelBoundary, 0), new Vector3(maxXLevelBoundary, minYLevelBoundary, 0), Color.blue); // Bottom line
+            Debug.DrawLine(new Vector3(minXLevelBoundary, maxYLevelBoundary, 0), new Vector3(maxXLevelBoundary, maxYLevelBoundary, 0), Color.blue); // Top line
+        }
+    }
+    
+    
+    
     private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject) {
         

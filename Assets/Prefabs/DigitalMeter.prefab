@@ -53,7 +53,7 @@ MonoBehaviour:
   fontSize: 13
   labelOffset: 0.1
   units: 
-  decimals: 1
+  decimals: 2
 --- !u!1 &9203225062430303385
 GameObject:
   m_ObjectHideFlags: 0

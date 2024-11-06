@@ -26,16 +26,18 @@ public class PlayerController2D : Entity2D {
     private float _stunLockTime;
 
     [Header("Movement")]
-    [SerializeField] [Min(0.1f)] private float walkSpeed = 4f;
-    [SerializeField] [Min(0.1f)] private float airWalkSpeed = 3f;
-    [SerializeField] [Min(0.1f)] private float airRunSpeed = 6f;
-    [SerializeField] [Min(0.1f)] private float moveAcceleration = 15f; // How fast the player gets to max speed
-    [SerializeField] [Min(0.01f)] private float groundFriction = 0.15f; // The higher the friction there is less resistance
-    [SerializeField] [Min(0.01f)] private float airFriction = 0.03f; // The higher the friction there is less resistance
-    [SerializeField] [Min(0.01f)] private float platformFriction = 0.5f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.1f)] private float maxMoveSpeed = 6f;
+    [SerializeField] [Min(0.1f)] private float maxAirMoveSpeed = 5f;
+    [SerializeField] [Min(0.1f)] private float airRunSpeed = 7f;
+    [SerializeField] [Min(0.1f)] private float moveAcceleration = 7f; // How fast the player gets to acceleration threshold
+    [SerializeField] private float finalAcceleration = 1.5f;     // Slower final acceleration
+    [SerializeField] private float accelerationThreshold = 4f;   // Speed at which we switch to slower acceleration
+    [SerializeField] [Min(0.1f)] private float directionChangeMultiplier  = 4f;
+    [SerializeField] [Min(0.01f)] private float groundFriction = 5f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)] private float airFriction = 0.1f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)] private float platformFriction = 1f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float movementThreshold = 0.1f;
-    [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
-    private bool _isMoving;
+    [SerializeField] private float runningThreshold = 5.9f; // How fast the player needs to move for running
     private float _moveSpeed;
     
     [Header("Jump")]
@@ -52,7 +54,6 @@ public class PlayerController2D : Entity2D {
     private float _variableJumpHeldDuration;
     
     [Header("Gravity")] 
-    [SerializeField] private bool lerpGravity;
     [SerializeField] private float gravityForce = 0.5f;
     [SerializeField] private float fallMultiplier = 4f; // Gravity multiplayer when the payer is falling
     [SerializeField] public float maxFallSpeed = 20f;
@@ -97,6 +98,7 @@ public class PlayerController2D : Entity2D {
     
     
     [Header("States")] 
+    public bool _isMoving { get; private set; }
     public bool isFacingRight { get; private set; }
     public bool isStunLocked { get; private set; }
     public bool isInvincible { get; private set; }
@@ -108,7 +110,6 @@ public class PlayerController2D : Entity2D {
     public bool ledgeOnLeft { get; private set; }
     public bool ledgeOnRight { get; private set; }
     public bool isDashing { get; private set; }
-
     
     
     [Header("Input")] 
@@ -208,10 +209,10 @@ public class PlayerController2D : Entity2D {
         if (!CanPlay()) { return; }
         
         CheckForInput();
-        HandleDropDown();
-        DashTimer();
-        JumpChecks();
         CheckFaceDirection();
+        HandleDropDown();
+        JumpChecks();
+        DashTimer();
     }
     
     private void FixedUpdate() {
@@ -223,40 +224,89 @@ public class PlayerController2D : Entity2D {
         HandleStepClimbing();
         HandleFastDrop();
         HandleJump();
+        
         HandleWallSlide();
         HandleWallJump();
         HandleDashing();
-        
     }
     
     
     #region Movement functions //------------------------------------
-    
     private void HandleMovement() {
         
-        // Get the ground object momentum
         float targetMovingRigidBodyVelocity = CalculateMovingRigidBodyMomentum();
+        float targetSpeed = CalculateTargetMoveSpeed();
+        float friction = CalculateFriction();
+
+        if (_horizontalInput != 0) {  
         
-        // Get move speed and apply fiction
-        float baseMoveSpeed = rigidBody.linearVelocity.x - targetMovingRigidBodyVelocity;
-        _moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateFriction());
-        
-        // Move
+            if (Mathf.Sign(_horizontalInput) != Mathf.Sign(_moveSpeed) && _moveSpeed != 0) { // Check if we're changing directions
+                _moveSpeed -= (moveAcceleration * directionChangeMultiplier) * Time.fixedDeltaTime * Mathf.Sign(_moveSpeed);
+            }
+            // Acceleration
+            else if (_horizontalInput > 0) {  // Moving right
+                if (Mathf.Abs(_moveSpeed) < accelerationThreshold) {
+                    _moveSpeed += moveAcceleration * Time.fixedDeltaTime;  // Fast initial acceleration
+                } else {
+                    _moveSpeed += finalAcceleration * Time.fixedDeltaTime;    // Slower final acceleration
+                }
+            }
+            else if (_horizontalInput < 0) {  // Moving left
+                if (Mathf.Abs(_moveSpeed) < accelerationThreshold) {
+                    _moveSpeed -= moveAcceleration * Time.fixedDeltaTime;  // Fast initial acceleration
+                } else {
+                    _moveSpeed -= finalAcceleration * Time.fixedDeltaTime;    // Slower final acceleration
+                }
+            }
+        }
+
+        // Apply friction when not moving
+        if (Mathf.Abs(_horizontalInput) < 0.01f) {
+            _moveSpeed *= (1 - friction * Time.fixedDeltaTime);
+        }
+
+        // Clamp move speed
+        float maxSpeed = isGrounded ? maxMoveSpeed : (wasRunning ? airRunSpeed : maxAirMoveSpeed);
+        _moveSpeed = Mathf.Clamp(_moveSpeed, -maxSpeed, maxSpeed);
+
+        // Apply final movement
         rigidBody.linearVelocityX = _moveSpeed + targetMovingRigidBodyVelocity;
-        _isMoving = _moveSpeed  > movementThreshold || _moveSpeed < -movementThreshold;
-        
-        
-        // Run effect
-        if (isRunning && isGrounded) { 
+        _isMoving = _moveSpeed > movementThreshold || _moveSpeed < -movementThreshold;
+
+        // Run effect (rest of your code remains the same)
+        if (isRunning && isGrounded) {
             PlayVfxEffect(peakMoveSpeedVfx, false);
             PlayVfxEffect(groundRunVfx, false);
-            // PlayAnimation("Run");
-            
         } else {
             StopVfxEffect(groundRunVfx, false);
             StopVfxEffect(peakMoveSpeedVfx, false);
         }
+        
     }
+
+    private float CalculateTargetMoveSpeed() {
+        float targetSpeed = _horizontalInput;
+
+        if (isWallSliding) {
+            if (Mathf.Abs(_horizontalInput) < wallSlideStickStrength) {
+                targetSpeed = 0;
+            }
+        } else {
+            isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
+            if (isRunning) { wasRunning = true; }
+            if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
+            
+            if (isGrounded) {
+                targetSpeed *= maxMoveSpeed;
+            } else {
+                targetSpeed *= wasRunning ? airRunSpeed : maxAirMoveSpeed;
+            }
+        }
+
+        return targetSpeed;
+    }
+
+    
     private float CalculateFriction() {
         
         // If grounded use ground friction else use air friction
@@ -266,45 +316,6 @@ public class PlayerController2D : Entity2D {
 
         return airFriction;
         
-    }
-    private float CalculateTargetMoveSpeed() {
-        
-        float targetSpeed = _horizontalInput;
-        float acceleration = moveAcceleration;
-
-        
-        if (isWallSliding) { // Wall sliding
-            
-            if (Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { 
-
-                targetSpeed = 0; 
-                acceleration = 0;
-            }
-            
-        } else { // Handle move speed
-            
-            isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
-            if (isRunning) { wasRunning = true; }
-
-            if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
-            
-            if (isGrounded) { // On Ground
-
-                targetSpeed *= walkSpeed;
-                
-            } else { // In air
-                
-                targetSpeed *= wasRunning ? airRunSpeed : airWalkSpeed;
-                // if (wasRunning) { acceleration *= 1.5f; }
-            } 
-        }
-        
-        
-        // Lerp the player movement
-        float targetMoveSpeed = Mathf.Lerp(_moveSpeed, targetSpeed, acceleration);
-        
-        
-        return targetMoveSpeed;
     }
     
     private float CalculateMovingRigidBodyMomentum()
@@ -677,11 +688,8 @@ public class PlayerController2D : Entity2D {
         float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
         float appliedGravity = gravityForce * gravityMultiplier;
         float fallSpeed = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime);
-
-
-        rigidBody.linearVelocityY = lerpGravity ? Mathf.Lerp(rigidBody.linearVelocity.y, -maxFallSpeed, appliedGravity * Time.fixedDeltaTime) : fallSpeed;
-        // Values gravityForce 9.8, fallMultiplier 2
-        // Values gravityForce 0.5, fallMultiplier 4
+        
+        rigidBody.linearVelocityY = fallSpeed;
 
     }
     private void CheckFallSpeed() {
@@ -855,7 +863,6 @@ public class PlayerController2D : Entity2D {
 
                 if (collision.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary))
                 {
-                    Debug.Log(collision.name);
                     CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());
                 }
                 break;
@@ -1117,6 +1124,7 @@ public class PlayerController2D : Entity2D {
                 _movingRigidbodyLastVelocityX = 0;
                 _isDashCooldownRunning = false;
                 fallSpeed = 0;
+                _moveSpeed = 0;
                 wasRunning = false;
                 isTeleporting = false;
                 isDashing = false;

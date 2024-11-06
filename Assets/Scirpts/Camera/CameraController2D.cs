@@ -317,7 +317,7 @@ public class CameraController2D : MonoBehaviour
 
         if (useBoundaries && _activeBoundary) 
         {
-            _debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeBoundary);
+            _debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeBoundary.name);
             _debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", _minXBoundary, _maxXBoundary);
             _debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", _minYBoundary, _maxYBoundary);
         }

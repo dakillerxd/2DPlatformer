@@ -242,12 +242,15 @@ MonoBehaviour:
   maxHealth: 2
   canTakeFallDamage: 0
   maxFallDamage: 1
-  walkSpeed: 6
-  airWalkSpeed: 4
+  maxMoveSpeed: 6
+  maxAirMoveSpeed: 5
   airRunSpeed: 7
-  moveAcceleration: 0.5
-  groundFriction: 0.2
-  airFriction: 0.05
+  moveAcceleration: 7
+  finalAcceleration: 1.5
+  accelerationThreshold: 4
+  directionChangeMultiplier: 4
+  groundFriction: 5
+  airFriction: 0.1
   platformFriction: 0.5
   movementThreshold: 0.1
   runningThreshold: 5.9

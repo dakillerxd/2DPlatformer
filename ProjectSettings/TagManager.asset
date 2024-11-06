@@ -11,6 +11,7 @@ TagManager:
   - RespawnTrigger
   - Portal
   - Platform
+  - CameraBoundary
   layers:
   - Default
   - TransparentFX

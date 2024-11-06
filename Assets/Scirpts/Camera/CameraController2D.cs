@@ -3,9 +3,10 @@ using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
+using VInspector;
 using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Camera))]
 public class CameraController2D : MonoBehaviour
 {
@@ -13,15 +14,15 @@ public class CameraController2D : MonoBehaviour
     private Camera _camera;
     private float _cameraHeight;
     private float _cameraWidth;
-    private  BoxCollider2D _collider;
-
+    
     [Header("Target")]
-    [SerializeField] [Range(0f, 2f)] private float smoothFollowSpeed = 0.5f;
+    [SerializeField] [Range(0f, 2f)] private float followDelay = 0.5f;
     private Transform _target;
     private Vector3 _targetPosition;
-    private PlayerController2D _player;
+    private Vector3 _targetOffset;
+    private Vector3 _currentVelocity;
     
-    [Header("Zoom Settings")]
+    [Header("Zoom")]
     [SerializeField] private bool allowZoomControl = true;
     [SerializeField] private float targetZoom = 5f;
     [SerializeField] private float zoomSpeed = 2f;
@@ -31,31 +32,27 @@ public class CameraController2D : MonoBehaviour
     private float _zoomOffset;
     private float _zoomVelocity;
 
-    [Header("Camera Boundaries")]
+    [Header("Boundaries")]
     [SerializeField] private bool useBoundaries;
+    [SerializeField] private CameraBoundary2D boundaryPrefab;
     private CameraBoundary2D _activeBoundary;
     private float _minXBoundary;
     private float _maxXBoundary;
     private float _minYBoundary;
     private float _maxYBoundary;
     
-    [Header("Shake Settings")]
+    [Header("Shake Effect")]
     [HideInInspector] public bool isShaking;
     private Vector3 _shakeOffset;
     
-    [Header("Player Specific Settings")]
+    [Header("Player Offset Settings")]
     [SerializeField] private bool verticalOffset = true;
     [SerializeField] private bool horizontalOffset = true;
     [SerializeField] [Range(0f, 2f)] private float verticalOffsetStrength = 1f;
     [SerializeField] [Range(0f, 2f)] private float horizontalOffsetStrength = 1f;
-    private Vector3 _targetOffset;
-    private Vector3 _currentVelocity;
-
-
-
+    private PlayerController2D _player;
 
     
-
 
     private void Awake() {
 
@@ -73,18 +70,17 @@ public class CameraController2D : MonoBehaviour
     private void Start() {
         
         // Initialize camera
-        _collider = GetComponent<BoxCollider2D>();
         _camera = GetComponent<Camera>();
+        targetZoom = startingZoom;
         _camera.orthographicSize = startingZoom;
-        _collider.isTrigger = true;
         _cameraHeight = _camera.orthographicSize * 2;
         _cameraWidth = _cameraHeight * _camera.aspect;
-        _collider.size = new Vector2(_cameraWidth, _cameraHeight);
-        
         
         // Get the player
         PlayerController2D.Instance.TryGetComponent<PlayerController2D>(out _player);
         if (_player) { _target = _player.transform; }
+        
+
     }
 
     private void Update() {
@@ -94,19 +90,14 @@ public class CameraController2D : MonoBehaviour
 
     private void LateUpdate() {
         
-        // Follow a target/player and set zoom levels
         FollowTarget();
         HandleZoom();
-        
-        // Handle camera boundaries
         HandleBoundaries();
         
         // Apply shake when needed
         // ApplyShake();
     }
 
-    
-    
     
     
 #region Target functions
@@ -123,7 +114,7 @@ public class CameraController2D : MonoBehaviour
         
         _targetPosition = CalculateTargetPosition();
         _targetOffset = CalculateTargetOffset();
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset, ref _currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
         transform.position = smoothedPosition;
     }
     
@@ -178,105 +169,76 @@ public class CameraController2D : MonoBehaviour
 
 #endregion Target functions
 
-#region Zoom
+#region Zoom functions
 
     private void HandleZoomInput() {
         if (!allowZoomControl) return;
 
         float zoomInput = Input.GetAxis("Mouse ScrollWheel");
-        targetZoom = targetZoom + (zoomInput * zoomSpeed);
+        targetZoom = targetZoom + (-zoomInput * zoomSpeed);
     }
     private void HandleZoom() {
-
+        if (!_target) return;
         _zoomOffset = (_target == _player.transform) ? CalculateTargetZoomOffset() : 0;
-        _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom + _zoomOffset, ref _zoomVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
-        float height = _camera.orthographicSize * 2;
-        float width = height * _camera.aspect;
-        _collider.size = new Vector2(width, height);
-    }
-
-    private float SetZoom(float zoom) {
-        return targetZoom = Mathf.Clamp(zoom, minZoom, maxZoom);
+        targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+        _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom + _zoomOffset, ref _zoomVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
     }
     
-    private float CalculateTargetZoomOffset() {
+    private float CalculateTargetZoomOffset()
+    {
+        float offset = 0;
         
-        if (_player.isRunning || _player.wasRunning) {
-            return 1;
+        if (_player.wasRunning)
+        {
+            offset += 2;
+        }
+        else if (_player.isTeleporting)
+        { 
+            offset-= 2;
         }
 
-        return 0;
+        return offset;
     }
     
-#endregion Zoom
+#endregion Zoom functions
 
-#region Boundaries
+#region Boundaries functions
 
-    public void SetBoundaries(float minXBoundary, float maxXBoundary, float minYBoundary, float maxYBoundary) {
-            
-        _minXBoundary = minXBoundary + (_cameraWidth/2);
-        _maxXBoundary = maxXBoundary - (_cameraWidth/2);
-        _minYBoundary = minYBoundary + (_cameraHeight/2);
-        _maxYBoundary = maxYBoundary - (_cameraHeight/2);;
+    public void SetBoundaries(CameraBoundary2D boundaryObject, Vector4  boundaries) {
+
         
+        _activeBoundary = boundaryObject;
+        _minXBoundary = boundaries.x + (_cameraWidth/2);
+        _maxXBoundary = boundaries.y - (_cameraWidth/2);
+        _minYBoundary = boundaries.z + (_cameraHeight/2);
+        _maxYBoundary = boundaries.w - (_cameraHeight/2);;
     }
     
-    private void OnTriggerEnter2D(Collider2D other) {
-        
-        if (!useBoundaries) return;
-        if (other.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary)) {
-            Debug.Log(other.name);
-            _activeBoundary = boundary;
-            SetBoundaries(boundary.GetMinXAreaBoundary(),boundary.GetMaxXAreaBoundary(),boundary.GetMinYAreaBoundary(),boundary.GetMaxYAreaBoundary());
-        }
-    }
     
     private void HandleBoundaries() {
-        if (!_activeBoundary && !useBoundaries) return;
+        if (!_activeBoundary || !useBoundaries) return;
 
         Vector3 position = transform.position;
         position.x = Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary);
         position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
         transform.position = position;
     }
-    private void OnDrawGizmos() {
+
+    [Button] private void CreateNewBoundary()
+    {
+        if (!boundaryPrefab) return;
+
+        CameraBoundary2D newBoundary = Instantiate(boundaryPrefab, transform.position, Quaternion.identity);
+
+        #if UNITY_EDITOR // Select the new boundary
+        UnityEditor.Selection.activeObject = newBoundary.gameObject;
+        #endif
         
-        float minXBoundaryPoint = _minXBoundary - (_cameraWidth/2);
-        float maxXBoundaryPoint = _maxXBoundary + (_cameraWidth/2);
-        float minYBoundaryPoint = _minYBoundary - (_cameraHeight/2);
-        float maxYBoundaryPoint = _maxYBoundary + (_cameraHeight/2);;
-        
-        Debug.DrawLine(new Vector3(minXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(minXBoundaryPoint, maxYBoundaryPoint, 0), Color.green); // Left line
-        Debug.DrawLine(new Vector3(maxXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, maxYBoundaryPoint, 0), Color.green); // Right line
-        Debug.DrawLine(new Vector3(minXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, minYBoundaryPoint, 0), Color.green); // Bottom line
-        Debug.DrawLine(new Vector3(minXBoundaryPoint, maxYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, maxYBoundaryPoint, 0), Color.green); // Top line
     }
+
+#endregion Boundaries functions
     
-    // private Vector3 HandleBoundaries(Vector3 position)
-    // {
-    //     float camHeight = _camera.orthographicSize;
-    //     float camWidth = camHeight * _camera.aspect;
-    //
-    //     float minXBoundaryBoundary = minXLevelBoundary + camWidth;
-    //     float maxXBoundaryBoundary = maxXLevelBoundary - camWidth;
-    //     float minYBoundaryBoundary = minYLevelBoundary + camHeight;
-    //     float maxYBoundaryBoundary = maxYLevelBoundary - camHeight;
-    //
-    //     float newX = Mathf.Clamp(position.x, minXBoundaryBoundary, maxXBoundaryBoundary);
-    //     float newY = Mathf.Clamp(position.y, minYBoundaryBoundary, maxYBoundaryBoundary);
-    //
-    //     
-    //     return new Vector3(newX, newY, position.z);
-    // }
-
-
-
-
- 
-
-#endregion Boundaries
-    
-#region Shake
+#region Shake functions
 
     public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f) {
         if (!_target) return;
@@ -307,7 +269,7 @@ public class CameraController2D : MonoBehaviour
     {
         if (isShaking)
         {
-            Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition, ref _currentVelocity, smoothFollowSpeed, Mathf.Infinity, Time.deltaTime);
+            Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
             
 
             transform.position = smoothedPosition;
@@ -320,34 +282,54 @@ public class CameraController2D : MonoBehaviour
         _shakeOffset = Vector3.zero;
     }
     
-#endregion Shake
+#endregion Shake functions
     
 #region Debugging functions
 
-    private readonly StringBuilder debugStringBuilder = new StringBuilder(256);
+    private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject) {
         
-        debugStringBuilder.Clear();
+        _debugStringBuilder.Clear();
         
-        debugStringBuilder.AppendFormat("Camera:\n");
-        // debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
-        debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0} ({2}/{3})\n", targetZoom, _zoomOffset, minZoom, maxZoom);
+        _debugStringBuilder.AppendFormat("Camera:\n");
+        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", targetZoom, minZoom, maxZoom);
+        // _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
 
-        debugStringBuilder.AppendFormat("\nTarget: {0}\n", _target.name);
-        debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", _targetPosition.x, _targetPosition.y);
-        debugStringBuilder.AppendFormat("Offset: ({0:0.0},{1:0.0})\n", _targetOffset.x, _targetOffset.y);
+        if (_target)
+        {
+            _debugStringBuilder.AppendFormat("\nTarget: {0}\n", _target.name);
+            _debugStringBuilder.AppendFormat("Position: ({0:0.},{1:0.})\n", _targetPosition.x, _targetPosition.y);
+            _debugStringBuilder.AppendFormat("Offset: ({0:0.},{1:0.})\n", _targetOffset.x, _targetOffset.y);
+            _debugStringBuilder.AppendFormat("Zoom Offset: {0}\n", _zoomOffset);
+        }
 
-        if (useBoundaries) {
-            debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeBoundary);
-            debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", _minXBoundary, _maxXBoundary);
-            debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", _minYBoundary, _maxYBoundary);
+
+        if (useBoundaries && _activeBoundary) 
+        {
+            _debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeBoundary);
+            _debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", _minXBoundary, _maxXBoundary);
+            _debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", _minYBoundary, _maxYBoundary);
         }
 
                 
-        textObject.text = debugStringBuilder.ToString(); 
-
-
+        textObject.text = _debugStringBuilder.ToString(); 
+        
     }
+    
+#if UNITY_EDITOR
+    private void OnDrawGizmos() { // Draw active bounds
+        
+        float minXBoundaryPoint = _minXBoundary - (_cameraWidth/2);
+        float maxXBoundaryPoint = _maxXBoundary + (_cameraWidth/2);
+        float minYBoundaryPoint = _minYBoundary - (_cameraHeight/2);
+        float maxYBoundaryPoint = _maxYBoundary + (_cameraHeight/2);;
+        
+        Debug.DrawLine(new Vector3(minXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(minXBoundaryPoint, maxYBoundaryPoint, 0), Color.red); // Left line
+        Debug.DrawLine(new Vector3(maxXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, maxYBoundaryPoint, 0), Color.red); // Right line
+        Debug.DrawLine(new Vector3(minXBoundaryPoint, minYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, minYBoundaryPoint, 0), Color.red); // Bottom line
+        Debug.DrawLine(new Vector3(minXBoundaryPoint, maxYBoundaryPoint, 0), new Vector3(maxXBoundaryPoint, maxYBoundaryPoint, 0), Color.red); // Top line
+    }
+#endif
     
 #endregion Debugging functions
 

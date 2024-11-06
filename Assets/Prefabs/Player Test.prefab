@@ -10,63 +10,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3175132503772560621, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_Name
-      value: Player Floaty
+      value: Player Test
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: runSpeed
-      value: 6
+      propertyPath: dashAbility
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: jumpForce
-      value: 5
+      propertyPath: wallJumpAbility
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: walkSpeed
-      value: 5
+      propertyPath: wallSlideAbility
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: airFriction
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: airRunSpeed
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: airWalkSpeed
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: gravityForce
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: fastFallSpeed
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: fallMultiplier
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: groundFriction
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: moveAcceleration
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: platformFriction
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: runningThreshold
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6010112362093298342, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
-      propertyPath: variableJumpMultiplier
-      value: 0.4
+      propertyPath: doubleJumpAbility
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6449356787988531081, guid: 2c81b8d567898d348be5c35685fcd9d0, type: 3}
       propertyPath: m_LocalPosition.x

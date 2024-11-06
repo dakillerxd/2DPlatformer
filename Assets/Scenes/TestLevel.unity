@@ -5861,7 +5861,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2334700437520795422, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_Name
-      value: Player Variant
+      value: Player Test
       objectReference: {fileID: 0}
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5902,22 +5902,6 @@ PrefabInstance:
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6854169415136180565, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
-      propertyPath: dashAbility
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6854169415136180565, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
-      propertyPath: wallJumpAbility
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6854169415136180565, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
-      propertyPath: wallSlideAbility
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6854169415136180565, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
-      propertyPath: doubleJumpAbility
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

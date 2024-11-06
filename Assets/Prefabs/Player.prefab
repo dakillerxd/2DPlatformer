@@ -242,24 +242,25 @@ MonoBehaviour:
   maxHealth: 2
   canTakeFallDamage: 0
   maxFallDamage: 1
-  isFacingRight: 1
-  walkSpeed: 4
-  airWalkSpeed: 3
-  moveAcceleration: 15
-  groundFriction: 0.15
-  airFriction: 0.03
-  platformFriction: 0.03
+  walkSpeed: 6
+  airWalkSpeed: 4
+  airRunSpeed: 7
+  moveAcceleration: 0.5
+  groundFriction: 0.2
+  airFriction: 0.05
+  platformFriction: 0.5
   movementThreshold: 0.1
-  jumpForce: 4
+  runningThreshold: 5.9
+  jumpForce: 5
   variableJumpMaxHoldDuration: 0.3
-  variableJumpMultiplier: 0.3
+  variableJumpMultiplier: 0.4
   holdJumpDownBuffer: 0.2
   coyoteJumpBuffer: 0.1
   lerpGravity: 0
-  gravityForce: 12
-  fallMultiplier: 2
+  gravityForce: 10
+  fallMultiplier: 3
   maxFallSpeed: 20
-  fastFallSpeed: 10
+  fastFallSpeed: 12
   fastFallBopDiminisher: 4
   isFastFalling: 0
   atMaxFallSpeed: 0
@@ -272,7 +273,7 @@ MonoBehaviour:
     m_Bits: 128
   wallCheckDistance: 0.02
   ledgeCheckDistance: 0.02
-  objectMomentumDecayRate: 4
+  movingRigidBodyVelocityXDecayRate: 4
   autoClimbSteps: 0
   stepHeight: 0.12
   stepWidth: 0.1
@@ -282,10 +283,6 @@ MonoBehaviour:
     m_Bits: 64
   canFastDrop: 1
   fastFallAcceleration: 0.2
-  runAbility: 1
-  runSpeed: 5
-  airRunSpeed: 6
-  runningThreshold: 3
   doubleJumpAbility: 0
   maxAirJumps: 1
   wallSlideAbility: 0
@@ -324,8 +321,6 @@ MonoBehaviour:
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
   hurtColor: {r: 1, g: 0, b: 0, a: 1}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
-  horizontalInput: 0
-  verticalInput: 0
 --- !u!1 &4153000382075459821
 GameObject:
   m_ObjectHideFlags: 0

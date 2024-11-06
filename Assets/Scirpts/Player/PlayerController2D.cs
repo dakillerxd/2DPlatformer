@@ -22,20 +22,19 @@ public class PlayerController2D : Entity2D {
     [ShowIf("canTakeFallDamage")][SerializeField] private int maxFallDamage = 1;[EndIf]
     private int _currentHealth;
     private int _deaths;
-    private bool _isInvincible;
     private float _invincibilityTime;
-    private bool _isStunLocked;
     private float _stunLockTime;
-    [HideInInspector] public bool isFacingRight;
 
     [Header("Movement")]
     [SerializeField] [Min(0.1f)] private float walkSpeed = 4f;
     [SerializeField] [Min(0.1f)] private float airWalkSpeed = 3f;
+    [SerializeField] [Min(0.1f)] private float airRunSpeed = 6f;
     [SerializeField] [Min(0.1f)] private float moveAcceleration = 15f; // How fast the player gets to max speed
     [SerializeField] [Min(0.01f)] private float groundFriction = 0.15f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float airFriction = 0.03f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float platformFriction = 0.5f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float movementThreshold = 0.1f;
+    [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
     private bool _isMoving;
     private float _moveSpeed;
     
@@ -51,7 +50,6 @@ public class PlayerController2D : Entity2D {
     private bool _canCoyoteJump;
     private float _coyoteJumpTime;
     private float _variableJumpHeldDuration;
-
     
     [Header("Gravity")] 
     [SerializeField] private bool lerpGravity;
@@ -73,10 +71,6 @@ public class PlayerController2D : Entity2D {
     private bool _isTouchingGround;
     private bool _isTouchingPlatform;
     private bool _isTouchingWall;
-    public bool isGrounded { get; private set; }
-    public bool ledgeOnLeft { get; private set; }
-    public bool ledgeOnRight { get; private set; }
-    public bool isOnPlatform { get; private set; }
     private bool _isTouchingWallOnRight;
     private bool _isTouchingWallOnLeft;
     private bool _onGroundObject;
@@ -99,18 +93,37 @@ public class PlayerController2D : Entity2D {
     [ShowIf("canFastDrop")]
     [SerializeField] [Range(0, 1f)] private float fastFallAcceleration = 0.2f;
     private bool _isFastDropping;
-    [EndIf]
+    [EndIf] 
+    
+    
+    [Header("States")] 
+    public bool isFacingRight { get; private set; }
+    public bool isStunLocked { get; private set; }
+    public bool isInvincible { get; private set; }
+    public bool isTeleporting { get; private set; }
+    public bool wasRunning { get; private set; }
+    public bool isRunning { get; private set; }
+    public bool isGrounded { get; private set; }
+    public bool isOnPlatform { get; private set; }
+    public bool ledgeOnLeft { get; private set; }
+    public bool ledgeOnRight { get; private set; }
+    public bool isDashing { get; private set; }
+
+    
+    
+    [Header("Input")] 
+    private float _horizontalInput;
+    private float _verticalInput;
+    private bool _jumpInputDownRequested;
+    private bool _jumpInputUp;
+    private bool _jumpInputHeld;
+    private bool _dashRequested;
+    private bool _runInput;
+    private bool _dropDownInput;
     
 
     [Tab("Player Abilities")] // ----------------------------------------------------------------------
-    [Header("Run")]
-    [SerializeField] public bool runAbility = true;
-    [SerializeField] private float runSpeed = 5f;
-    [SerializeField] private float airRunSpeed = 6f;
-    [SerializeField] private float runningThreshold = 3; // How fast the player needs to move for running
-    public bool wasRunning { get; private set; }
-    public bool isRunning { get; private set; }
-    
+
     [Header("Double Jump")]
     [SerializeField] public bool doubleJumpAbility = true;
     [SerializeField] [Range(1, 10f)] public int maxAirJumps = 1;
@@ -137,7 +150,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private float dashCooldownDuration = 1f;
     [SerializeField] [Range(0.1f, 1f)] private float holdDashRequestTime = 0.1f; // For how long the dash buffer will hold
     private int _remainingDashes;
-    public bool isDashing { get; private set; }
     private float _dashBufferTimer;
     private float _dashCooldownTimer;
     private bool _isDashCooldownRunning;
@@ -171,15 +183,7 @@ public class PlayerController2D : Entity2D {
 
     
 
-    [Header("Input")] // ----------------------------------------------------------------------
-    [HideInInspector] public float horizontalInput;
-    [HideInInspector] public float verticalInput;
-    private bool _jumpInputDownRequested;
-    private bool _jumpInputUp;
-    private bool _jumpInputHeld;
-    private bool _dashRequested;
-    private bool _runInput;
-    private bool _dropDownInput;
+
     
     
     private void Awake() {
@@ -192,8 +196,9 @@ public class PlayerController2D : Entity2D {
         Instance = this;
     }
 
-    private void Start() {
-        
+    private void Start()
+    {
+        isFacingRight = true;
         CheckpointManager2D.Instance.SetSpawnPoint(transform.position);
         UIManager.Instance.UpdateAbilitiesUI();
         RespawnFromSpawnPoint();
@@ -216,12 +221,12 @@ public class PlayerController2D : Entity2D {
         HandleGravity();
         HandleMovement();
         HandleStepClimbing();
+        HandleFastDrop();
         HandleJump();
-        HandleRunning();
         HandleWallSlide();
         HandleWallJump();
         HandleDashing();
-        HandleFastDrop();
+        
     }
     
     
@@ -234,11 +239,23 @@ public class PlayerController2D : Entity2D {
         
         // Get move speed and apply fiction
         float baseMoveSpeed = rigidBody.linearVelocity.x - targetMovingRigidBodyVelocity;
-        _moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTarget_moveSpeed(), CalculateFriction());
+        _moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateFriction());
         
         // Move
         rigidBody.linearVelocityX = _moveSpeed + targetMovingRigidBodyVelocity;
         _isMoving = _moveSpeed  > movementThreshold || _moveSpeed < -movementThreshold;
+        
+        
+        // Run effect
+        if (isRunning && isGrounded) { 
+            PlayVfxEffect(peakMoveSpeedVfx, false);
+            PlayVfxEffect(groundRunVfx, false);
+            // PlayAnimation("Run");
+            
+        } else {
+            StopVfxEffect(groundRunVfx, false);
+            StopVfxEffect(peakMoveSpeedVfx, false);
+        }
     }
     private float CalculateFriction() {
         
@@ -250,31 +267,35 @@ public class PlayerController2D : Entity2D {
         return airFriction;
         
     }
-    private float CalculateTarget_moveSpeed() {
+    private float CalculateTargetMoveSpeed() {
         
-        float targetSpeed = horizontalInput;
+        float targetSpeed = _horizontalInput;
         float acceleration = moveAcceleration;
 
-        // Handle move speed
+        
         if (isWallSliding) { // Wall sliding
-
-            if (horizontalInput < wallSlideStickStrength && horizontalInput > -wallSlideStickStrength) { 
+            
+            if (Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { 
 
                 targetSpeed = 0; 
                 acceleration = 0;
             }
-        } else {
+            
+        } else { // Handle move speed
+            
+            isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
+            if (isRunning) { wasRunning = true; }
+
+            if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
+            
             if (isGrounded) { // On Ground
 
-                targetSpeed *= runAbility && _runInput ? runSpeed : walkSpeed;
-                wasRunning = runAbility && _runInput && Mathf.Abs(_moveSpeed) > runningThreshold;
-
-            } else{ // In air
-
-                if (_isTouchingWall) { wasRunning = false;}
-
-                targetSpeed *= runAbility && _runInput ? airRunSpeed : airWalkSpeed;
-                wasRunning = runAbility && _runInput && Mathf.Abs(_moveSpeed) > runningThreshold;
+                targetSpeed *= walkSpeed;
+                
+            } else { // In air
+                
+                targetSpeed *= wasRunning ? airRunSpeed : airWalkSpeed;
+                // if (wasRunning) { acceleration *= 1.5f; }
             } 
         }
         
@@ -306,7 +327,7 @@ public class PlayerController2D : Entity2D {
     
     private void HandleDropDown() { 
         
-        if (!_softObject) return;
+        if (!_softObject && !isGrounded) return;
 
         if (_dropDownInput) {
             rigidBody.linearVelocityY = jumpForce/3;
@@ -334,7 +355,7 @@ public class PlayerController2D : Entity2D {
 
                     // Check if there's space above the step and move the player
                     RaycastHit2D hitUpper = Physics2D.Raycast(collFeet.bounds.center + new Vector3(0, stepHeight, 0), moveDirection, collFeet.bounds.extents.x + stepCheckDistance, stepLayer);
-                    if (!hitUpper) { rigidBody.position += new Vector2(horizontalInput * stepWidth, stepHeight); }
+                    if (!hitUpper) { rigidBody.position += new Vector2(_horizontalInput * stepWidth, stepHeight); }
                 }
             } 
         }
@@ -345,7 +366,7 @@ public class PlayerController2D : Entity2D {
         if (!canFastDrop) return;
         if (isGrounded && !atMaxFallSpeed) return;
 
-        _isFastDropping = verticalInput < 0;
+        _isFastDropping = _verticalInput < 0;
 
         if (_isFastDropping) {
 
@@ -391,9 +412,9 @@ public class PlayerController2D : Entity2D {
             }
 
             string jumpDirection;
-            if (rigidBody.linearVelocity.x < 0 && horizontalInput > 0) {
+            if (rigidBody.linearVelocity.x < 0 && _horizontalInput > 0) {
                 jumpDirection = "Right";
-            } else if (rigidBody.linearVelocity.x > 0 && horizontalInput < 0) {
+            } else if (rigidBody.linearVelocity.x > 0 && _horizontalInput < 0) {
                 jumpDirection = "Left";
             } else {
                 jumpDirection = "None";
@@ -481,36 +502,7 @@ public class PlayerController2D : Entity2D {
 
       
     #region Abilitis functions //------------------------------------
-
-    private void HandleRunning() {
-        if (!runAbility) return;
-        
-        
-        bool isRunningOnGround = _runInput && isGrounded && !isWallSliding && (_moveSpeed > runningThreshold || _moveSpeed < -runningThreshold);
-        bool isRunningOnAir = wasRunning && !isGrounded && !isWallSliding && (_moveSpeed > runningThreshold || _moveSpeed < -runningThreshold);
-        
-        if (isRunningOnGround) { // When on ground
-            PlayVfxEffect(peakMoveSpeedVfx, false);
-            PlayVfxEffect(groundRunVfx, false);
-            // PlayAnimation("Run");
-            
-        } else {
-            StopVfxEffect(groundRunVfx, false);
-            StopVfxEffect(peakMoveSpeedVfx, false);
-            // PlayAnimation("Idle");
-        }
-        
-        // if (isRunningOnAir) { // When in the air
-        //     PlayVfxEffect(peakMoveSpeedVfx, false);
-        // }
-        //
-        // if (!isRunningOnAir && !isRunningOnGround) {
-        //     StopVfxEffect(groundRunVfx, false);
-        //     StopVfxEffect(peakMoveSpeedVfx, false);
-        // }
     
-    }
-
     private void HandleDashing() {
 
 
@@ -859,12 +851,15 @@ public class PlayerController2D : Entity2D {
                 SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
                 RespawnFromCheckpoint();
             break;
+            case "CameraBoundary":
+
+                if (collision.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary))
+                {
+                    Debug.Log(collision.name);
+                    CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());
+                }
+                break;
         }
-        
-        if (other.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary)) {
-            Debug.Log(other.name);
-            _activeBoundary = boundary;
-            SetBoundaries(boundary.GetMinXAreaBoundary(),boundary.GetMaxXAreaBoundary(),boundary.GetMinYAreaBoundary(),boundary.GetMaxYAreaBoundary());
     }
     
     
@@ -931,7 +926,7 @@ public class PlayerController2D : Entity2D {
     }
     
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
-        if (_currentHealth > 0 && !_isInvincible) {
+        if (_currentHealth > 0 && !isInvincible) {
             
             if (setInvincible) { TurnInvincible();}
             TurnStunLocked();
@@ -959,7 +954,7 @@ public class PlayerController2D : Entity2D {
     }
     private void TurnVulnerable() {
 
-        _isInvincible = false;
+        isInvincible = false;
         isDashing = false;
         
         foreach (SpriteRenderer sr in spriteRenderers) {
@@ -968,13 +963,13 @@ public class PlayerController2D : Entity2D {
     }
     private IEnumerator Invisible(float invincibilityDuration) {
         
-        _isInvincible = true;
+        isInvincible = true;
         _invincibilityTime = invincibilityDuration;
         foreach (SpriteRenderer sr in spriteRenderers) {
             sr.color = invincibilityColor;
         }
 
-        while (_isInvincible && _invincibilityTime > 0) {
+        while (isInvincible && _invincibilityTime > 0) {
             _invincibilityTime -= Time.deltaTime;
             yield return null;
         }
@@ -991,17 +986,17 @@ public class PlayerController2D : Entity2D {
         if (CanMove()) { // Only check for input if the player can move
 
             // Check for horizontal input
-            horizontalInput = InputManager.Movement.x;
+            _horizontalInput = InputManager.Movement.x;
 
             // Check for vertical input
-            verticalInput = InputManager.Movement.y;
+            _verticalInput = InputManager.Movement.y;
 
 
             // Check for jump inputs
             _jumpInputHeld = InputManager.JumpIsHeld;
             _jumpInputUp = InputManager.JumpWasReleased;
 
-            if (verticalInput > -1 && InputManager.JumpWasPressed) {
+            if (_verticalInput > -1 && InputManager.JumpWasPressed) {
                 _jumpInputDownRequested = true;
                 _holdJumpDownTimer = 0f;
 
@@ -1010,9 +1005,6 @@ public class PlayerController2D : Entity2D {
                     _isJumpCut = false;
                 }
             }
-            
-            // Check for run input
-            if (runAbility) { _runInput = InputManager.RunIsHeld; }
 
             // Check for dash input
             if (dashAbility && _remainingDashes > 0 && InputManager.DashWasPressed) {
@@ -1021,15 +1013,15 @@ public class PlayerController2D : Entity2D {
             }
             
             // Check for drop down input
-            _dropDownInput = verticalInput <= -1 && InputManager.JumpWasPressed;
+            _dropDownInput = _verticalInput <= -1 && InputManager.JumpWasPressed;
             
             // Check for restart input
             if (InputManager.RestartWasPressed) { RespawnFromCheckpoint(); }
 
         } else { // Set inputs to 0 if the player cannot move
 
-            horizontalInput = 0;
-            verticalInput = 0;
+            _horizontalInput = 0;
+            _verticalInput = 0;
         }
     }
     
@@ -1037,7 +1029,7 @@ public class PlayerController2D : Entity2D {
     
     private void Push(Vector2 pushForce) {
         
-        if (_currentHealth > 0 && !_isInvincible) {
+        if (_currentHealth > 0 && !isInvincible) {
             
             // Reset current velocity before applying push
             rigidBody.linearVelocity = Vector2.zero;
@@ -1056,15 +1048,15 @@ public class PlayerController2D : Entity2D {
     }
     private void UnStuckLock() {
 
-        _isStunLocked = false;
+        isStunLocked = false;
         _stunLockTime = 0f;
     }
     private IEnumerator StuckLock(float stunLockDuration) {
         
-        _isStunLocked = true;
+        isStunLocked = true;
         _stunLockTime = stunLockDuration;
 
-        while (_isStunLocked && _stunLockTime > 0) {
+        while (isStunLocked && _stunLockTime > 0) {
             _stunLockTime -= Time.deltaTime;
             yield return null;
         }
@@ -1075,9 +1067,9 @@ public class PlayerController2D : Entity2D {
 
         if (isWallSliding) return; // Only flip the player based on input if he is not wall sliding
 
-        if (!isFacingRight && horizontalInput > 0) {
+        if (!isFacingRight && _horizontalInput > 0) {
             FlipPlayer("Right");
-        } else if (isFacingRight && horizontalInput < 0) {
+        } else if (isFacingRight && _horizontalInput < 0) {
             FlipPlayer("Left");
         }
     }
@@ -1100,7 +1092,7 @@ public class PlayerController2D : Entity2D {
     }
 
     private bool CanMove() {
-        return !_isStunLocked && currentPlayerState == PlayerState.Controllable;
+        return !isStunLocked && currentPlayerState == PlayerState.Controllable;
         
     }
 
@@ -1108,6 +1100,13 @@ public class PlayerController2D : Entity2D {
         return currentPlayerState == PlayerState.Controllable && GameManager.Instance.currentGameState == GameStates.GamePlay;
     }
     public void SetPlayerState(PlayerState state) {
+        
+        StopVfxEffect(groundRunVfx, true);
+        StopVfxEffect(peakMoveSpeedVfx, true);
+        StopVfxEffect(jumpVfx, true);
+        StopVfxEffect(dashVfx, true);
+        StopVfxEffect(wallSlideVfx, true);
+        StopVfxEffect(peakFallSpeedVfx, true);
         currentPlayerState = state;
         
         switch (state) {
@@ -1119,21 +1118,22 @@ public class PlayerController2D : Entity2D {
                 _isDashCooldownRunning = false;
                 fallSpeed = 0;
                 wasRunning = false;
+                isTeleporting = false;
+                isDashing = false;
+                isWallSliding = false;
+                isInvincible = false;
+                isStunLocked = false;
+                _canCoyoteJump = false;
+                _invincibilityTime = 0f;
+                _stunLockTime = 0f;
                 HealToFullHealth();
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
                 PlayVfxEffect(spawnVfx, true);
-                StopVfxEffect(groundRunVfx, true);
-                StopVfxEffect(peakMoveSpeedVfx, true);
-                StopVfxEffect(jumpVfx, true);
-                StopVfxEffect(dashVfx, true);
-                StopVfxEffect(wallSlideVfx, true);
-                StopVfxEffect(peakFallSpeedVfx, true);
                 
                 break;
             case PlayerState.Frozen:
                 rigidBody.linearVelocity = Vector2.zero;
-                StopVfxEffect(peakFallSpeedVfx, true);
-                
+                isTeleporting = true;
                 break;
         }
     }
@@ -1189,10 +1189,10 @@ public class PlayerController2D : Entity2D {
 
                 _debugStringBuilder.AppendFormat("\nStates:\n");
                 _debugStringBuilder.AppendFormat("Facing Right: {0}\n", isFacingRight);
-                _debugStringBuilder.AppendFormat("Invincible: {0} ({1:0.0})\n", _isInvincible, _invincibilityTime);
-                _debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", _isStunLocked, _stunLockTime);
+                _debugStringBuilder.AppendFormat("Invincible: {0} ({1:0.0})\n", isInvincible, _invincibilityTime);
+                _debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", isStunLocked, _stunLockTime);
                 _debugStringBuilder.AppendFormat("Jumping: {0}\n", _isJumping);
-                if (runAbility) _debugStringBuilder.AppendFormat("Running: {0}\n", wasRunning);
+                _debugStringBuilder.AppendFormat("Running: {0}, {1}\n", isRunning, wasRunning);
                 if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
                 if (wallSlideAbility) _debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);
                 if (canFastDrop) _debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", _isFastDropping);

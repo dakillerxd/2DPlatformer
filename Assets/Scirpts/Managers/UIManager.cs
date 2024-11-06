@@ -34,7 +34,6 @@ public class UIManager : MonoBehaviour
     [Header("Abilities")] 
     [SerializeField] private  Color abilityUnlocked = Color.white;
     [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
-    [SerializeField] private GameObject run;
     [SerializeField] private GameObject doubleJump;
     [SerializeField] private GameObject wallSlide;
     [SerializeField] private GameObject wallJump;
@@ -108,8 +107,6 @@ public class UIManager : MonoBehaviour
 
     public void UpdateAbilitiesUI() {
         if (PlayerController2D.Instance == null) return;
-        // Set abilities color
-        run.SetActive(PlayerController2D.Instance.runAbility); 
         doubleJump.SetActive(PlayerController2D.Instance.doubleJumpAbility);
         wallSlide.SetActive(PlayerController2D.Instance.wallSlideAbility);
         wallJump.SetActive(PlayerController2D.Instance.wallJumpAbility);

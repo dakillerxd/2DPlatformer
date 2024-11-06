@@ -42,7 +42,7 @@ public class CameraController2D : MonoBehaviour
     private float _maxYBoundary;
     
     [Header("Shake Effect")]
-    [HideInInspector] public bool isShaking;
+    private bool _isShaking;
     private Vector3 _shakeOffset;
     
     [Header("Player Offset Settings")]
@@ -85,6 +85,7 @@ public class CameraController2D : MonoBehaviour
 
     private void Update() {
         HandleZoomInput();
+        HandleTargetSelection();
     }
 
 
@@ -93,9 +94,6 @@ public class CameraController2D : MonoBehaviour
         FollowTarget();
         HandleZoom();
         HandleBoundaries();
-        
-        // Apply shake when needed
-        // ApplyShake();
     }
 
     
@@ -114,7 +112,7 @@ public class CameraController2D : MonoBehaviour
         
         _targetPosition = CalculateTargetPosition();
         _targetOffset = CalculateTargetOffset();
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset + _shakeOffset, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
         transform.position = smoothedPosition;
     }
     
@@ -240,18 +238,13 @@ public class CameraController2D : MonoBehaviour
     
 #region Shake functions
 
-    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f) {
-        if (!_target) return;
-        StartCoroutine(Shake(duration, magnitude, xShakeRange, yShakeRange));
-
-    }
 
     private IEnumerator Shake(float duration, float magnitude, float xShakeRange, float yShakeRange)
     {
-        isShaking = true;
+        _isShaking = true;
         float elapsed = 0f;
 
-        while (isShaking && elapsed < duration)
+        while (_isShaking && elapsed < duration)
         {
             float x = Random.Range(-xShakeRange, xShakeRange) * magnitude;
             float y = Random.Range(-yShakeRange, yShakeRange) * magnitude;
@@ -263,28 +256,46 @@ public class CameraController2D : MonoBehaviour
         }
 
         _shakeOffset = Vector3.zero;
-        isShaking = false;
+        _isShaking = false;
     }
-    private void ApplyShake()
-    {
-        if (isShaking)
-        {
-            Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
-            
+    
+    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f) {
+        if (!_target) return;
+        StartCoroutine(Shake(duration, magnitude, xShakeRange, yShakeRange));
 
-            transform.position = smoothedPosition;
-        }
     }
-
-
+    
     public void StopCameraShake() {
-        isShaking = false;
+        _isShaking = false;
         _shakeOffset = Vector3.zero;
     }
     
 #endregion Shake functions
     
 #region Debugging functions
+    private void HandleTargetSelection()
+    {
+        if (Input.GetMouseButtonDown(0)) {
+            Vector2 mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (hit) {
+                if (hit.collider.CompareTag("Player")) {
+                    CameraController2D.Instance.SetTarget(hit.collider.transform.parent.parent);
+                    Debug.Log("Set camera target to: " + hit.collider.transform.parent.parent.name);
+                }
+                else if (hit.collider.CompareTag("Enemy")) {
+                    CameraController2D.Instance.SetTarget(hit.collider.transform.parent.parent);
+                }
+                else if (hit.collider.CompareTag("Checkpoint")) {
+                    CheckpointManager2D.Instance.ActivateCheckpoint(hit.collider.gameObject.GetComponent<Checkpoint2D>());
+                }
+                else {
+                    Debug.Log("Clicked on: " + hit.collider.gameObject.name);
+                }
+            }
+        }
+    }
 
     private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject) {
@@ -293,7 +304,7 @@ public class CameraController2D : MonoBehaviour
         
         _debugStringBuilder.AppendFormat("Camera:\n");
         _debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", targetZoom, minZoom, maxZoom);
-        // _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
+        _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
 
         if (_target)
         {

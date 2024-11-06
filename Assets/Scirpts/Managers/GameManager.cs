@@ -78,10 +78,10 @@ public class GameManager : MonoBehaviour
     
     private void Update() {
         UpdateTextInfo();
-        // HandleTargetSelection();
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
+        if (Input.GetKeyUp(KeyCode.F)) { CameraController2D.Instance.ShakeCamera(5f, 2f, 2f,  2f); }
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
     }
     
@@ -138,30 +138,6 @@ public class GameManager : MonoBehaviour
     #endregion GameStates
     
     #region Debugging functions
-    
-    private void HandleTargetSelection()
-    {
-        if (Input.GetMouseButtonDown(0)) {
-            Vector2 mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-            if (hit) {
-                if (hit.collider.CompareTag("Player")) {
-                    CameraController2D.Instance.SetTarget(hit.collider.transform.parent.parent);
-                    Debug.Log("Set camera target to: " + hit.collider.transform.parent.parent.name);
-                }
-                else if (hit.collider.CompareTag("Enemy")) {
-                    CameraController2D.Instance.SetTarget(hit.collider.transform.parent.parent);
-                }
-                else if (hit.collider.CompareTag("Checkpoint")) {
-                    CheckpointManager2D.Instance.ActivateCheckpoint(hit.collider.gameObject.GetComponent<Checkpoint2D>());
-                }
-                else {
-                    Debug.Log("Clicked on: " + hit.collider.gameObject.name);
-                }
-            }
-        }
-    }
 
     private void ToggleDebugText() {
         showDebugInfo = !showDebugInfo;

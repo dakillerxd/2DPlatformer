@@ -26,13 +26,13 @@ public class PlayerController2D : Entity2D {
     private float _stunLockTime;
 
     [Header("Movement")]
-    [SerializeField] [Min(0.1f)] private float maxMoveSpeed = 6f;
-    [SerializeField] [Min(0.1f)] private float maxAirMoveSpeed = 5f;
-    [SerializeField] [Min(0.1f)] private float airRunSpeed = 7f;
-    [SerializeField] [Min(0.1f)] private float moveAcceleration = 7f; // How fast the player gets to acceleration threshold
-    [SerializeField] private float finalAcceleration = 1.5f;     // Slower final acceleration
+    [SerializeField] [Min(0.01f)] private float maxMoveSpeed = 6f;
+    [SerializeField] [Min(0.01f)] private float maxAirMoveSpeed = 5f;
+    [SerializeField] [Min(0.01f)] private float airRunSpeed = 7f;
+    [SerializeField] [Min(0.01f)] private float moveAcceleration = 7f; // How fast the player gets to acceleration threshold
+    [SerializeField] private float runAcceleration = 1.5f;     // Slower final acceleration
     [SerializeField] private float accelerationThreshold = 4f;   // Speed at which we switch to slower acceleration
-    [SerializeField] [Min(0.1f)] private float directionChangeMultiplier  = 4f;
+    [SerializeField] [Min(0.01f)] private float directionChangeMultiplier  = 4f;
     [SerializeField] [Min(0.01f)] private float groundFriction = 5f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float airFriction = 0.1f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float platformFriction = 1f; // The higher the friction there is less resistance
@@ -98,7 +98,7 @@ public class PlayerController2D : Entity2D {
     
     
     [Header("States")] 
-    public bool _isMoving { get; private set; }
+    public bool isMoving { get; private set; }
     public bool isFacingRight { get; private set; }
     public bool isStunLocked { get; private set; }
     public bool isInvincible { get; private set; }
@@ -232,86 +232,78 @@ public class PlayerController2D : Entity2D {
     
     
     #region Movement functions //------------------------------------
-    private void HandleMovement() {
+    
+    
+    
+    private  void HandleMovement() {
         
+        // Set variables
         float targetMovingRigidBodyVelocity = CalculateMovingRigidBodyMomentum();
-        float targetSpeed = CalculateTargetMoveSpeed();
-        float friction = CalculateFriction();
-
-        if (_horizontalInput != 0) {  
+        float baseMoveSpeed = rigidBody.linearVelocity.x - targetMovingRigidBodyVelocity;
         
-            if (Mathf.Sign(_horizontalInput) != Mathf.Sign(_moveSpeed) && _moveSpeed != 0) { // Check if we're changing directions
-                _moveSpeed -= (moveAcceleration * directionChangeMultiplier) * Time.fixedDeltaTime * Mathf.Sign(_moveSpeed);
-            }
-            // Acceleration
-            else if (_horizontalInput > 0) {  // Moving right
-                if (Mathf.Abs(_moveSpeed) < accelerationThreshold) {
-                    _moveSpeed += moveAcceleration * Time.fixedDeltaTime;  // Fast initial acceleration
-                } else {
-                    _moveSpeed += finalAcceleration * Time.fixedDeltaTime;    // Slower final acceleration
-                }
-            }
-            else if (_horizontalInput < 0) {  // Moving left
-                if (Mathf.Abs(_moveSpeed) < accelerationThreshold) {
-                    _moveSpeed -= moveAcceleration * Time.fixedDeltaTime;  // Fast initial acceleration
-                } else {
-                    _moveSpeed -= finalAcceleration * Time.fixedDeltaTime;    // Slower final acceleration
-                }
-            }
-        }
-
-        // Apply friction when not moving
-        if (Mathf.Abs(_horizontalInput) < 0.01f) {
-            _moveSpeed *= (1 - friction * Time.fixedDeltaTime);
-        }
-
-        // Clamp move speed
-        float maxSpeed = isGrounded ? maxMoveSpeed : (wasRunning ? airRunSpeed : maxAirMoveSpeed);
-        _moveSpeed = Mathf.Clamp(_moveSpeed, -maxSpeed, maxSpeed);
-
-        // Apply final movement
+        // Acceleration and friction
+        _moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateAcceleration() * Time.fixedDeltaTime);
+        if (_horizontalInput == 0) { _moveSpeed = Mathf.Lerp(_moveSpeed, 0, CalculateFriction() * Time.fixedDeltaTime); }
+        
+        // Move
         rigidBody.linearVelocityX = _moveSpeed + targetMovingRigidBodyVelocity;
-        _isMoving = _moveSpeed > movementThreshold || _moveSpeed < -movementThreshold;
-
-        // Run effect (rest of your code remains the same)
-        if (isRunning && isGrounded) {
+        isMoving = Mathf.Abs(_moveSpeed) > movementThreshold;
+        
+        
+        
+        // Handle run
+        isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
+        if (isRunning) { wasRunning = true; }
+        if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
+        
+        if (isRunning) { 
             PlayVfxEffect(peakMoveSpeedVfx, false);
             PlayVfxEffect(groundRunVfx, false);
+            
         } else {
             StopVfxEffect(groundRunVfx, false);
             StopVfxEffect(peakMoveSpeedVfx, false);
         }
-        
+
     }
 
-    private float CalculateTargetMoveSpeed() {
+    private float CalculateTargetMoveSpeed()
+    {
+
         float targetSpeed = _horizontalInput;
 
-        if (isWallSliding) {
-            if (Mathf.Abs(_horizontalInput) < wallSlideStickStrength) {
-                targetSpeed = 0;
-            }
-        } else {
-            isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
-            if (isRunning) { wasRunning = true; }
-            if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
-            
-            if (isGrounded) {
-                targetSpeed *= maxMoveSpeed;
-            } else {
-                targetSpeed *= wasRunning ? airRunSpeed : maxAirMoveSpeed;
-            }
-        }
 
+        if (isGrounded) {
+            targetSpeed *= maxMoveSpeed;
+
+        } else {
+            targetSpeed *= wasRunning ? airRunSpeed : maxAirMoveSpeed;
+        }
+        
+        
+        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) {
+            targetSpeed = 0;
+        }
+        
         return targetSpeed;
+    }
+
+    private float CalculateAcceleration()
+    {
+        // use moveAcceleration until getting to accelerationThreshold then use runAcceleration
+        float acceleration = Mathf.Abs(_horizontalInput) > accelerationThreshold ? runAcceleration : moveAcceleration;
+        
+        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0; }
+
+        return acceleration;
     }
 
     
     private float CalculateFriction() {
         
-        // If grounded use ground friction else use air friction
+        // If grounded use ground or platform friction else use air friction
         if (isGrounded) {
-            return isOnPlatform || isDashing ? platformFriction : groundFriction; // If on a platform multiply the ground friction
+            return isOnPlatform || isDashing ? platformFriction : groundFriction;
         }
 
         return airFriction;
@@ -1040,7 +1032,9 @@ public class PlayerController2D : Entity2D {
             
             // Reset current velocity before applying push
             rigidBody.linearVelocity = Vector2.zero;
+            _moveSpeed = 0;
             // Apply a consistent impulse force
+            _moveSpeed = pushForce.x;
             rigidBody.AddForce(pushForce, ForceMode2D.Impulse);
             // Clamp the resulting velocity to prevent excessive speed
             float maxPushSpeed = 4f;

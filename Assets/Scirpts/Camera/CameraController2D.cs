@@ -85,7 +85,7 @@ public class CameraController2D : MonoBehaviour
 
     private void Update() {
         HandleZoomInput();
-        HandleTargetSelection();
+        // HandleTargetSelection();
     }
 
 

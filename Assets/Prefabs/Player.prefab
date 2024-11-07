@@ -245,13 +245,13 @@ MonoBehaviour:
   maxMoveSpeed: 6
   maxAirMoveSpeed: 5
   airRunSpeed: 7
-  moveAcceleration: 7
-  finalAcceleration: 1.5
+  moveAcceleration: 2
+  runAcceleration: 1.5
   accelerationThreshold: 4
   directionChangeMultiplier: 4
-  groundFriction: 5
+  groundFriction: 3.5
   airFriction: 0.1
-  platformFriction: 0.5
+  platformFriction: 25
   movementThreshold: 0.1
   runningThreshold: 5.9
   jumpForce: 5
@@ -259,7 +259,6 @@ MonoBehaviour:
   variableJumpMultiplier: 0.4
   holdJumpDownBuffer: 0.2
   coyoteJumpBuffer: 0.1
-  lerpGravity: 0
   gravityForce: 10
   fallMultiplier: 3
   maxFallSpeed: 20
@@ -298,7 +297,7 @@ MonoBehaviour:
   wallJumpVerticalForce: 5
   wallJumpHorizontalForce: 4
   dashAbility: 0
-  dashForce: 10
+  dashForce: 15
   dashPushForce: 10
   maxDashes: 1
   dashCooldownDuration: 1

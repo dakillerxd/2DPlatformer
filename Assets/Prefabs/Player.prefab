@@ -248,7 +248,6 @@ MonoBehaviour:
   moveAcceleration: 2
   runAcceleration: 1.5
   accelerationThreshold: 4
-  directionChangeMultiplier: 4
   groundFriction: 3.5
   airFriction: 0.1
   platformFriction: 25
@@ -274,7 +273,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   wallCheckDistance: 0.02
-  ledgeCheckDistance: 0.02
+  ledgeCheckHorizontalDistance: 0.5
+  ledgeCheckVerticalDistance: 2
   movingRigidBodyVelocityXDecayRate: 4
   autoClimbSteps: 0
   stepHeight: 0.12

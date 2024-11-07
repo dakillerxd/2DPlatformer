@@ -3,10 +3,18 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public enum PlayerState {
     Controllable,
     Frozen,
+}
+
+public enum PlayerAbilities {
+    DoubleJump,
+    WallSlide,
+    WallJump,
+    Dash,
 }
 
 public class PlayerController2D : Entity2D {
@@ -37,6 +45,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] [Min(0.01f)] private float platformFriction = 1f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float movementThreshold = 0.1f;
     [SerializeField] private float runningThreshold = 5.9f; // How fast the player needs to move for running
+    [SerializeField] private float movingRigidbodyVelocityDecayRate = 4f; // 0 Keep momentum
     private float _moveSpeed;
     
     [Header("Jump")]
@@ -66,8 +75,8 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
-    [SerializeField] [Range(0, 3f)] private float ledgeCheckDistance = 0.02f;
-    [SerializeField] private float movingRigidBodyVelocityXDecayRate = 4f; // 0 Keep momentum
+    [SerializeField] [Range(0, 3f)] private float ledgeCheckHorizontalDistance = 0.5f;
+    [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 0.05f;
     private bool _isTouchingGround;
     private bool _isTouchingPlatform;
     private bool _isTouchingWall;
@@ -92,7 +101,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] public bool canFastDrop = true;
     [ShowIf("canFastDrop")]
     [SerializeField] [Range(0, 1f)] private float fastFallAcceleration = 0.2f;
-    private bool _isFastDropping;
     [EndIf] 
     
     
@@ -109,6 +117,7 @@ public class PlayerController2D : Entity2D {
     public bool ledgeOnLeft { get; private set; }
     public bool ledgeOnRight { get; private set; }
     public bool isDashing { get; private set; }
+    public bool isFastDropping { get; private set; }
     
     
     [Header("Input")] 
@@ -321,7 +330,7 @@ public class PlayerController2D : Entity2D {
             return 0f;
         }
         
-        float targetMovingRigidBodyVelocity = Mathf.Lerp(_movingRigidbodyLastVelocityX, 0f, movingRigidBodyVelocityXDecayRate * Time.fixedDeltaTime);
+        float targetMovingRigidBodyVelocity = Mathf.Lerp(_movingRigidbodyLastVelocityX, 0f, movingRigidbodyVelocityDecayRate * Time.fixedDeltaTime);
         _movingRigidbodyLastVelocityX = targetMovingRigidBodyVelocity;
         return targetMovingRigidBodyVelocity ;
     }
@@ -365,12 +374,11 @@ public class PlayerController2D : Entity2D {
     
     private void HandleFastDrop() {
 
-        if (!canFastDrop) return;
-        if (isGrounded && !atMaxFallSpeed) return;
+        if (!canFastDrop || atMaxFallSpeed) return;
 
-        _isFastDropping = _verticalInput < 0;
+        isFastDropping = _verticalInput < 0;
 
-        if (_isFastDropping) {
+        if (isFastDropping) {
 
             rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, rigidBody.linearVelocity.y - fastFallAcceleration * Time.fixedDeltaTime);
         }
@@ -591,7 +599,7 @@ public class PlayerController2D : Entity2D {
             float maxSlideSpeed = maxWallSlideSpeed;
 
             // Accelerate slide if fast dropping
-            if (_isFastDropping) {
+            if (isFastDropping) {
                 slideSpeed *= 1.5f;
                 maxSlideSpeed *= 1.5f;
             }
@@ -751,14 +759,14 @@ public class PlayerController2D : Entity2D {
         // Ledge checks
         if (isGrounded) {
             // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
             ledgeOnRight = !hitRight;
             
 
             // Check collision with walls on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, wallCheckDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (wallCheckDistance), Color.red);
+            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
             ledgeOnLeft = !hitLeft;
         }
         
@@ -902,8 +910,9 @@ public class PlayerController2D : Entity2D {
         CameraController2D.Instance.transform.position = new Vector3(position.x, position.y, CameraController2D.Instance.transform.position.z);
         transform.position = position;
 
-        if (!keepMomentum) {
-            rigidBody.linearVelocity = new Vector2(0, 0);
+        if (!keepMomentum)
+        {
+            rigidBody.linearVelocity = Vector2.zero;
             isDashing = false;
             wasRunning = false;
             StopVfxEffect(jumpVfx, true);
@@ -924,9 +933,8 @@ public class PlayerController2D : Entity2D {
             {
                 spriteRenderer.color = Color.clear;
             }
-            PlayAnimation("Death");
             SetPlayerState(PlayerState.Frozen);
-            StopVfxEffect(bleedVfx,true);
+            PlayAnimation("Death");
             SpawnVfxEffect(deathVfx);
             SoundManager.Instance?.PlaySoundFX("Player Death");
             _logText = "Death by: " + cause;
@@ -943,7 +951,7 @@ public class PlayerController2D : Entity2D {
             SoundManager.Instance.PlaySoundFX("Player Hurt");
             if (_currentHealth == 1 && _currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
             _logText = "Damaged by: " + cause;
-            // CameraController2D.Instance?.ShakeCamera(0.4f,1f);
+            CameraController2D.Instance?.ShakeCamera(0.4f,1f);
         } 
         CheckIfDead(cause);
     }
@@ -1073,6 +1081,7 @@ public class PlayerController2D : Entity2D {
 
         UnStuckLock();
     }
+    
     private void CheckFaceDirection() {
 
         if (isWallSliding) return; // Only flip the player based on input if he is not wall sliding
@@ -1083,6 +1092,7 @@ public class PlayerController2D : Entity2D {
             FlipPlayer("Left");
         }
     }
+    
     private void FlipPlayer(string side) {
     
         if (isFacingRight && side == "Right" || !isFacingRight && side == "Left") return; // Only flip the player if he is not already facing the wanted direction
@@ -1148,6 +1158,31 @@ public class PlayerController2D : Entity2D {
                 break;
         }
     }
+
+    public void ReceiveAbility(PlayerAbilities ability)
+    {
+        switch (ability)
+        {
+            case PlayerAbilities.DoubleJump:
+                doubleJumpAbility = true;
+                break;
+            case  PlayerAbilities.WallSlide:
+                wallSlideAbility = true;
+                break;
+            case PlayerAbilities.WallJump:
+                wallJumpAbility = true;
+                break;
+            case PlayerAbilities.Dash:
+                dashAbility = true;
+                break;
+        }
+        
+        // SetPlayerState(PlayerState.Frozen);
+        SpawnVfxEffect(healVfx);
+        SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
+        PlayAnimation("ReceiveAbility");
+        
+    }
     
     #endregion Other functions
     
@@ -1206,7 +1241,7 @@ public class PlayerController2D : Entity2D {
                 _debugStringBuilder.AppendFormat("Running: {0}, {1}\n", isRunning, wasRunning);
                 if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
                 if (wallSlideAbility) _debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);
-                if (canFastDrop) _debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", _isFastDropping);
+                if (canFastDrop) _debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", isFastDropping);
                 _debugStringBuilder.AppendFormat("Coyote Jumping: {0} ({1:0.0} / {2:0.0})\n",_canCoyoteJump, _coyoteJumpTime,coyoteJumpBuffer);
                 _debugStringBuilder.AppendFormat("Fast Falling: {0}\n", isFastFalling);
                 _debugStringBuilder.AppendFormat("At Max Fall Speed: {0}\n", atMaxFallSpeed);
@@ -1219,10 +1254,10 @@ public class PlayerController2D : Entity2D {
                 _debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", _movingRigidbody, _movingRigidbody?.linearVelocityX, _movingRigidbodyLastVelocityX);
                 _debugStringBuilder.AppendFormat("Soft Object: {0}\n", _softObject);
 
-                // _debugStringBuilder.AppendFormat("\nInputs:\n");
-                // _debugStringBuilder.AppendFormat($"H/V: {horizontalInput:F2} / {verticalInput:F2}\n");
+                _debugStringBuilder.AppendFormat("\nInputs:\n");
+                _debugStringBuilder.AppendFormat($"H/V: {_horizontalInput:F2} / {_verticalInput:F2}\n");
                 // _debugStringBuilder.AppendFormat("Run: {0}\n", _runInput);
-                // _debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", InputManager.JumpWasPressed, variableJumpHeldDuration, variableJumpMaxHoldDuration);
+                // _debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", InputManager.JumpWasPressed, _variableJumpHeldDuration, variableJumpMaxHoldDuration);
                 // _debugStringBuilder.AppendFormat("Dash: {0}\n", InputManager.DashWasPressed);
                 // _debugStringBuilder.AppendFormat("Drop Down: {0}\n", _dropDownInput);
                 

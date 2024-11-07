@@ -46,10 +46,15 @@ public class CameraController2D : MonoBehaviour
     private Vector3 _shakeOffset;
     
     [Header("Player Offset Settings")]
-    [SerializeField] private bool verticalOffset = true;
     [SerializeField] private bool horizontalOffset = true;
-    [SerializeField] [Range(0f, 2f)] private float verticalOffsetStrength = 1f;
-    [SerializeField] [Range(0f, 2f)] private float horizontalOffsetStrength = 1f;
+    [SerializeField] [Min(0f)] private float baseHorizontalOffset = 1f;
+    [SerializeField] private float horizontalMoveDiminisher = 1.5f;
+    [SerializeField] private float maxhorizontalOffset = 10f;
+    [Space(10f)]
+    [SerializeField] private bool verticalOffset = true;
+    [SerializeField] [Min(0f)] private float baseVerticalOffset = 1f;
+    [SerializeField] private float verticalMoveDiminisher = 2f;
+    [SerializeField] private float maxVerticalOffset = 10f;
     private PlayerController2D _player;
 
     
@@ -129,40 +134,71 @@ public class CameraController2D : MonoBehaviour
             
                 
         if (horizontalOffset) {
-            if (_player.rigidBody.linearVelocity.x != 0 ) {
+            if (_player.rigidBody.linearVelocityX != 0 ) {
 
                 if (_player.isFacingRight) {
-                    offset.x = horizontalOffsetStrength + (_player.rigidBody.linearVelocity.x/1.5f);
+                    offset.x = baseHorizontalOffset + (_player.rigidBody.linearVelocityX/horizontalMoveDiminisher);
                 } else {
-                    offset.x = -horizontalOffsetStrength + (_player.rigidBody.linearVelocity.x/1.5f);
+                    offset.x = -baseHorizontalOffset + (_player.rigidBody.linearVelocityX/horizontalMoveDiminisher);
                 }
             }
         }
 
         if (verticalOffset) {
             if (_player.isGrounded) { // player is on the ground
-                offset.y = 1f;
-            } else {
-                if (_player.isWallSliding) { // Player is wall sliding
-                    offset.y = verticalOffsetStrength + _player.rigidBody.linearVelocity.y;
+                
+                if (!_player.isMoving && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge
+                {
+                    offset.y = _player.isFastDropping ? -baseVerticalOffset*3 : -baseVerticalOffset*2;
+                } else {
+                    offset.y = baseVerticalOffset;
+                }
+                
+                
+            } else if (_player.isWallSliding) { // Player is wall sliding
+                offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
                         
-                }  else { // Player is in the air
-                    if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y > 0) { // Player is jumping
-                        offset.y = verticalOffsetStrength * _player.rigidBody.linearVelocity.y;
-                            
-                    } else if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y < 0 && _player.rigidBody.linearVelocity.y > -7) { // Player is falling
-                        offset.y = -verticalOffsetStrength + Mathf.Clamp(_player.rigidBody.linearVelocity.y/2f,-1,0);
-
-                    } else if (!_player.isWallSliding && _player.rigidBody.linearVelocity.y < -7) { // Player is fast falling
-                        offset.y = -verticalOffsetStrength + Mathf.Clamp(_player.rigidBody.linearVelocity.y/2f,-10,0);
-
-                    }
+            }  else if (!_player.isGrounded && !_player.isWallSliding) { // Player is in the air
+                
+                if (_player.rigidBody.linearVelocityY > 0) { // Player is jumping
+                    offset.y = baseVerticalOffset + Mathf.Clamp(_player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
+                        
+                } else if (_player.rigidBody.linearVelocityY < 0) { // Player is falling
+                    offset.y = -baseVerticalOffset + Mathf.Clamp(_player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
                 }
             }
         }
-            
+
         
         return offset;
+        
+        // if (verticalOffset) {
+        //     if (_player.isGrounded) { // player is on the ground
+        //         
+        //         offset.y = baseVerticalOffset;
+        //         
+        //     } else {
+        //         
+        //         if (_player.isWallSliding) { // Player is wall sliding
+        //             offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
+        //                 
+        //         }  else { // Player is in the air
+        //             if (_player.rigidBody.linearVelocityY > 0) { // Player is jumping
+        //                 offset.y = baseVerticalOffset * _player.rigidBody.linearVelocityY;
+        //                     
+        //             } else if (_player.rigidBody.linearVelocityY < 0 && _player.rigidBody.linearVelocityY > -7) { // Player is falling
+        //                 offset.y = -baseVerticalOffset + Mathf.Clamp(_player.rigidBody.linearVelocityY/2f,-1,0);
+        //
+        //             } else if (_player.rigidBody.linearVelocityY < -7) { // Player is fast falling
+        //                 offset.y = -baseVerticalOffset + Mathf.Clamp(_player.rigidBody.linearVelocityY/2f,-10,0);
+        //
+        //             }
+        //         }
+        //     }
+        // }
+        //     
+        
+        
     }
 
 #endregion Target functions
@@ -173,7 +209,6 @@ public class CameraController2D : MonoBehaviour
     {
         targetZoom = zoom;
     }
-
     public void ResetTargetZoom()
     {
         targetZoom = startingZoom;
@@ -182,11 +217,12 @@ public class CameraController2D : MonoBehaviour
         if (!allowZoomControl) return;
 
         float zoomInput = Input.GetAxis("Mouse ScrollWheel");
-        targetZoom = targetZoom + (-zoomInput * zoomSpeed);
+        targetZoom += -zoomInput * zoomSpeed;
     }
     private void HandleZoom() {
         if (!_target) return;
         _zoomOffset = (_target == _player.transform) ? CalculateTargetZoomOffset() : 0;
+        _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize, minZoom, maxZoom);
         targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
         _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom + _zoomOffset, ref _zoomVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
     }
@@ -277,7 +313,7 @@ public class CameraController2D : MonoBehaviour
         _isShaking = false;
     }
     
-    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 1f, float yShakeRange = 1f) {
+    public void ShakeCamera(float duration, float magnitude, float xShakeRange = 2f, float yShakeRange = 2f) {
         if (!_target) return;
         StartCoroutine(Shake(duration, magnitude, xShakeRange, yShakeRange));
 
@@ -321,14 +357,14 @@ public class CameraController2D : MonoBehaviour
         _debugStringBuilder.Clear();
         
         _debugStringBuilder.AppendFormat("Camera:\n");
-        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} ({1}/{2})\n", targetZoom, minZoom, maxZoom);
+        _debugStringBuilder.AppendFormat("Zoom: {0:0.0}, {1:0.0} ({2}/{3})\n", targetZoom, _camera.orthographicSize, minZoom, maxZoom);
         _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
 
         if (_target)
         {
             _debugStringBuilder.AppendFormat("\nTarget: {0}\n", _target.name);
-            _debugStringBuilder.AppendFormat("Position: ({0:0.},{1:0.})\n", _targetPosition.x, _targetPosition.y);
-            _debugStringBuilder.AppendFormat("Offset: ({0:0.},{1:0.})\n", _targetOffset.x, _targetOffset.y);
+            // _debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", _targetPosition.x, _targetPosition.y);
+            _debugStringBuilder.AppendFormat("Position Offset: ({0:0.0},{1:0.0})\n", _targetOffset.x, _targetOffset.y);
             _debugStringBuilder.AppendFormat("Zoom Offset: {0}\n", _zoomOffset);
         }
 
@@ -336,8 +372,8 @@ public class CameraController2D : MonoBehaviour
         if (useBoundaries && _activeBoundary) 
         {
             _debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeBoundary.name);
-            _debugStringBuilder.AppendFormat("Horizontal: {0:0.} / {1:0.}\n", _minXBoundary, _maxXBoundary);
-            _debugStringBuilder.AppendFormat("Vertical: {0:0.} / {1:0.}", _minYBoundary, _maxYBoundary);
+            _debugStringBuilder.AppendFormat("Horizontal: {0:0.0} / {1:0.0}\n", _minXBoundary, _maxXBoundary);
+            _debugStringBuilder.AppendFormat("Vertical: {0:0.0} / {1:0.0}", _minYBoundary, _maxYBoundary);
         }
 
                 
@@ -348,6 +384,7 @@ public class CameraController2D : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos() { // Draw active bounds
         
+        if (!_activeBoundary || !useBoundaries) return;
         float minXBoundaryPoint = _minXBoundary - (_cameraWidth/2);
         float maxXBoundaryPoint = _maxXBoundary + (_cameraWidth/2);
         float minYBoundaryPoint = _minYBoundary - (_cameraHeight/2);

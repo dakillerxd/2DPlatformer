@@ -98,6 +98,11 @@ public class CameraBoundary2D : MonoBehaviour
         Debug.DrawLine(new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Right line
         Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), Color.blue); // Bottom line
         Debug.DrawLine(new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Top line
+
+        if (useColliderAsBoundary)
+        {
+            MatchBoundaryToCollider();
+        }
     }
 
     private void OnDrawGizmosSelected()

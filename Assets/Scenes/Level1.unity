@@ -1872,9 +1872,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  limitCameraToBoundary: 1
   boundaryZoom: 4
   useColliderAsBoundary: 1
+  limitCameraToBoundary: 1
   minXAreaBoundary: -37.43
   maxXAreaBoundary: 3
   minYAreaBoundary: -5
@@ -5463,9 +5463,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  limitCameraToBoundary: 1
   boundaryZoom: 4
   useColliderAsBoundary: 1
+  limitCameraToBoundary: 1
   minXAreaBoundary: 3.0663223
   maxXAreaBoundary: 100.2
   minYAreaBoundary: -8.58061

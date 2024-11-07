@@ -9,9 +9,13 @@ using VInspector;
 public class CameraBoundary2D : MonoBehaviour
 {
 
-    [Header("Settings")]
+    [Header("Zoom")]
+    [SerializeField] private float boundaryZoom = 4f;
+    
+    [Header("Boundary")]
     [SerializeField] private bool useColliderAsBoundary;
-    [HideIf("useColliderAsBoundary")]
+    [SerializeField] private bool limitCameraToBoundary = true;
+    [DisableIf("useColliderAsBoundary")]
     [SerializeField] private float minXAreaBoundary;
     [SerializeField] private float maxXAreaBoundary;
     [SerializeField] private float minYAreaBoundary;
@@ -34,14 +38,19 @@ public class CameraBoundary2D : MonoBehaviour
 
     public Vector4 GetBoundaries()
     {
+        if (!limitCameraToBoundary) return Vector4.zero;
+        
         if (useColliderAsBoundary)
         {
             return  new Vector4(boxCollider2D.bounds.min.x, boxCollider2D.bounds.max.x, boxCollider2D.bounds.min.y, boxCollider2D.bounds.max.y);
         }
         return  new Vector4(minXAreaBoundary, maxXAreaBoundary, minYAreaBoundary, maxYAreaBoundary);
     }
-    
-    
+
+    public float GetBoundaryZoom()
+    {
+            return boundaryZoom;
+    }
     
 
 #if UNITY_EDITOR
@@ -85,8 +94,6 @@ public class CameraBoundary2D : MonoBehaviour
     
     private void OnDrawGizmos() {
         
-        if (useColliderAsBoundary) return;
-        // Draw boundary if not using collider size
         Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Left line
         Debug.DrawLine(new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Right line
         Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), Color.blue); // Bottom line
@@ -126,7 +133,6 @@ public class CameraBoundary2D : MonoBehaviour
             Gizmos.DrawSphere(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), 0.5f);
         }
         
-
     }
 #endif
 

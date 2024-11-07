@@ -69,7 +69,7 @@ public class SoundManager : MonoBehaviour
             sound.source.spatialBlend = sound.spatialBlend;
             sound.source.reverbZoneMix = sound.reverbZoneMix;
             sound.source.loop = sound.loop;
-            sound.source.volume = sound.volume * soundCategory * masterGameVolume;
+            sound.source.volume = sound.volume;
         }
 
     }
@@ -118,6 +118,7 @@ public class SoundManager : MonoBehaviour
         }
         
         StopAllMusic();
+        newMusic.source.volume = newMusic.volume * musicVolume * masterGameVolume;
         newMusic.source.Play();
     }
 
@@ -170,6 +171,7 @@ public class SoundManager : MonoBehaviour
         } else {
                 
             soundFx.source.clip = soundFx.clips[rand];
+            soundFx.source.volume = soundFx.volume * soundFXVolume * masterGameVolume;
             soundFx.source.Play();
         }
     }

@@ -32,7 +32,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] [Min(0.01f)] private float moveAcceleration = 7f; // How fast the player gets to acceleration threshold
     [SerializeField] private float runAcceleration = 1.5f;     // Slower final acceleration
     [SerializeField] private float accelerationThreshold = 4f;   // Speed at which we switch to slower acceleration
-    [SerializeField] [Min(0.01f)] private float directionChangeMultiplier  = 4f;
     [SerializeField] [Min(0.01f)] private float groundFriction = 5f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float airFriction = 0.1f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float platformFriction = 1f; // The higher the friction there is less resistance
@@ -792,9 +791,6 @@ public class PlayerController2D : Entity2D {
         _onGroundObject = _movingRigidbody; 
         
         switch (collision.gameObject.tag) {
-            case "Platform":
-
-            break;
             case "Enemy":
                 
                 EnemyController2D enemyCont = collision.gameObject.GetComponent<EnemyController2D>();
@@ -856,9 +852,22 @@ public class PlayerController2D : Entity2D {
                 if (collision.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary))
                 {
                     CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());
+                    CameraController2D.Instance.SetCameraTargetZoom(boundary.GetBoundaryZoom());
                 }
                 break;
         }
+    }
+    
+    private void OnTriggerExit2D(Collider2D collision) {
+        
+        switch (collision.gameObject.tag) {
+            case "CameraBoundary":
+                
+                CameraController2D.Instance.ResetTargetZoom();
+                
+                break;
+        }
+
     }
     
     
@@ -947,7 +956,7 @@ public class PlayerController2D : Entity2D {
         _currentHealth = maxHealth;
     }
     
-    private void TurnInvincible(float invincibilityDuration = 0.5f) {
+    private void TurnInvincible(float invincibilityDuration = 0.1f) {
 
         StartCoroutine(Invisible(invincibilityDuration));
     }

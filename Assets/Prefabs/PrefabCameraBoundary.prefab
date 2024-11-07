@@ -15,7 +15,7 @@ GameObject:
   m_Layer: 0
   m_Name: PrefabCameraBoundary
   m_TagString: CameraBoundary
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  limitCameraToBoundary: 1
+  boundaryZoom: 0
   useColliderAsBoundary: 1
   minXAreaBoundary: 0
   maxXAreaBoundary: 0

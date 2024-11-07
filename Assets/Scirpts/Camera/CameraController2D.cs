@@ -169,6 +169,15 @@ public class CameraController2D : MonoBehaviour
 
 #region Zoom functions
 
+    public void SetCameraTargetZoom(float zoom)
+    {
+        targetZoom = zoom;
+    }
+
+    public void ResetTargetZoom()
+    {
+        targetZoom = startingZoom;
+    }
     private void HandleZoomInput() {
         if (!allowZoomControl) return;
 
@@ -198,12 +207,14 @@ public class CameraController2D : MonoBehaviour
         return offset;
     }
     
+    
 #endregion Zoom functions
 
 #region Boundaries functions
 
     public void SetBoundaries(CameraBoundary2D boundaryObject, Vector4  boundaries) {
 
+        if (boundaries == Vector4.zero) {return;}
         
         _activeBoundary = boundaryObject;
         _minXBoundary = boundaries.x + (_cameraWidth/2);
@@ -212,6 +223,13 @@ public class CameraController2D : MonoBehaviour
         _maxYBoundary = boundaries.w - (_cameraHeight/2);;
     }
     
+    public void  ResetBoundaries() {
+        _activeBoundary = null;
+        _minXBoundary = 0;
+        _maxXBoundary = 0;
+        _minYBoundary = 0;
+        _maxYBoundary = 0;
+    }
     
     private void HandleBoundaries() {
         if (!_activeBoundary || !useBoundaries) return;

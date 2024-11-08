@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 2879183197102708590}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.114, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -150,7 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dece43db101b299439a1ee4e9586b68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothFollowSpeed: 0.5
+  followDelay: 0.5
+  target: {fileID: 0}
   allowZoomControl: 1
   targetZoom: 4
   zoomSpeed: 2
@@ -159,8 +160,12 @@ MonoBehaviour:
   startingZoom: 4
   useBoundaries: 1
   boundaryPrefab: {fileID: 4529777456246908639, guid: 40eddc7bb4437304d9bb20eb7a7efecb, type: 3}
-  isShaking: 0
-  verticalOffset: 1
   horizontalOffset: 1
-  verticalOffsetStrength: 1
-  horizontalOffsetStrength: 1
+  baseHorizontalOffset: 1
+  horizontalMoveDiminisher: 1.5
+  maxHorizontalOffset: 4
+  runOffset: 8
+  verticalOffset: 1
+  baseVerticalOffset: 1
+  verticalMoveDiminisher: 2
+  maxVerticalOffset: 3

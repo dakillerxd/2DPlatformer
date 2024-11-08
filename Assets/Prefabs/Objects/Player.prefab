@@ -167,7 +167,7 @@ Transform:
   m_GameObject: {fileID: 3175132503772560621}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.206, y: -3.451, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -244,15 +244,16 @@ MonoBehaviour:
   maxFallDamage: 1
   maxMoveSpeed: 6
   maxAirMoveSpeed: 5
-  airRunSpeed: 7
+  airRunSpeed: 6
   moveAcceleration: 2
-  runAcceleration: 1.5
-  accelerationThreshold: 4
+  runAcceleration: 3
+  accelerationThreshold: 5
   groundFriction: 3.5
   airFriction: 0.1
   platformFriction: 25
   movementThreshold: 0.1
   runningThreshold: 5.9
+  movingRigidbodyVelocityDecayRate: 4
   jumpForce: 5
   variableJumpMaxHoldDuration: 0.3
   variableJumpMultiplier: 0.4
@@ -275,7 +276,6 @@ MonoBehaviour:
   wallCheckDistance: 0.02
   ledgeCheckHorizontalDistance: 0.5
   ledgeCheckVerticalDistance: 2
-  movingRigidBodyVelocityXDecayRate: 4
   autoClimbSteps: 0
   stepHeight: 0.12
   stepWidth: 0.1

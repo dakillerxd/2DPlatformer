@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  limitCameraToBoundary: 1
-  boundaryZoom: 0
+  boundaryZoom: 4
   useColliderAsBoundary: 1
+  limitCameraToBoundary: 0
   minXAreaBoundary: 0
   maxXAreaBoundary: 0
   minYAreaBoundary: 0

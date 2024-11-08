@@ -102,7 +102,11 @@ public class SoundManager : MonoBehaviour
         
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
         if (soundFx == null || soundFx.clips.Length == 0) {
-            Debug.Log("SoundFX: " + name + " not found!");
+
+            #if UNITY_EDITOR
+            Debug.Log("SoundFX: " + name + " not found!");   
+            #endif
+            
             return;
         }
         
@@ -113,7 +117,10 @@ public class SoundManager : MonoBehaviour
         
         Sound newMusic = music.Find(music => music.name == name);
         if (newMusic == null || newMusic.clips.Length == 0) {
-            Debug.Log("Music: " + name + " not found!");
+            #if UNITY_EDITOR
+            Debug.Log("Music: " + name + " not found!"); 
+            #endif
+            
             return;
         }
         
@@ -127,7 +134,11 @@ public class SoundManager : MonoBehaviour
         
         Sound s = soundEffects.Find(sound => sound.name == name);
         if (s == null) {
-            Debug.Log("SoundFX: " + name + " not found!");
+            
+            #if UNITY_EDITOR
+            Debug.Log("SoundFX: " + name + " not found!"); 
+            #endif
+            
             return;
         }
         s.source.Stop();

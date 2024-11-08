@@ -3,7 +3,6 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
-using UnityEngine.Serialization;
 
 public enum PlayerState {
     Controllable,
@@ -163,6 +162,7 @@ public class PlayerController2D : Entity2D {
     private float _dashCooldownTimer;
     private bool _isDashCooldownRunning;
     
+    
     [Tab("References")] // ----------------------------------------------------------------------
     [Header("Components")]
     [SerializeField] public Rigidbody2D rigidBody;
@@ -189,9 +189,7 @@ public class PlayerController2D : Entity2D {
     [SerializeField] private Color hurtColor = Color.red;
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
     private readonly Color _defaultColor = Color.white;
-
     
-
 
     
     
@@ -232,7 +230,6 @@ public class PlayerController2D : Entity2D {
         HandleStepClimbing();
         HandleFastDrop();
         HandleJump();
-        
         HandleWallSlide();
         HandleWallJump();
         HandleDashing();
@@ -299,9 +296,9 @@ public class PlayerController2D : Entity2D {
     private float CalculateAcceleration()
     {
         // use moveAcceleration until getting to accelerationThreshold then use runAcceleration
-        float acceleration = Mathf.Abs(_horizontalInput) > accelerationThreshold ? runAcceleration : moveAcceleration;
+        float acceleration = Mathf.Abs(_moveSpeed) > accelerationThreshold ? runAcceleration : moveAcceleration;
         
-        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0; }
+        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0; Debug.Log("WALL SLIDING");}
 
         return acceleration;
     }
@@ -442,12 +439,12 @@ public class PlayerController2D : Entity2D {
                 _coyoteJumpTime = 0;
                 _canCoyoteJump = false;
                 
-            } else if (!isGrounded && !_isTouchingWall && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump
+            } else if (!isGrounded && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump
                 
                 // Jump
                 ExecuteJump(1, jumpDirection);
                 PlayVfxEffect(airJumpVfx, true); 
-                // PlayAnimation("AirJump");
+                PlayAnimation("AirJump");
                 SoundManager.Instance?.PlaySoundFX("Player Air Jump");
             }
         }
@@ -516,9 +513,9 @@ public class PlayerController2D : Entity2D {
     private void HandleDashing() {
 
 
-        if (!dashAbility) return; // Return if not allowed to dash
+        if (!dashAbility && _remainingDashes <= 0) return; // Return if not allowed to dash
 
-        if (_dashRequested && _remainingDashes > 0) {
+        if (_dashRequested) {
 
             int dashDirection = isFacingRight ? 1 : -1;
 
@@ -532,7 +529,7 @@ public class PlayerController2D : Entity2D {
             // Dash
             isDashing = true;
             _remainingDashes --;
-            TurnInvincible();
+            TurnInvincible(0.5f);
             TurnStunLocked();
             rigidBody.linearVelocityX += dashForce * dashDirection;
             if (isGrounded) { rigidBody.linearVelocityY += 1f; }
@@ -572,12 +569,10 @@ public class PlayerController2D : Entity2D {
 
     private void HandleWallSlide() {
 
+        if (!wallSlideAbility) return;
+        
         // Check if wall sliding
-        if (wallSlideAbility && _isTouchingWall && !isGrounded && rigidBody.linearVelocity.y < 0) { 
-            isWallSliding = true;
-        } else {
-            isWallSliding = false;
-        }
+        isWallSliding = !isGrounded && (_isTouchingWallOnLeft || _isTouchingWallOnRight) && rigidBody.linearVelocity.y < 0;
 
         // Play wall slide effect
         if (isWallSliding) { PlayVfxEffect(wallSlideVfx, false);}
@@ -614,13 +609,12 @@ public class PlayerController2D : Entity2D {
                 rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, -maxSlideSpeed);
 
             }
-            
         }   
     }
     
     private void HandleWallJump () {
 
-        if (!wallJumpAbility) return;
+        if (!wallJumpAbility || isGrounded) return;
 
         if (_jumpInputDownRequested) {
             if (_holdJumpDownTimer > holdJumpDownBuffer) {
@@ -628,15 +622,17 @@ public class PlayerController2D : Entity2D {
                 return;
             }
             
-            if (!isGrounded && _isTouchingWallOnRight) { // Wall jump to the left
+            if (_isTouchingWallOnRight) { // Wall jump to the left
                 ExecuteWallJump("Left");
                 
-            } else if (!isGrounded && _isTouchingWallOnLeft ) { // Wall jump to the right
+            } else if (_isTouchingWallOnLeft ) { // Wall jump to the right
                 ExecuteWallJump("Right");
             }
         }
         
-        if (wallJumpResetsJumps && !isGrounded && _isTouchingWall) { // Reset jumps
+        
+        if (!wallJumpResetsJumps) return;
+        if  (_isTouchingWallOnLeft || _isTouchingWallOnRight) { // Reset jumps
             _remainingAirJumps = maxAirJumps;
             _variableJumpHeldDuration = 0;
         }

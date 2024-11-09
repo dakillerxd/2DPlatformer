@@ -18,6 +18,7 @@ public class CameraController2D : MonoBehaviour
     [Header("Target")]
     [SerializeField] [Range(0f, 2f)] private float followDelay = 0.5f;
     [SerializeField] private Transform target;
+    private float _targetFollowDelay;
     private Vector3 _targetPosition;
     private Vector3 _targetOffset;
     private Vector3 _currentVelocity;
@@ -45,16 +46,16 @@ public class CameraController2D : MonoBehaviour
     private bool _isShaking;
     private Vector3 _shakeOffset;
     
-    [Header("Player Offset Settings")]
-    [SerializeField] private bool horizontalOffset = true;
+    [Header("Player Settings")]
     [SerializeField] [Min(0f)] private float baseHorizontalOffset = 1f;
-    [SerializeField] private float horizontalMoveDiminisher = 1.5f;
-    [SerializeField] private float maxHorizontalOffset = 10f;
-    [SerializeField] private float runOffset = 8f;
-    [SerializeField] private bool verticalOffset = true;
+    [SerializeField] [Min(0f)] private float horizontalMoveDiminisher = 1.5f;
+    [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
+    [SerializeField] [Min(0f)] private float runOffset = 8f;
     [SerializeField] [Min(0f)] private float baseVerticalOffset = 1f;
-    [SerializeField] private float verticalMoveDiminisher = 2f;
-    [SerializeField] private float maxVerticalOffset = 10f;
+    [SerializeField] [Min(0f)] private float verticalMoveDiminisher = 2f;
+    [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
+    [SerializeField] private float jumpFollowDelayAddition = 0.4f;
+    [SerializeField] private float fallFollowDelaySubtraction = -0.25f;
     private PlayerController2D _player;
 
     
@@ -117,7 +118,8 @@ public class CameraController2D : MonoBehaviour
         
         _targetPosition = CalculateTargetPosition();
         _targetOffset = CalculateTargetOffset();
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset + _shakeOffset, ref _currentVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
+        _targetFollowDelay = CalculateTargetFollowDelay();
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset + _shakeOffset, ref _currentVelocity, followDelay + _targetFollowDelay, Mathf.Infinity, Time.deltaTime);
         transform.position = smoothedPosition;
     }
     
@@ -131,54 +133,68 @@ public class CameraController2D : MonoBehaviour
             
         Vector3 offset = Vector3.zero;
         if (!target.CompareTag("Player")) return offset;
-        // if (_player.currentPlayerState == PlayerState.Frozen) return offset;
-        
-        if (horizontalOffset) {
+        if (_player.currentPlayerState == PlayerState.Frozen) return offset;
 
-            if (!_player.wasRunning)
-            {
-                offset.x = _player.isFacingRight 
-                    ? Mathf.Clamp(baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset) 
-                    : Mathf.Clamp(-baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset);
-            }
-            else
-            {
-                offset.x = _player.isFacingRight ? runOffset : -runOffset;
-            }
-
+        if (!_player.wasRunning)
+        {
+            offset.x = _player.isFacingRight 
+                ? Mathf.Clamp(baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset) 
+                : Mathf.Clamp(-baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset);
         }
-
-        if (verticalOffset) {
+        else
+        {
+            offset.x = _player.isFacingRight ? runOffset : -runOffset;
+        }
+        
             
-            if (_player.isGrounded) { // player is on the ground
-                
-                if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
-                {
-                    offset.y = -baseVerticalOffset*3;
-                } else {
-                    offset.y = baseVerticalOffset;
-                }
-                
-            } else if (_player.isWallSliding) { // Player is wall sliding
-                offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
-                        
-            }  else if (!_player.isGrounded && !_player.isWallSliding) { // Player is in the air
+        if (_player.isGrounded) { // player is on the ground
+            
+            if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
+            {
+                offset.y = -baseVerticalOffset*3;
+            } else {
+                offset.y = baseVerticalOffset;
+            }
+            
+        } else if (_player.isWallSliding) { // Player is wall sliding
+            offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
+                    
+        }  else if (!_player.isGrounded && !_player.isWallSliding) { // Player is in the air
 
-                switch (_player.rigidBody.linearVelocityY)
-                {
-                    case  > 0: // Player is jumping
-                        offset.y = Mathf.Clamp(baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
-                    break;
-                    case < 0: // Player is falling
-                        offset.y = Mathf.Clamp(-baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
-                    break;
-                }
-
+            switch (_player.rigidBody.linearVelocityY)
+            {
+                case  > 0: // Player is jumping
+                    offset.y = Mathf.Clamp(baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
+                break;
+                case < 0: // Player is falling
+                    offset.y = Mathf.Clamp(-baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
+                break;
             }
         }
-
-        
         return offset;
+    }
+    
+    private float CalculateTargetFollowDelay() {
+
+        float delay = 0;
+        if (!target.CompareTag("Player")) return delay;
+        if (_player.currentPlayerState == PlayerState.Frozen) return delay;
+
+
+        if (_player.isJumping)
+        {
+            delay = jumpFollowDelayAddition;
+        }
+        switch (_player.rigidBody.linearVelocityY)
+        {
+            case < 0: // Player is falling
+
+                if (_player.isFastFalling) {delay = fallFollowDelaySubtraction;}
+                break;
+        }
+        
+        
+        return delay;
     }
 
 #endregion Target functions
@@ -229,8 +245,6 @@ public class CameraController2D : MonoBehaviour
 #region Boundaries functions
 
     public void SetBoundaries(CameraBoundary2D boundaryObject, Vector4  boundaries) {
-
-        if (boundaries == Vector4.zero) {return;}
         
         _activeBoundary = boundaryObject;
         _minXBoundary = boundaries.x + (_cameraWidth/2);
@@ -337,15 +351,14 @@ public class CameraController2D : MonoBehaviour
         _debugStringBuilder.Clear();
         
         _debugStringBuilder.AppendFormat("Camera:\n");
-        _debugStringBuilder.AppendFormat("Zoom: {0:0.0}, {1:0.0} ({2}/{3})\n", targetZoom, _camera.orthographicSize, minZoom, maxZoom);
+        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0}, {2:0.0} ({3}/{4})\n", targetZoom,_zoomOffset , _camera.orthographicSize, minZoom, maxZoom);
         _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
 
         if (target)
         {
             _debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-            // _debugStringBuilder.AppendFormat("Position: ({0:0.0},{1:0.0})\n", _targetPosition.x, _targetPosition.y);
-            _debugStringBuilder.AppendFormat("Position Offset: ({0:0.0},{1:0.0})\n", _targetOffset.x, _targetOffset.y);
-            _debugStringBuilder.AppendFormat("Zoom Offset: {0}\n", _zoomOffset);
+            _debugStringBuilder.AppendFormat("Follow Delay: {0:0.0} + {1:0.0}\n", followDelay, _targetFollowDelay);
+            _debugStringBuilder.AppendFormat("Position Offset: {0:0.0}, {1:0.0}\n", _targetOffset.x, _targetOffset.y);
         }
 
 

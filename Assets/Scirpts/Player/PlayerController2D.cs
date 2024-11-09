@@ -53,7 +53,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.5f; // Multiplier for jump cut height
     [SerializeField] [Range(0.1f, 1f)] private float holdJumpDownBuffer = 0.2f; // For how long the jump buffer will hold
     [SerializeField] [Range(0, 2f)] private float coyoteJumpBuffer = 0.1f; // For how long the coyote buffer will hold
-    private bool _isJumping;
     private bool _isJumpCut;
     private float _holdJumpDownTimer;
     private bool _canCoyoteJump;
@@ -105,6 +104,7 @@ public class PlayerController2D : Entity2D {
     
     [Header("States")] 
     public bool isMoving { get; private set; }
+    public bool isJumping { get; private set; }
     public bool isFacingRight { get; private set; }
     public bool isStunLocked { get; private set; }
     public bool isInvincible { get; private set; }
@@ -397,15 +397,15 @@ public class PlayerController2D : Entity2D {
             _canCoyoteJump = true;
             _coyoteJumpTime = coyoteJumpBuffer;
             
-            // Only reset _isJumping if not actively jumping
+            // Only reset isJumping if not actively jumping
             if (rigidBody.linearVelocity.y <= 0) {
-                _isJumping = false;
+                isJumping = false;
             }
         }
         
         // Reset jump state and cut when falling
         if (!isGrounded && rigidBody.linearVelocity.y <= 0) { 
-            _isJumping = false;
+            isJumping = false;
             _isJumpCut = false;
         }
         
@@ -427,7 +427,7 @@ public class PlayerController2D : Entity2D {
                 jumpDirection = "None";
             }
 
-            if ((isGrounded || _canCoyoteJump) && !_isJumping) { // Ground jump
+            if ((isGrounded || _canCoyoteJump) && !isJumping) { // Ground jump
                 
                 if (_canCoyoteJump && !isGrounded) { _logText = $"Coyote Jumped: {_coyoteJumpTime}";}
                 // Jump
@@ -465,7 +465,7 @@ public class PlayerController2D : Entity2D {
         }
         _jumpInputDownRequested = false;
         _remainingAirJumps -= jumpCost;
-        _isJumping = true;
+        isJumping = true;
         _jumpInputHeld = true;
         _isJumpCut = false;
         _variableJumpHeldDuration = 0;
@@ -487,7 +487,7 @@ public class PlayerController2D : Entity2D {
         
         // Only Cut jump height if button is released early in upward motion
         if (_jumpInputUp && !_isJumpCut) {  
-            if (_isJumping && rigidBody.linearVelocity.y > 0) {
+            if (isJumping && rigidBody.linearVelocity.y > 0) {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
                 // SoundManager.Instance?.StopSoundFx("Player Jump");
                 _isJumpCut = true;
@@ -654,7 +654,7 @@ public class PlayerController2D : Entity2D {
         _logText = "Wall Jumped " + side;
         _jumpInputDownRequested = false;
         _variableJumpHeldDuration = 0;
-        _isJumping = true;
+        isJumping = true;
         TurnStunLocked();
     }
 
@@ -855,8 +855,11 @@ public class PlayerController2D : Entity2D {
 
                 if (collision.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary))
                 {
-                    CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());
-                    CameraController2D.Instance.SetCameraTargetZoom(boundary.GetBoundaryZoom());
+                    if (boundary.setCameraZoom) {CameraController2D.Instance.SetCameraTargetZoom(boundary.GetBoundaryZoom());}
+                    
+                    if (boundary.limitCameraToBoundary) {CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());}
+                    
+                    
                 }
                 break;
         }
@@ -1233,7 +1236,7 @@ public class PlayerController2D : Entity2D {
                 _debugStringBuilder.AppendFormat("Facing Right: {0}\n", isFacingRight);
                 _debugStringBuilder.AppendFormat("Invincible: {0} ({1:0.0})\n", isInvincible, _invincibilityTime);
                 _debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", isStunLocked, _stunLockTime);
-                _debugStringBuilder.AppendFormat("Jumping: {0}\n", _isJumping);
+                _debugStringBuilder.AppendFormat("Jumping: {0}\n", isJumping);
                 _debugStringBuilder.AppendFormat("Running: {0}, {1}\n", isRunning, wasRunning);
                 if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
                 if (wallSlideAbility) _debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);

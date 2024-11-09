@@ -160,12 +160,12 @@ MonoBehaviour:
   startingZoom: 4
   useBoundaries: 1
   boundaryPrefab: {fileID: 4529777456246908639, guid: 40eddc7bb4437304d9bb20eb7a7efecb, type: 3}
-  horizontalOffset: 1
   baseHorizontalOffset: 1
   horizontalMoveDiminisher: 1.5
   maxHorizontalOffset: 4
   runOffset: 8
-  verticalOffset: 1
   baseVerticalOffset: 1
   verticalMoveDiminisher: 2
   maxVerticalOffset: 3
+  jumpFollowDelayAddition: 0
+  fallFollowDelaySubtraction: 0

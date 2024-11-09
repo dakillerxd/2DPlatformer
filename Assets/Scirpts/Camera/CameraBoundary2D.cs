@@ -1,26 +1,29 @@
 
-using System;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VInspector;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class CameraBoundary2D : MonoBehaviour
 {
-
-    [Header("Zoom")]
-    [SerializeField] private float boundaryZoom = 4f;
-    
-    [Header("Boundary")]
+    [Header("Settings")]
     [SerializeField] private bool useColliderAsBoundary;
-    [SerializeField] private bool limitCameraToBoundary = true;
-    [DisableIf("useColliderAsBoundary")]
+    [DisableIf(nameof(useColliderAsBoundary))]
     [SerializeField] private float minXAreaBoundary;
     [SerializeField] private float maxXAreaBoundary;
     [SerializeField] private float minYAreaBoundary;
     [SerializeField] private float maxYAreaBoundary;
     [EndIf]
+    
+    [Header("Zoom")]
+    public bool setCameraZoom;
+    [EnableIf(nameof(setCameraZoom))]
+    [SerializeField] [Min(1f)] private float boundaryZoom = 4f;
+    [EndIf]
+    
+    [Header("Boundary")]
+    public bool limitCameraToBoundary;
+    
     [Header("References")]
     [SerializeField] private  BoxCollider2D boxCollider2D;
     
@@ -49,6 +52,7 @@ public class CameraBoundary2D : MonoBehaviour
 
     public float GetBoundaryZoom()
     {
+        if (!setCameraZoom) return 0;
             return boundaryZoom;
     }
     
@@ -88,7 +92,7 @@ public class CameraBoundary2D : MonoBehaviour
 
     [Button] private void DeleteBoundary()
     {
-        DestroyImmediate(this.gameObject);
+        DestroyImmediate(gameObject);
     }
     
     
@@ -133,7 +137,6 @@ public class CameraBoundary2D : MonoBehaviour
         // Draw boundary info
         if ((minXAreaBoundary != 0 || maxXAreaBoundary != 0 || minYAreaBoundary != 0 || maxYAreaBoundary != 0) && !useColliderAsBoundary)
         {
-            
             Handles.Label(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2 + 2, 0), "Camera Boundary", style);
             Gizmos.DrawSphere(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), 0.5f);
         }

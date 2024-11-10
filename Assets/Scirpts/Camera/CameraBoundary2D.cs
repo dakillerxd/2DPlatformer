@@ -98,50 +98,46 @@ public class CameraBoundary2D : MonoBehaviour
     
     private void OnDrawGizmos() {
         
-        Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Left line
-        Debug.DrawLine(new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Right line
-        Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), Color.blue); // Bottom line
-        Debug.DrawLine(new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), Color.blue); // Top line
-
-        if (useColliderAsBoundary)
-        {
-            MatchBoundaryToCollider();
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
+        if (!boxCollider2D) return;
+        if (useColliderAsBoundary) { MatchBoundaryToCollider(); }
+        
+        Color infoColor = Color.cyan;
+        Gizmos.color = infoColor;
         GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.red;
+        style.normal.textColor = infoColor;
         style.fontSize = 10;
         style.fontStyle = FontStyle.Bold;
         style.alignment = TextAnchor.UpperCenter;
         
+        
+        Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), infoColor); // Left line
+        Debug.DrawLine(new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), infoColor); // Right line
+        Debug.DrawLine(new Vector3(minXAreaBoundary, minYAreaBoundary, 0), new Vector3(maxXAreaBoundary, minYAreaBoundary, 0), infoColor); // Bottom line
+        Debug.DrawLine(new Vector3(minXAreaBoundary, maxYAreaBoundary, 0), new Vector3(maxXAreaBoundary, maxYAreaBoundary, 0), infoColor); // Top line
+        
         // Draw collider info
-        if (boxCollider2D)
+        if (useColliderAsBoundary)
         {
-            Gizmos.DrawSphere(boxCollider2D.bounds.center, 0.5f);
-            if (useColliderAsBoundary)
-            {
-                Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 2, 0), "Camera Collider&Boundary", style);
-            }
-            else
-            {
-                Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 2, 0), "Player Collider", style);
-                Debug.DrawLine(boxCollider2D.bounds.center, new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), Color.red);
-            }
+            Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 1, 0), "Camera Collider&Boundary", style);
+        }
+        else
+        {
+            // Draw collider info
+            Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 2, 0), "Player Collider", style);
+            Debug.DrawLine(boxCollider2D.bounds.center, new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), infoColor);
             
+            
+            // Draw boundary info
+            if (minXAreaBoundary != 0 || maxXAreaBoundary != 0 || minYAreaBoundary != 0 || maxYAreaBoundary != 0)
+            {
+                Handles.Label(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2 + 1, 0), "Camera Boundary", style);
+                Gizmos.DrawSphere(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), 0.3f);
+            }
+
         }
-        
-        // Draw boundary info
-        if ((minXAreaBoundary != 0 || maxXAreaBoundary != 0 || minYAreaBoundary != 0 || maxYAreaBoundary != 0) && !useColliderAsBoundary)
-        {
-            Handles.Label(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2 + 2, 0), "Camera Boundary", style);
-            Gizmos.DrawSphere(new Vector3((maxXAreaBoundary + minXAreaBoundary) / 2, (maxYAreaBoundary + minYAreaBoundary) / 2, 0), 0.5f);
-        }
-        
+
     }
+    
 #endif
 
 

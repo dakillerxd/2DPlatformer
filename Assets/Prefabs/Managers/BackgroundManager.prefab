@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1328080476843783271}
   - component: {fileID: 6599675306297937152}
   m_Layer: 0
-  m_Name: Layer4_Walls
+  m_Name: Layer1_Walls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,10 +76,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5580011918406320416}
+  - {fileID: 1328080476843783271}
+  - {fileID: 1254467266685977639}
   - {fileID: 3341069836360536612}
   - {fileID: 8006558434120702669}
-  - {fileID: 1328080476843783271}
+  - {fileID: 5580011918406320416}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3950283706052020224
@@ -93,7 +94,7 @@ GameObject:
   - component: {fileID: 8006558434120702669}
   - component: {fileID: 867505069114136650}
   m_Layer: 0
-  m_Name: Layer3_ParalaxObjects
+  m_Name: Layer4_ParalaxObjects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -140,7 +141,7 @@ GameObject:
   - component: {fileID: 3341069836360536612}
   - component: {fileID: 391148073143140505}
   m_Layer: 0
-  m_Name: Layer2_ParalaxObjects
+  m_Name: Layer3_ParalaxObjects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -176,6 +177,53 @@ MonoBehaviour:
   parallaxEffectX: 0.1
   parallaxEffectY: 0.1
   orderInLayer: -19
+--- !u!1 &6176657177239963657
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1254467266685977639}
+  - component: {fileID: 5717007796120681647}
+  m_Layer: 0
+  m_Name: Layer2_ParalaxObjects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1254467266685977639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6176657177239963657}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3282455991741977539}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5717007796120681647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6176657177239963657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parallaxEffectX: 0.1
+  parallaxEffectY: 0.1
+  orderInLayer: -18
 --- !u!1 &7505008654064531884
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +235,7 @@ GameObject:
   - component: {fileID: 5580011918406320416}
   - component: {fileID: 6797311345467741720}
   m_Layer: 0
-  m_Name: Layer1_Background
+  m_Name: Layer5_Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

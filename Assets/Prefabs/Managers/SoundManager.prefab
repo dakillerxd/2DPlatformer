@@ -109,6 +109,16 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
     source: {fileID: 0}
+  - name: Player Receive Ability
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
+    source: {fileID: 0}
   - name: ?Player Spawn
     volume: 1
     pitch: 1

@@ -168,4 +168,4 @@ MonoBehaviour:
   verticalMoveDiminisher: 2
   maxVerticalOffset: 3
   jumpFollowDelayAddition: 0
-  fallFollowDelaySubtraction: 0
+  fallFollowDelaySubtraction: -0.3

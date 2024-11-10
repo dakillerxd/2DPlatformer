@@ -8889,13 +8889,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundaryZoom: 3
   useColliderAsBoundary: 1
-  limitCameraToBoundary: 0
   minXAreaBoundary: 30
   maxXAreaBoundary: 54.03
   minYAreaBoundary: -2.6999998
   maxYAreaBoundary: 8.54
+  setCameraZoom: 0
+  boundaryZoom: 3
+  limitCameraToBoundary: 0
   boxCollider2D: {fileID: 822274224}
 --- !u!4 &822274226
 Transform:
@@ -16835,13 +16836,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundaryZoom: 3
   useColliderAsBoundary: 1
-  limitCameraToBoundary: 0
   minXAreaBoundary: 9.826609
   maxXAreaBoundary: 15.272898
   minYAreaBoundary: -4.658943
   maxYAreaBoundary: 3.938943
+  setCameraZoom: 0
+  boundaryZoom: 3
+  limitCameraToBoundary: 0
   boxCollider2D: {fileID: 1484933058}
 --- !u!1001 &1486721996
 PrefabInstance:
@@ -22670,13 +22672,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundaryZoom: 3
   useColliderAsBoundary: 1
-  limitCameraToBoundary: 0
   minXAreaBoundary: 20.2
   maxXAreaBoundary: 24.7
   minYAreaBoundary: 0.8000002
   maxYAreaBoundary: 6.62
+  setCameraZoom: 0
+  boundaryZoom: 3
+  limitCameraToBoundary: 0
   boxCollider2D: {fileID: 2079501698}
 --- !u!4 &2079501700
 Transform:
@@ -22797,13 +22800,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundaryZoom: 5
   useColliderAsBoundary: 1
-  limitCameraToBoundary: 0
   minXAreaBoundary: 70.25
   maxXAreaBoundary: 89.95999
   minYAreaBoundary: 2.4899998
   maxYAreaBoundary: 10.16
+  setCameraZoom: 0
+  boundaryZoom: 5
+  limitCameraToBoundary: 0
   boxCollider2D: {fileID: 2097172480}
 --- !u!4 &2097172482
 Transform:
@@ -22954,7 +22958,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2106352265}
   - component: {fileID: 2106352264}
-  - component: {fileID: 2106352263}
+  - component: {fileID: 2106352266}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -22962,26 +22966,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2106352263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2106352262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
 --- !u!114 &2106352264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23012,6 +22996,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2106352266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106352262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!4 &2116062908 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3591096685193118491, guid: 39701f49f6e8f384ab0ef2a9193a22ed, type: 3}

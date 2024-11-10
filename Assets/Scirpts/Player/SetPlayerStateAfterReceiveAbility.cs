@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SetPlayerStateBeforeTeleoprt : StateMachineBehaviour
+public class SetPlayerStateAfterReceiveAbility : StateMachineBehaviour
 {
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -20,6 +20,10 @@ public class SetPlayerStateBeforeTeleoprt : StateMachineBehaviour
     //    
     //}
 
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+        base.OnStateExit(animator, stateInfo, layerIndex);
+        PlayerController2D.Instance.SetPlayerState(PlayerState.Controllable);
+    }
     // OnStateMove is called right after Animator.OnAnimatorMove()
     //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{

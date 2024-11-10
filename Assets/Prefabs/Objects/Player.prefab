@@ -261,7 +261,7 @@ MonoBehaviour:
   coyoteJumpBuffer: 0.1
   gravityForce: 10
   fallMultiplier: 3
-  maxFallSpeed: 20
+  maxFallSpeed: 15
   fastFallSpeed: 12
   fastFallBopDiminisher: 4
   isFastFalling: 0

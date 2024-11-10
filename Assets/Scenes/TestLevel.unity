@@ -5691,11 +5691,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: 28.5
       objectReference: {fileID: 0}
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 36.5
       objectReference: {fileID: 0}
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5728,10 +5728,6 @@ PrefabInstance:
     - target: {fileID: 6194248602333166714, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6854169415136180565, guid: 12244f87d335c5f4ba803e319860afca, type: 3}
-      propertyPath: wallSlideStickStrength
-      value: 0.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

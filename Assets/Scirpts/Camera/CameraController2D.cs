@@ -16,17 +16,18 @@ public class CameraController2D : MonoBehaviour
     private float _cameraWidth;
     
     [Header("Target")]
-    [SerializeField] [Range(0f, 2f)] private float followDelay = 0.5f;
     [SerializeField] private Transform target;
     private float _targetFollowDelay;
     private Vector3 _targetPosition;
     private Vector3 _targetOffset;
     private Vector3 _currentVelocity;
+    private float _currentVelocityX;
+    private float _currentVelocityY;
     
     [Header("Zoom")]
     [SerializeField] private bool allowZoomControl = true;
     [SerializeField] private float targetZoom = 5f;
-    [SerializeField] private float zoomSpeed = 2f;
+    [SerializeField] private float zoomSpeed = 0.5f;
     [SerializeField] private float minZoom = 2f;
     [SerializeField] private float maxZoom = 6f;
     [SerializeField] [Min(2)] private float startingZoom = 2;
@@ -47,15 +48,19 @@ public class CameraController2D : MonoBehaviour
     private Vector3 _shakeOffset;
     
     [Header("Player Settings")]
+    [SerializeField] [Range(0f, 2f)] private float verticalFollowDelay = 0.5f;
+    [SerializeField] [Range(0f, 2f)] private float horizontalFollowDelay = 0.5f;
+    [Space(10)]
     [SerializeField] [Min(0f)] private float baseHorizontalOffset = 1f;
     [SerializeField] [Min(0f)] private float horizontalMoveDiminisher = 1.5f;
     [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
-    [SerializeField] [Min(0f)] private float runOffset = 8f;
+    [SerializeField] [Min(0f)] private float runHorizontalOffset = 8f;
+    [Space(10)]
     [SerializeField] [Min(0f)] private float baseVerticalOffset = 1f;
     [SerializeField] [Min(0f)] private float verticalMoveDiminisher = 2f;
     [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
-    [SerializeField] private float jumpFollowDelayAddition = 0.4f;
-    [SerializeField] private float fallFollowDelaySubtraction = -0.25f;
+    [SerializeField] private float fallFollowDelaySubtraction = -0.35f;
+    [SerializeField] private float fastFallFollowDelaySubtraction = -0.7f;
     private PlayerController2D _player;
 
     
@@ -116,10 +121,17 @@ public class CameraController2D : MonoBehaviour
         
         if (!target) return;
         
+        
         _targetPosition = CalculateTargetPosition();
         _targetOffset = CalculateTargetOffset();
         _targetFollowDelay = CalculateTargetFollowDelay();
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, _targetPosition + _targetOffset + _shakeOffset, ref _currentVelocity, followDelay + _targetFollowDelay, Mathf.Infinity, Time.deltaTime);
+        Vector3 targetPos = _targetPosition + _targetOffset + _shakeOffset;
+        
+        float smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, horizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+        float smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, verticalFollowDelay + _targetFollowDelay, Mathf.Infinity, Time.deltaTime);
+        float smoothedZ = transform.position.z; // Keep Z as is, or smooth it too if needed
+
+        Vector3 smoothedPosition = new Vector3(smoothedX, smoothedY, smoothedZ);
         transform.position = smoothedPosition;
     }
     
@@ -143,7 +155,7 @@ public class CameraController2D : MonoBehaviour
         }
         else
         {
-            offset.x = _player.isFacingRight ? runOffset : -runOffset;
+            offset.x = _player.isFacingRight ? runHorizontalOffset : -runHorizontalOffset;
         }
         
             
@@ -151,7 +163,7 @@ public class CameraController2D : MonoBehaviour
             
             if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
             {
-                offset.y = -baseVerticalOffset*3;
+                offset.y = -baseVerticalOffset*2;
             } else {
                 offset.y = baseVerticalOffset;
             }
@@ -180,22 +192,20 @@ public class CameraController2D : MonoBehaviour
         if (!target.CompareTag("Player")) return delay;
         if (_player.currentPlayerState == PlayerState.Frozen) return delay;
 
-
-        if (_player.isJumping)
-        {
-            delay = jumpFollowDelayAddition;
-        }
+        
         switch (_player.rigidBody.linearVelocityY)
         {
             case < 0: // Player is falling
 
-                if (_player.isFastFalling) {delay = fallFollowDelaySubtraction;}
+                delay = fallFollowDelaySubtraction;
+                if (_player.isFastFalling) {delay = fastFallFollowDelaySubtraction;}
                 break;
         }
         
         
         return delay;
     }
+    
 
 #endregion Target functions
 
@@ -217,10 +227,10 @@ public class CameraController2D : MonoBehaviour
     }
     private void HandleZoom() {
         if (!target) return;
-        _zoomOffset = (target == _player.transform) ? CalculateTargetZoomOffset() : 0;
-        _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize, minZoom, maxZoom);
+        _zoomOffset = CalculateTargetZoomOffset();
         targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
-        _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom + _zoomOffset, ref _zoomVelocity, followDelay, Mathf.Infinity, Time.deltaTime);
+        _camera.orthographicSize = Mathf.SmoothDamp(_camera.orthographicSize, targetZoom + _zoomOffset, ref _zoomVelocity, zoomSpeed, Mathf.Infinity, Time.deltaTime);
+        _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize, minZoom, maxZoom);
     }
     
     private float CalculateTargetZoomOffset()
@@ -351,15 +361,11 @@ public class CameraController2D : MonoBehaviour
         _debugStringBuilder.Clear();
         
         _debugStringBuilder.AppendFormat("Camera:\n");
+        _debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
+        // _debugStringBuilder.AppendFormat("Follow Delay: {0:0.0} + {1:0.0}\n", followDelay, _targetFollowDelay);
+        _debugStringBuilder.AppendFormat("Position Offset: {0:0.0}, {1:0.0}\n", _targetOffset.x, _targetOffset.y);
         _debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0}, {2:0.0} ({3}/{4})\n", targetZoom,_zoomOffset , _camera.orthographicSize, minZoom, maxZoom);
         _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
-
-        if (target)
-        {
-            _debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-            _debugStringBuilder.AppendFormat("Follow Delay: {0:0.0} + {1:0.0}\n", followDelay, _targetFollowDelay);
-            _debugStringBuilder.AppendFormat("Position Offset: {0:0.0}, {1:0.0}\n", _targetOffset.x, _targetOffset.y);
-        }
 
 
         if (useBoundaries && _activeBoundary) 

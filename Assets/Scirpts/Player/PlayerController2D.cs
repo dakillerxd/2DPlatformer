@@ -188,6 +188,7 @@ public class PlayerController2D : Entity2D {
     [Header("Colors")]
     [SerializeField] private Color hurtColor = Color.red;
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
+    [SerializeField] private Color deadColor = Color.clear;
     private readonly Color _defaultColor = Color.white;
     
 
@@ -335,7 +336,8 @@ public class PlayerController2D : Entity2D {
     
     private void HandleDropDown() { 
         
-        if (!_softObject && !isGrounded) return;
+        if (!isGrounded) return;
+        if (!_softObject) return;
 
         if (_dropDownInput) {
             rigidBody.linearVelocityY = jumpForce/3;
@@ -691,7 +693,9 @@ public class PlayerController2D : Entity2D {
 
         fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
         
+        
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
+        if (isFastFalling) { CameraController2D.Instance.ShakeCamera(0.1f, 0.5f * fallSpeed/fastFallBopDiminisher, 1f, 1f);}
         if (atMaxFallSpeed) { PlayVfxEffect(peakFallSpeedVfx, false); }
         
         atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;
@@ -706,10 +710,12 @@ public class PlayerController2D : Entity2D {
         if (isFastFalling && isGrounded && !isDashing) { // Check if landed
             
             rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+            CameraController2D.Instance.ShakeCamera(0.2f, 1 * fallSpeed/fastFallBopDiminisher, 1, 1);
+            
             PlayAnimation("Land");
             
             if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
-                DamageHealth(maxFallDamage, false, "Ground");
+                DamageHealth(1, false, "Ground");
             }
             
             atMaxFallSpeed = false;
@@ -803,6 +809,13 @@ public class PlayerController2D : Entity2D {
                 Vector2 enemyDashForce = enemyNormal * dashPushForce;
                 
                 
+                // Damage and push the enemy if the player is dashing
+                if (isDashing) {
+                    enemyCont.Push(-enemyDashForce);
+                    CameraController2D.Instance.ShakeCamera(0.3f, 2f, 1f, 1f);
+                    return;
+                }
+                
                 // Damage and push the player and enemy
                 if (collision.collider == enemyCont.collHead) {
 
@@ -812,12 +825,7 @@ public class PlayerController2D : Entity2D {
                     Push(enemyPushForce);
                     DamageHealth(1, true, collision.gameObject.name);
                 }
-
-                // Damage and push the enemy if the player is dashing
-                if (isDashing) {
-                    enemyCont.Push(-enemyDashForce);
-                    // enemyCont.DamageHealth(1, true); 
-                }
+                
                 
                 break;
             case "Spike":
@@ -930,7 +938,7 @@ public class PlayerController2D : Entity2D {
 
             foreach (SpriteRenderer spriteRenderer in spriteRenderers)
             {
-                spriteRenderer.color = Color.clear;
+                spriteRenderer.color = deadColor;
             }
             SetPlayerState(PlayerState.Frozen);
             PlayAnimation("Death");
@@ -944,13 +952,13 @@ public class PlayerController2D : Entity2D {
         if (_currentHealth > 0 && !isInvincible) {
             
             if (setInvincible) { TurnInvincible();}
+            CameraController2D.Instance.ShakeCamera(0.2f, 4,3,3);
             TurnStunLocked();
             _currentHealth -= damage;
             SpawnVfxEffect(hurtVfx);
             SoundManager.Instance.PlaySoundFX("Player Hurt");
             if (_currentHealth == 1 && _currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
             _logText = "Damaged by: " + cause;
-            CameraController2D.Instance?.ShakeCamera(0.4f,1f);
         } 
         CheckIfDead(cause);
     }
@@ -1148,7 +1156,13 @@ public class PlayerController2D : Entity2D {
                 _stunLockTime = 0f;
                 HealToFullHealth();
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
+                CameraController2D.Instance.StopCameraShake();
                 PlayVfxEffect(spawnVfx, true);
+                
+                foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+                {
+                    spriteRenderer.color = _defaultColor;
+                }
                 
                 break;
             case PlayerState.Frozen:

@@ -365,7 +365,8 @@ public class CameraController2D : MonoBehaviour
         // _debugStringBuilder.AppendFormat("Follow Delay: {0:0.0} + {1:0.0}\n", followDelay, _targetFollowDelay);
         _debugStringBuilder.AppendFormat("Position Offset: {0:0.0}, {1:0.0}\n", _targetOffset.x, _targetOffset.y);
         _debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0}, {2:0.0} ({3}/{4})\n", targetZoom,_zoomOffset , _camera.orthographicSize, minZoom, maxZoom);
-        _debugStringBuilder.AppendFormat("Shake Offset: ({0:0.0},{1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
+        _debugStringBuilder.AppendFormat("Shake Offset: {0} ({1:0.0},{2:0.0})\n", _isShaking, _shakeOffset.x, _shakeOffset.y);
+        
 
 
         if (useBoundaries && _activeBoundary) 

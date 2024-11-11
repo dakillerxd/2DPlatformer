@@ -859,30 +859,7 @@ public class PlayerController2D : Entity2D {
                 SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
                 RespawnFromCheckpoint();
             break;
-            case "CameraBoundary":
-
-                if (collision.TryGetComponent<CameraBoundary2D>(out CameraBoundary2D boundary))
-                {
-                    if (boundary.setCameraZoom) {CameraController2D.Instance.SetCameraTargetZoom(boundary.GetBoundaryZoom());}
-                    
-                    if (boundary.limitCameraToBoundary) {CameraController2D.Instance.SetBoundaries(boundary, boundary.GetBoundaries());}
-                    
-                    
-                }
-                break;
         }
-    }
-    
-    private void OnTriggerExit2D(Collider2D collision) {
-        
-        switch (collision.gameObject.tag) {
-            case "CameraBoundary":
-                
-                CameraController2D.Instance.ResetTargetZoom();
-                
-                break;
-        }
-
     }
     
     

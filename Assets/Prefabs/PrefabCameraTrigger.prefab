@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6792568642440335435}
   - component: {fileID: 4832938201333862547}
   m_Layer: 0
-  m_Name: PrefabCameraBoundary
+  m_Name: PrefabCameraTrigger
   m_TagString: CameraBoundary
   m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0

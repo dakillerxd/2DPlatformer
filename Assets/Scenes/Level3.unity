@@ -488,7 +488,7 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &40467478
@@ -1765,7 +1765,7 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &170814004
@@ -8969,10 +8969,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 60.75
-  maxXAreaBoundary: 83.75
-  minYAreaBoundary: 23.59
-  maxYAreaBoundary: 31.59
+  boundaryMinX: 60.75
+  boundaryMaxX: 83.75
+  boundaryMinY: 23.59
+  boundaryMaxY: 31.59
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -9428,10 +9428,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: -24.895
-  maxXAreaBoundary: 1.1100006
-  minYAreaBoundary: -7.22
-  maxYAreaBoundary: 2.7199998
+  boundaryMinX: -24.895
+  boundaryMaxX: 1.1100006
+  boundaryMinY: -7.22
+  boundaryMaxY: 2.7199998
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -16961,10 +16961,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 47.949997
-  maxXAreaBoundary: 67.55
-  minYAreaBoundary: 0.8499999
-  maxYAreaBoundary: 4.65
+  boundaryMinX: 47.949997
+  boundaryMaxX: 67.55
+  boundaryMinY: 0.8499999
+  boundaryMaxY: 4.65
   setCameraZoom: 1
   boundaryZoom: 6
   limitCameraToBoundary: 0
@@ -18319,10 +18319,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 42.25
-  maxXAreaBoundary: 65.25
-  minYAreaBoundary: -9.75
-  maxYAreaBoundary: -4.75
+  boundaryMinX: 42.25
+  boundaryMaxX: 65.25
+  boundaryMinY: -9.75
+  boundaryMaxY: -4.75
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -19513,10 +19513,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: -26.400002
-  maxXAreaBoundary: 82.6
-  minYAreaBoundary: -10.5
-  maxYAreaBoundary: 42.1
+  boundaryMinX: -26.400002
+  boundaryMaxX: 82.6
+  boundaryMinY: -10.5
+  boundaryMaxY: 42.1
   setCameraZoom: 0
   boundaryZoom: 4
   limitCameraToBoundary: 1
@@ -20556,14 +20556,6 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 468135478}
-    - target: {fileID: 7239564406554024694, guid: e86e1cbf76f1dbd47974558b8e9e85f6, type: 3}
-      propertyPath: fallFollowDelaySubtraction
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7239564406554024694, guid: e86e1cbf76f1dbd47974558b8e9e85f6, type: 3}
-      propertyPath: fastFallFollowDelaySubtraction
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

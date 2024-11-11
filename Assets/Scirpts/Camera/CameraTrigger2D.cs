@@ -46,20 +46,23 @@ public class CameraTrigger2D : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.transform == CameraController2D.Instance.target)
-        {
-            if (setCameraZoom) {CameraController2D.Instance.SetCameraTargetZoom(GetBoundaryZoom());}
-                    
-            if (limitCameraToBoundary) {CameraController2D.Instance.SetBoundaries(gameObject.GetComponent<CameraTrigger2D>(), GetBoundaries());}
-        }
+        if (other.gameObject.transform != CameraController2D.Instance.target) return;
+        
+        if (setCameraZoom) {CameraController2D.Instance.SetCameraTargetZoom(GetBoundaryZoom());}
+        if (setCameraOffset) {CameraController2D.Instance.SetTriggerOffset(offset);}
+        if (limitCameraToBoundary) {CameraController2D.Instance.SetBoundaries(gameObject.GetComponent<CameraTrigger2D>(), GetBoundaries());}
+        
     }
     
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.transform == CameraController2D.Instance.target)
-        {
-            CameraController2D.Instance.ResetTargetZoom();
-        }
+        if (other.gameObject.transform != CameraController2D.Instance.target) return;
+        
+        if (limitCameraToBoundary) {CameraController2D.Instance.ResetBoundaries();}
+        if (setCameraZoom) {CameraController2D.Instance.ResetZoom();}
+        if (setCameraOffset) {CameraController2D.Instance.ResetTriggerOffset();}
+            
+        
 
     }
 

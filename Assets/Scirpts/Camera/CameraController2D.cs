@@ -110,7 +110,6 @@ public class CameraController2D : MonoBehaviour
         
         if (!target) return;
         
-        
         _targetPosition = CalculateTargetPosition();
         _targetStateOffset = CalculateTargetOffset();
         Vector3 targetPos = _targetPosition + _triggerOffset + _targetStateOffset + _shakeOffset;
@@ -178,6 +177,11 @@ public class CameraController2D : MonoBehaviour
     {
         _triggerOffset = offset;
     }
+    
+    public void ResetTriggerOffset()
+    {
+        _triggerOffset = Vector3.zero;
+    }
 
 
 #endregion Target functions
@@ -188,7 +192,7 @@ public class CameraController2D : MonoBehaviour
     {
         _currentZoom = zoom;
     }
-    public void ResetTargetZoom()
+    public void ResetZoom()
     {
         _currentZoom = defaultZoom;
     }

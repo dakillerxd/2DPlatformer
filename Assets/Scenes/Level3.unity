@@ -8973,6 +8973,8 @@ MonoBehaviour:
   boundaryMaxX: 83.75
   boundaryMinY: 23.59
   boundaryMaxY: 31.59
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -9432,6 +9434,8 @@ MonoBehaviour:
   boundaryMaxX: 1.1100006
   boundaryMinY: -7.22
   boundaryMaxY: 2.7199998
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -16965,6 +16969,8 @@ MonoBehaviour:
   boundaryMaxX: 67.55
   boundaryMinY: 0.8499999
   boundaryMaxY: 4.65
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 1
   boundaryZoom: 6
   limitCameraToBoundary: 0
@@ -18323,6 +18329,8 @@ MonoBehaviour:
   boundaryMaxX: 65.25
   boundaryMinY: -9.75
   boundaryMaxY: -4.75
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -19517,6 +19525,8 @@ MonoBehaviour:
   boundaryMaxX: 82.6
   boundaryMinY: -10.5
   boundaryMaxY: 42.1
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 0
   boundaryZoom: 4
   limitCameraToBoundary: 1

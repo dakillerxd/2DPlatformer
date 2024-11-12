@@ -20,14 +20,14 @@ public class CameraController2D : MonoBehaviour
     [Header("Follow Speed")]
     [SerializeField] private float baseVerticalFollowDelay = 0.5f;
     [SerializeField] private float baseHorizontalFollowDelay = 0.5f;
+    [SerializeField] [Min(0f)] private float horizontalMoveDiminisher = 1.5f;
+    [SerializeField] [Min(0f)] private float verticalMoveDiminisher = 2f;
     private float _currentVelocityX;
     private float _currentVelocityY;
     
     [Header("Position")]
     [SerializeField] [Min(0f)] private float baseHorizontalOffset = 1f;
     [SerializeField] [Min(0f)] private float baseVerticalOffset = 1f;
-    [SerializeField] [Min(0f)] private float horizontalMoveDiminisher = 1.5f;
-    [SerializeField] [Min(0f)] private float verticalMoveDiminisher = 2f;
     [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
     [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
     [SerializeField] [Min(0f)] private float runHorizontalOffset = 8f;
@@ -86,7 +86,7 @@ public class CameraController2D : MonoBehaviour
     }
 
     private void Update() {
-        HandleZoomInput();
+        // HandleZoomInput();
     }
     
     private void LateUpdate() {
@@ -148,12 +148,14 @@ public class CameraController2D : MonoBehaviour
             
         if (_player.isGrounded) { // player is on the ground
             
-            if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
-            {
-                offset.y = -baseVerticalOffset*2;
-            } else {
-                offset.y = baseVerticalOffset;
-            }
+            offset.y = baseVerticalOffset;
+            
+            // if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
+            // {
+            //     offset.y = -baseVerticalOffset*2;
+            // } else {
+            //     offset.y = baseVerticalOffset;
+            // }
             
         } else if (_player.isWallSliding) { // Player is wall sliding
             offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
@@ -249,6 +251,7 @@ public class CameraController2D : MonoBehaviour
     
     private void HandleBoundaries() {
 
+        if (!_activeTrigger) return;
         Vector3 position = transform.position;
         position.x = Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary);
         position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
@@ -315,12 +318,11 @@ public class CameraController2D : MonoBehaviour
         
         _debugStringBuilder.AppendFormat("Camera:\n");
         _debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-        _debugStringBuilder.AppendFormat("Position Offset: {0:0.0}, {1:0.0}\n", _targetStateOffset.x, _targetStateOffset.y);
-        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0}, {2:0.0} ({3}/{4})\n", _currentZoom,_zoomOffset , _camera.orthographicSize, minZoom, maxZoom);
+        _debugStringBuilder.AppendFormat("Offset: ({0:0.0}, {1:0.0}) + ({2:0.0}, {3:0.0}) \n", _targetStateOffset.x, _targetStateOffset.y, _triggerOffset.x, _triggerOffset.y);
+        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} + {1:0.0}, {2:0.0} ({3}/{4})\n", _currentZoom, _zoomOffset , _camera.orthographicSize, minZoom, maxZoom);
         _debugStringBuilder.AppendFormat("Shake Offset: {0} ({1:0.0},{2:0.0})\n", _isShaking, _shakeOffset.x, _shakeOffset.y);
         
-
-
+        
         if (_activeTrigger) 
         {
             _debugStringBuilder.AppendFormat("\nBoundaries: {0}\n", _activeTrigger.name);

@@ -2587,7 +2587,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &256958750
@@ -4284,7 +4284,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &439277001
@@ -5757,7 +5757,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &553249693
@@ -5968,7 +5968,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &560178377
@@ -6315,7 +6315,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &572914650
@@ -6402,7 +6402,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &581246558
@@ -7576,7 +7576,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &717389622
@@ -8092,60 +8092,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 911508127}
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1079027901}
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 827203539}
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1424287287}
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 559974887}
-    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1546849715}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 572914651}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 427857378}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1148284744}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1787910014}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1697758555}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 256036987}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1978767015}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 570620555}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1283809294}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 893008376}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 715964490}
-    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 540292924}
     - targetCorrespondingSourceObject: {fileID: 1328080476843783271, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1469851417}
@@ -8203,6 +8149,60 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1328080476843783271, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
       insertIndex: -1
       addedObject: {fileID: 678455557}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 911508127}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1079027901}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 827203539}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1424287287}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 559974887}
+    - targetCorrespondingSourceObject: {fileID: 3341069836360536612, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1546849715}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 572914651}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 427857378}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1148284744}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1787910014}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1697758555}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 256036987}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1978767015}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 570620555}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1283809294}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 893008376}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 715964490}
+    - targetCorrespondingSourceObject: {fileID: 8006558434120702669, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 540292924}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
 --- !u!4 &762209408 stripped
@@ -8890,10 +8890,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 30
-  maxXAreaBoundary: 54.03
-  minYAreaBoundary: -2.6999998
-  maxYAreaBoundary: 8.54
+  boundaryMinX: 30
+  boundaryMaxX: 54.03
+  boundaryMinY: -2.6999998
+  boundaryMaxY: 8.54
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 0
   boundaryZoom: 3
   limitCameraToBoundary: 0
@@ -9121,7 +9123,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &842764847
@@ -9728,7 +9730,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &906310391
@@ -9947,7 +9949,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &917699576
@@ -12395,7 +12397,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1087470701
@@ -12487,7 +12489,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 0.16, y: 0.16}
+    newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -12538,12 +12540,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -2
-  m_Sprite: {fileID: 7482667652216324306, guid: e2a20148dc1ac0140bd223b500a254d3, type: 3}
+  m_Sprite: {fileID: 7482667652216324306, guid: 0d04b02beccb31f4f83fa6feb2a51ce3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.16, y: 0.16}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -12896,7 +12898,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1152279557
@@ -14291,7 +14293,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1286234152
@@ -14674,6 +14676,8 @@ Transform:
   - {fileID: 1997746755}
   - {fileID: 822274226}
   - {fileID: 2079501700}
+  - {fileID: 1569462900}
+  - {fileID: 1543140146}
   - {fileID: 1484933056}
   - {fileID: 2097172482}
   m_Father: {fileID: 0}
@@ -15988,7 +15992,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1427823174
@@ -16837,11 +16841,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 9.826609
-  maxXAreaBoundary: 15.272898
-  minYAreaBoundary: -4.658943
-  maxYAreaBoundary: 3.938943
-  setCameraZoom: 0
+  boundaryMinX: 9.826609
+  boundaryMaxX: 15.272898
+  boundaryMinY: -4.658943
+  boundaryMaxY: 3.938943
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
+  setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
   boxCollider2D: {fileID: 1484933058}
@@ -17229,6 +17235,136 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2705343423499858932, guid: 29fbf9d4d1814074e85663dfb082a23d, type: 3}
   m_PrefabInstance: {fileID: 1536596710}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1543140145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1543140146}
+  - component: {fileID: 1543140149}
+  - component: {fileID: 1543140148}
+  - component: {fileID: 1543140147}
+  m_Layer: 0
+  m_Name: PrefabCameraBoundary(Clone) (4)
+  m_TagString: CameraBoundary
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1543140146
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543140145}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 58.25, y: 3.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1305661516}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1543140147
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543140145}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!61 &1543140148
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543140145}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.3, y: 1.5}
+  m_EdgeRadius: 0
+--- !u!114 &1543140149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543140145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useColliderAsBoundary: 1
+  boundaryMinX: 57.6
+  boundaryMaxX: 58.9
+  boundaryMinY: 3
+  boundaryMaxY: 4.5
+  setCameraOffset: 1
+  offset: {x: 0, y: -2, z: 0}
+  setCameraZoom: 0
+  boundaryZoom: 3
+  limitCameraToBoundary: 0
+  boxCollider2D: {fileID: 1543140148}
 --- !u!1001 &1544845992
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17437,7 +17573,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1548497056
@@ -17638,6 +17774,136 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2705343423499858932, guid: 29fbf9d4d1814074e85663dfb082a23d, type: 3}
   m_PrefabInstance: {fileID: 1563149152}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1569462899
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1569462900}
+  - component: {fileID: 1569462903}
+  - component: {fileID: 1569462902}
+  - component: {fileID: 1569462901}
+  m_Layer: 0
+  m_Name: PrefabCameraBoundary(Clone) (3)
+  m_TagString: CameraBoundary
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1569462900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569462899}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 29.74, y: 5.77, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1305661516}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1569462901
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569462899}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!61 &1569462902
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569462899}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.3, y: 2}
+  m_EdgeRadius: 0
+--- !u!114 &1569462903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569462899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862223eeebfc2344c80542e2ce9bc388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useColliderAsBoundary: 1
+  boundaryMinX: 29.09
+  boundaryMaxX: 30.39
+  boundaryMinY: 4.77
+  boundaryMaxY: 6.77
+  setCameraOffset: 1
+  offset: {x: 0, y: -2, z: 0}
+  setCameraZoom: 0
+  boundaryZoom: 3
+  limitCameraToBoundary: 0
+  boxCollider2D: {fileID: 1569462902}
 --- !u!1001 &1571755812
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19237,7 +19503,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1715064765
@@ -20045,7 +20311,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1793313124
@@ -21559,7 +21825,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1991317999
@@ -21728,7 +21994,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 0.16, y: 0.16}
+    newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -21779,12 +22045,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -2
-  m_Sprite: {fileID: 7482667652216324306, guid: e2a20148dc1ac0140bd223b500a254d3, type: 3}
+  m_Sprite: {fileID: 7482667652216324306, guid: 0d04b02beccb31f4f83fa6feb2a51ce3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.16, y: 0.16}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -22673,11 +22939,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 20.2
-  maxXAreaBoundary: 24.7
-  minYAreaBoundary: 0.8000002
-  maxYAreaBoundary: 6.62
-  setCameraZoom: 0
+  boundaryMinX: 20.2
+  boundaryMaxX: 24.7
+  boundaryMinY: 0.8000002
+  boundaryMaxY: 6.62
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
+  setCameraZoom: 1
   boundaryZoom: 3
   limitCameraToBoundary: 0
   boxCollider2D: {fileID: 2079501698}
@@ -22801,10 +23069,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useColliderAsBoundary: 1
-  minXAreaBoundary: 70.25
-  maxXAreaBoundary: 89.95999
-  minYAreaBoundary: 2.4899998
-  maxYAreaBoundary: 10.16
+  boundaryMinX: 70.25
+  boundaryMaxX: 89.95999
+  boundaryMinY: 2.4899998
+  boundaryMaxY: 10.16
+  setCameraOffset: 0
+  offset: {x: 0, y: 0, z: 0}
   setCameraZoom: 0
   boundaryZoom: 5
   limitCameraToBoundary: 0
@@ -23443,10 +23713,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7511014247409590366, guid: 55c0f2c0afdad9d42ac3238750f80f42, type: 3}
       propertyPath: checkpointList.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7511014247409590366, guid: 55c0f2c0afdad9d42ac3238750f80f42, type: 3}
       propertyPath: 'checkpointList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1997746756}
+    - target: {fileID: 7511014247409590366, guid: 55c0f2c0afdad9d42ac3238750f80f42, type: 3}
+      propertyPath: 'checkpointList.Array.data[1]'
       value: 
       objectReference: {fileID: 1087470702}
     m_RemovedComponents: []

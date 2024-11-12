@@ -37,16 +37,16 @@ public class CameraTrigger2D : MonoBehaviour
     
     private void Start()
     {
-        if (boxCollider2D == null)
-        {
-            boxCollider2D = GetComponent<BoxCollider2D>();
-            boxCollider2D.isTrigger = true;
-        }
+        if (boxCollider2D) return;
+        
+        boxCollider2D = GetComponent<BoxCollider2D>();
+        boxCollider2D.isTrigger = true;
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.transform != CameraController2D.Instance.target) return;
+        if (other.gameObject.transform.root != CameraController2D.Instance.target) return;
         
         if (setCameraZoom) {CameraController2D.Instance.SetCameraTargetZoom(GetBoundaryZoom());}
         if (setCameraOffset) {CameraController2D.Instance.SetTriggerOffset(offset);}
@@ -56,14 +56,11 @@ public class CameraTrigger2D : MonoBehaviour
     
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.transform != CameraController2D.Instance.target) return;
+        if (other.gameObject.transform.root != CameraController2D.Instance.target) return;
         
         if (limitCameraToBoundary) {CameraController2D.Instance.ResetBoundaries();}
         if (setCameraZoom) {CameraController2D.Instance.ResetZoom();}
         if (setCameraOffset) {CameraController2D.Instance.ResetTriggerOffset();}
-            
-        
-
     }
 
     private Vector4 GetBoundaries()

@@ -23,6 +23,7 @@ public class PlayerController2D : Entity2D {
     [Tab("Player Settings")] // ----------------------------------------------------------------------
     public PlayerState currentPlayerState = PlayerState.Controllable;
     private string _logText;
+    
     [Header("Health")]
     [SerializeField] private int maxHealth = 2;
     [SerializeField] private bool canTakeFallDamage;
@@ -299,7 +300,7 @@ public class PlayerController2D : Entity2D {
         // use moveAcceleration until getting to accelerationThreshold then use runAcceleration
         float acceleration = Mathf.Abs(_moveSpeed) > accelerationThreshold ? runAcceleration : moveAcceleration;
         
-        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0; Debug.Log("WALL SLIDING");}
+        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0;}
 
         return acceleration;
     }
@@ -715,7 +716,7 @@ public class PlayerController2D : Entity2D {
             PlayAnimation("Land");
             
             if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
-                DamageHealth(1, false, "Ground");
+                DamageHealth(maxFallDamage, false, "Ground");
             }
             
             atMaxFallSpeed = false;

@@ -248,8 +248,8 @@ MonoBehaviour:
   moveAcceleration: 2
   runAcceleration: 3
   accelerationThreshold: 5
-  groundFriction: 3.5
-  airFriction: 0.1
+  groundFriction: 4.5
+  airFriction: 0.15
   platformFriction: 25
   movementThreshold: 0.1
   runningThreshold: 5.9
@@ -264,8 +264,6 @@ MonoBehaviour:
   maxFallSpeed: 15
   fastFallSpeed: 12
   fastFallBopDiminisher: 4
-  isFastFalling: 0
-  atMaxFallSpeed: 0
   fallSpeed: 0
   groundLayer:
     serializedVersion: 2
@@ -323,6 +321,7 @@ MonoBehaviour:
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
   hurtColor: {r: 1, g: 0, b: 0, a: 1}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
+  deadColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &4153000382075459821
 GameObject:
   m_ObjectHideFlags: 0

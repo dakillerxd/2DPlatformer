@@ -66,8 +66,6 @@ public class PlayerController2D : Entity2D {
     [SerializeField] public float maxFallSpeed = 20f;
     [SerializeField] private float fastFallSpeed = 10f; // The speed at which the player bobs after a fall
     [SerializeField] [Min(0)] private float fastFallBopDiminisher = 4f;
-    [HideInInspector] public bool isFastFalling;
-    [HideInInspector] public bool atMaxFallSpeed;
     [HideInInspector] public float fallSpeed;
     
     [Header("Collisions")]
@@ -118,6 +116,9 @@ public class PlayerController2D : Entity2D {
     public bool ledgeOnRight { get; private set; }
     public bool isDashing { get; private set; }
     public bool isFastDropping { get; private set; }
+    public bool isFalling { get; private set; }
+    public bool isFastFalling { get; private set; }
+    public bool atMaxFallSpeed { get; private set; } 
     
     
     [Header("Input")] 
@@ -694,12 +695,14 @@ public class PlayerController2D : Entity2D {
 
         fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
         
+        isFalling = rigidBody.linearVelocityY < -0.1; // Check if falling
         
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
         if (isFastFalling) { CameraController2D.Instance.ShakeCamera(0.1f, 0.5f * fallSpeed/fastFallBopDiminisher, 1f, 1f);}
-        if (atMaxFallSpeed) { PlayVfxEffect(peakFallSpeedVfx, false); }
+        
         
         atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;
+        if (atMaxFallSpeed) { PlayVfxEffect(peakFallSpeedVfx, false); }
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }
@@ -708,12 +711,17 @@ public class PlayerController2D : Entity2D {
     }
     private void HandleGroundedGravity() {
         
-        if (isFastFalling && isGrounded && !isDashing) { // Check if landed
-            
-            rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
-            CameraController2D.Instance.ShakeCamera(0.2f, 1 * fallSpeed/fastFallBopDiminisher, 1, 1);
-            
+        if (isFalling && isGrounded && !isDashing) { // Check if landed
+
             PlayAnimation("Land");
+            SoundManager.Instance.PlaySoundFX("Player Land");
+            
+            if (isFastFalling)
+            {
+                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+                CameraController2D.Instance.ShakeCamera(0.2f, 1 * fallSpeed/fastFallBopDiminisher, 1, 1);
+            }
+
             
             if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
                 DamageHealth(maxFallDamage, false, "Ground");
@@ -721,6 +729,7 @@ public class PlayerController2D : Entity2D {
             
             atMaxFallSpeed = false;
             isFastFalling = false;
+            isFalling = false;
         }
     }
     
@@ -1129,6 +1138,9 @@ public class PlayerController2D : Entity2D {
                 isWallSliding = false;
                 isInvincible = false;
                 isStunLocked = false;
+                isFalling = false;
+                isFastFalling = false;
+                isJumping = false;
                 _canCoyoteJump = false;
                 _invincibilityTime = 0f;
                 _stunLockTime = 0f;

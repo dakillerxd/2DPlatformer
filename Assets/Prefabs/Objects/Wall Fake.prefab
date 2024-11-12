@@ -72,6 +72,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2317086232289892755}
   m_SourcePrefab: {fileID: 100100000, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+--- !u!212 &2604739599625638965 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+  m_PrefabInstance: {fileID: 6245603296718150542}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6381535776318679528 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1018679801429308006, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
@@ -92,9 +97,4 @@ MonoBehaviour:
   destroyOnTrigger: 1
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
   spriteRenderers:
-  - {fileID: 8737557439504158014}
---- !u!212 &8737557439504158014 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 3453941132651878064, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
-  m_PrefabInstance: {fileID: 6245603296718150542}
-  m_PrefabAsset: {fileID: 0}
+  - {fileID: 2604739599625638965}

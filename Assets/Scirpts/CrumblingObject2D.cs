@@ -17,6 +17,7 @@ public class CrumblingObject2D : MonoBehaviour
     private bool isBroken = false;
     
     [Header("References")]
+    [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D coll;
 
@@ -33,6 +34,7 @@ public class CrumblingObject2D : MonoBehaviour
 
     private IEnumerator CountDownToBreak() {
         
+        if (animator) { animator.SetTrigger("Shake"); }
         float time = timeUntilBroken;
         
         while (time > 0) {
@@ -55,7 +57,8 @@ public class CrumblingObject2D : MonoBehaviour
     private void Break() {
         isBroken = true;
         coll.enabled = false;
-        spriteRenderer.color = new Color(1f, 1f, 1f, brokenAlpha);;
+        spriteRenderer.color = new Color(1f, 1f, 1f, brokenAlpha);
+        if (animator) { animator.SetTrigger("Idle"); }
         StartCoroutine(CountDownToUnBreak());
     }
 

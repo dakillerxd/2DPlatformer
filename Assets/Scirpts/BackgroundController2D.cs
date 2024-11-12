@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 using VInspector;
 
 public class BackgroundController : MonoBehaviour
@@ -7,12 +8,13 @@ public class BackgroundController : MonoBehaviour
     [SerializeField] [Range(0f, 2f)] private float parallaxEffectX;
     [SerializeField] [Range(0f, 2f)] private float parallaxEffectY;
     [SerializeField] private int orderInLayer;
-    private float startPos;
+    private Vector3 startPos;
     private GameObject cam;
     
     
     private void Start() {
-        startPos = transform.position.x;
+        startPos.x = transform.position.x;
+        startPos.y = transform.position.y;
         cam = Camera.main.gameObject;
         SetChildrenLayer();
     }
@@ -32,7 +34,7 @@ public class BackgroundController : MonoBehaviour
         Vector2 distance = cam.transform.position * new Vector2(parallaxEffectX, parallaxEffectY);
 
         // Move based of distance
-        transform.position = new Vector3(startPos + distance.x, startPos + distance.y, transform.position.z);
+        transform.position = new Vector3(startPos.x + distance.x, startPos.y + distance.y, transform.position.z);
         
     }
 

@@ -44,9 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orderInLayer: -15
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
   parallaxEffectX: 0
   parallaxEffectY: 0
-  orderInLayer: -15
 --- !u!1 &2548105494772465706
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,7 +127,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -20
   m_Sprite: {fileID: 7482667652216324306, guid: 0d04b02beccb31f4f83fa6feb2a51ce3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -215,9 +218,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallaxEffectX: 0.1
-  parallaxEffectY: 0.1
   orderInLayer: -18
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
+  parallaxEffectX: 0.3
+  parallaxEffectY: 0.3
 --- !u!1 &4578070229102411650
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,9 +268,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallaxEffectX: 0.1
-  parallaxEffectY: 0.1
   orderInLayer: -17
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
+  parallaxEffectX: 0.2
+  parallaxEffectY: 0.2
 --- !u!1 &6061294750296568520
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,9 +318,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orderInLayer: 20
+  sortingLayer:
+    m_LayerName: Foreground
+    m_LayerID: 776302797
   parallaxEffectX: 0
   parallaxEffectY: 0
-  orderInLayer: 20
 --- !u!1 &6176657177239963657
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,9 +368,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orderInLayer: -16
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
   parallaxEffectX: 0.1
   parallaxEffectY: 0.1
-  orderInLayer: -16
 --- !u!1 &7505008654064531884
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,6 +419,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orderInLayer: -20
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
   parallaxEffectX: 0
   parallaxEffectY: 0
-  orderInLayer: -20

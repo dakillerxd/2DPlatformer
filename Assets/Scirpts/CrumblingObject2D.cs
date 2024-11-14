@@ -13,8 +13,9 @@ public class CrumblingObject2D : MonoBehaviour
     [SerializeField] private float breakDuration = 3f;
     [SerializeField] [Range(0f, 1f)] private float brokenAlpha;
 
-    [Header("State")]
-    private bool isBroken = false;
+    [Header("State")] 
+    private bool _isBroken;
+    private bool _isShaking;
     
     [Header("References")]
     [SerializeField] private Animator animator;
@@ -28,13 +29,19 @@ public class CrumblingObject2D : MonoBehaviour
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-        if (isBroken) return; 
-        StartCoroutine(CountDownToBreak());
+        if (_isBroken || _isShaking) return;
+        if (collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Enemy"))
+        {
+            StartCoroutine(CountDownToBreak());
+        }
+        
     }
 
     private IEnumerator CountDownToBreak() {
         
         if (animator) { animator.SetTrigger("Shake"); }
+        _isShaking = true;
+        
         float time = timeUntilBroken;
         
         while (time > 0) {
@@ -55,7 +62,8 @@ public class CrumblingObject2D : MonoBehaviour
         UnBreak();
     }
     private void Break() {
-        isBroken = true;
+        _isBroken = true;
+        _isShaking = false;
         coll.enabled = false;
         spriteRenderer.color = new Color(1f, 1f, 1f, brokenAlpha);
         if (animator) { animator.SetTrigger("Idle"); }
@@ -63,7 +71,8 @@ public class CrumblingObject2D : MonoBehaviour
     }
 
     private void UnBreak() {
-        isBroken = false;
+        _isBroken = false;
+        _isShaking = false;
         coll.enabled = true;
         spriteRenderer.color = new Color(1f, 1f, 1f, 1f);;
     }

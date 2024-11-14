@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using VInspector;
 
-public class BackgroundController : MonoBehaviour
+public class ParallaxObject : MonoBehaviour
 {
     
     [SerializeField] [Range(0f, 2f)] private float parallaxEffectX;

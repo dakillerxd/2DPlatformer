@@ -160,7 +160,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Player Land
     volume: 1
-    pitch: 1
+    pitch: 0.8
     stereoPan: 0
     spatialBlend: 0
     reverbZoneMix: 1

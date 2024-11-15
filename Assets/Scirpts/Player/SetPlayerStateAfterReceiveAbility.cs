@@ -22,7 +22,7 @@ public class SetPlayerStateAfterReceiveAbility : StateMachineBehaviour
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         base.OnStateExit(animator, stateInfo, layerIndex);
-        PlayerController2D.Instance.SetPlayerState(PlayerState.Controllable);
+        PlayerController.Instance.SetPlayerState(PlayerState.Controllable);
     }
     // OnStateMove is called right after Animator.OnAnimatorMove()
     //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

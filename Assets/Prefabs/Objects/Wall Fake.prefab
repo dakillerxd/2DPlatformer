@@ -16,9 +16,9 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6276350543332575165, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
-      propertyPath: m_Material
-      value: 
+    - target: {fileID: 1067067003672982914, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6276350543332575165, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_IsTrigger

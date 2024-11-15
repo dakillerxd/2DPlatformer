@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dece43db101b299439a1ee4e9586b68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseVerticalFollowDelay: 0.5
+  baseVerticalFollowDelay: 1.5
   baseHorizontalFollowDelay: 0.5
   horizontalMoveDiminisher: 1.5
   verticalMoveDiminisher: 2

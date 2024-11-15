@@ -106,11 +106,11 @@ public class UIManager : MonoBehaviour
 #region  Gameplay Screen
 
     public void UpdateAbilitiesUI() {
-        if (PlayerController2D.Instance == null) return;
-        doubleJump.SetActive(PlayerController2D.Instance.doubleJumpAbility);
-        wallSlide.SetActive(PlayerController2D.Instance.wallSlideAbility);
-        wallJump.SetActive(PlayerController2D.Instance.wallJumpAbility);
-        dash.SetActive(PlayerController2D.Instance.dashAbility);
+        if (PlayerController.Instance == null) return;
+        doubleJump.SetActive(PlayerController.Instance.doubleJumpAbility);
+        wallSlide.SetActive(PlayerController.Instance.wallSlideAbility);
+        wallJump.SetActive(PlayerController.Instance.wallJumpAbility);
+        dash.SetActive(PlayerController.Instance.dashAbility);
 
     }
     
@@ -274,12 +274,12 @@ public class UIManager : MonoBehaviour
         {
             if (playerDebugText)
             {
-                PlayerController2D.Instance?.UpdateDebugText(playerDebugText);
+                PlayerController.Instance?.UpdateDebugText(playerDebugText);
             }
 
             if (cameraDebugText)
             {
-                CameraController2D.Instance?.UpdateDebugText(cameraDebugText);
+                CameraController.Instance?.UpdateDebugText(cameraDebugText);
             }
 
             if (fpsText)

@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
-        if (Input.GetKeyUp(KeyCode.F)) { CameraController2D.Instance.ShakeCamera(5f, 2f, 2f,  2f); }
+        if (Input.GetKeyUp(KeyCode.F)) { CameraController.Instance.ShakeCamera(5f, 2f, 2f,  2f); }
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
     }
     

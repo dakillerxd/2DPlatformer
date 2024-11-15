@@ -16,8 +16,8 @@ public class ParallaxLayer : MonoBehaviour
     [SerializeField] private bool followCamera;
     
     [Header("Parallax")]
-    [SerializeField] [Range(0f, 2f)] private float parallaxEffectX;
-    [SerializeField] [Range(0f, 2f)] private float parallaxEffectY;
+    [SerializeField] [Range(-2f, 2f)] private float parallaxEffectX;
+    [SerializeField] [Range(-2f, 2f)] private float parallaxEffectY;
     
     
     private Vector3 startPos;

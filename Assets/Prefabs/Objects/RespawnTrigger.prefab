@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 865939872225815038}
   - component: {fileID: 7433319475137850595}
   - component: {fileID: 5675501794804825328}
+  - component: {fileID: 8566519087313332591}
   m_Layer: 0
   m_Name: RespawnTrigger
-  m_TagString: RespawnTrigger
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -134,3 +135,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &8566519087313332591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4768939878819942212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f3fdd605ace1304fa75caa9cb513320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

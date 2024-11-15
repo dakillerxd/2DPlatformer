@@ -14,7 +14,7 @@ public class PlayerAbilityItem : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             _triggered = true;
-            PlayerController2D.Instance.ReceiveAbility(ability);
+            PlayerController.Instance.ReceiveAbility(ability);
             Destroy(gameObject);
         }
     }

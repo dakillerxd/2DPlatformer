@@ -28,13 +28,21 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6276350543332575165, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6276350543332575165, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8085409036725681643, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -11.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8085409036725681643, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.49999997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8085409036725681643, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -69,12 +77,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 7482667652216324306, guid: 76448bece211df84e9c0db6f5c320014, type: 3}
+      objectReference: {fileID: 21300000, guid: f4a088c52eb5a284ea6c4fc95c7bf480, type: 3}
     - target: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       propertyPath: m_SortingOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8253184718115213243, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -142,7 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeUntilBroken: 0.5
-  breakDuration: 1
+  breakDuration: 1.5
   brokenAlpha: 0.1
   animator: {fileID: 8962264274723219074}
   spriteRenderer: {fileID: 1920848302338869080}

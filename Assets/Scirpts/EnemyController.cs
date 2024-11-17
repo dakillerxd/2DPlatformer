@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using VInspector;
 
-public class EnemyController : Entity
+public class EnemyController : MonoBehaviour
 {
     [Tab("Settings")]
     [Header("Health")]

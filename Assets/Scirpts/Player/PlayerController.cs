@@ -16,7 +16,7 @@ public enum PlayerAbilities {
     Dash,
 }
 
-public class PlayerController : Entity {
+public class PlayerController : MonoBehaviour {
     
     public static PlayerController Instance { get; private set; }
 

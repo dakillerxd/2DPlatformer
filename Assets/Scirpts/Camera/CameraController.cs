@@ -26,8 +26,8 @@ public class CameraController : MonoBehaviour
     private float _currentVelocityY;
     
     [Header("Position")]
-    [SerializeField] [Min(0f)] private float baseHorizontalOffset = 1f;
-    [SerializeField] [Min(0f)] private float baseVerticalOffset = 1f;
+    [SerializeField] private float baseHorizontalOffset = 1f;
+    [SerializeField] private float baseVerticalOffset = 1f;
     [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
     [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
     [SerializeField] [Min(0f)] private float runHorizontalOffset = 8f;

@@ -15,6 +15,7 @@ public class PlayerAbilityItem : MonoBehaviour
         {
             _triggered = true;
             PlayerController.Instance.ReceiveAbility(ability);
+            CameraController.Instance.ShakeCamera(3f, 5f,2,2);
             Destroy(gameObject);
         }
     }

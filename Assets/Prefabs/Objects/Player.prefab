@@ -249,7 +249,7 @@ MonoBehaviour:
   runAcceleration: 3
   accelerationThreshold: 5
   groundFriction: 4.5
-  airFriction: 0.15
+  airFriction: 0.2
   platformFriction: 25
   movementThreshold: 0.1
   runningThreshold: 5.9
@@ -464,8 +464,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1241097857
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 1304837503652038735, guid: d0c5a2d2524be1d499cb380bc3901d8e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -551,8 +551,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1241097857
+  m_SortingLayer: 1
   m_SortingOrder: 1
   m_Sprite: {fileID: 2029563368909846659, guid: 6e99f61a8ad1e744cbfca9a893405f0b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

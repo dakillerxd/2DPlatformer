@@ -17,7 +17,7 @@ public class HoverEffect : MonoBehaviour
 
     private void Start()
     {
-        initialPosition = transform.position;
+        initialPosition = transform.localPosition;
         hoverTime = Random.value * Mathf.PI * 2;
 
     }
@@ -37,7 +37,7 @@ public class HoverEffect : MonoBehaviour
         float hoverOffset = Mathf.Sin(hoverTime) * hoverAmount;
         Vector3 normalizedHoverDir = hoverDirection.normalized;
         Vector3 newPosition = initialPosition + normalizedHoverDir * hoverOffset;
-        transform.position = newPosition;
+        transform.localPosition = newPosition;
     }
     
 }

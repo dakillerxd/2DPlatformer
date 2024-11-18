@@ -10,19 +10,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4094791650407052779, guid: 22a0b58bda6875e4cbdc9043d056ac94, type: 3}
       propertyPath: m_Color.b
-      value: 0.24370071
+      value: 0.28299662
       objectReference: {fileID: 0}
     - target: {fileID: 4094791650407052779, guid: 22a0b58bda6875e4cbdc9043d056ac94, type: 3}
       propertyPath: m_Color.g
-      value: 0.7564141
+      value: 0.74876744
       objectReference: {fileID: 0}
     - target: {fileID: 4094791650407052779, guid: 22a0b58bda6875e4cbdc9043d056ac94, type: 3}
       propertyPath: m_Color.r
-      value: 0.76729554
+      value: 0.759434
       objectReference: {fileID: 0}
     - target: {fileID: 4759707207825199174, guid: 22a0b58bda6875e4cbdc9043d056ac94, type: 3}
       propertyPath: m_Name
-      value: Background Object Near Variant
+      value: Yellow Background Object Near
       objectReference: {fileID: 0}
     - target: {fileID: 4966703873301106834, guid: 22a0b58bda6875e4cbdc9043d056ac94, type: 3}
       propertyPath: m_LocalScale.x

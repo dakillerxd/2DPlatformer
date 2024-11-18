@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.b
-      value: 0.61801344
+      value: 0.63910645
       objectReference: {fileID: 0}
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.g
-      value: 0.8785647
+      value: 0.7948071
       objectReference: {fileID: 0}
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.r
-      value: 0.9056604
+      value: 0.8113208
       objectReference: {fileID: 0}
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_SortingLayer
@@ -78,7 +78,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4947297197838703049, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Name
-      value: Background Variant
+      value: Yellow Background
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -150,14 +150,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dece43db101b299439a1ee4e9586b68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseVerticalFollowDelay: 1.5
+  baseVerticalFollowDelay: 0.5
   baseHorizontalFollowDelay: 0.5
-  horizontalMoveDiminisher: 1.5
-  verticalMoveDiminisher: 2
   baseHorizontalOffset: 1
   baseVerticalOffset: 1.5
+  fastFallVeticalOffset: 8
+  verticalMoveDiminisher: 1
   maxHorizontalOffset: 4
   maxVerticalOffset: 3
+  horizontalMoveDiminisher: 1
   runHorizontalOffset: 8
   defaultZoom: 4
   minZoom: 2

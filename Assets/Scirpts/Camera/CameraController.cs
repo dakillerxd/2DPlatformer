@@ -20,16 +20,18 @@ public class CameraController : MonoBehaviour
     [Header("Follow Speed")]
     [SerializeField] private float baseVerticalFollowDelay = 0.5f;
     [SerializeField] private float baseHorizontalFollowDelay = 0.5f;
-    [SerializeField] [Min(0f)] private float horizontalMoveDiminisher = 1.5f;
-    [SerializeField] [Min(0f)] private float verticalMoveDiminisher = 2f;
     private float _currentVelocityX;
     private float _currentVelocityY;
     
     [Header("Position")]
     [SerializeField] private float baseHorizontalOffset = 1f;
     [SerializeField] private float baseVerticalOffset = 1f;
+    [SerializeField] [Min(0f)] private float fastFallVerticalOffset = 8f;
+    [SerializeField] [Min(1f)] private float verticalMoveDiminisher = 2f;
+    [Space(10)]
     [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
     [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
+    [SerializeField] [Min(1f)] private float horizontalMoveDiminisher = 1.5f;
     [SerializeField] [Min(0f)] private float runHorizontalOffset = 8f;
     private Vector3 _targetPosition;
     private Vector3 _targetStateOffset;
@@ -134,6 +136,7 @@ public class CameraController : MonoBehaviour
         if (!target.CompareTag("Player")) return offset;
         if (_player.currentPlayerState == PlayerState.Frozen) return offset;
 
+        if (_player.isFastFalling) offset.x = 0;
         if (!_player.wasRunning)
         {
             offset.x = _player.isFacingRight 
@@ -162,15 +165,15 @@ public class CameraController : MonoBehaviour
                     
         }  else if (!_player.isGrounded && !_player.isWallSliding) { // Player is in the air
 
-            switch (_player.rigidBody.linearVelocityY)
+            if (_player.isJumping)
             {
-                case  > 0: // Player is jumping
-                    offset.y = Mathf.Clamp(baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
-                break;
-                case < 0: // Player is falling
-                    offset.y = Mathf.Clamp(-baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
-                break;
+                offset.y = Mathf.Clamp(baseVerticalOffset,-maxVerticalOffset,maxVerticalOffset);
+                // offset.y = Mathf.Clamp(baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
+                
+            } else if (_player.isFastFalling) {
+                offset.y = -fastFallVerticalOffset;
             }
+            
         }
         return offset;
     }

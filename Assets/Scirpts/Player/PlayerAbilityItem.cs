@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics;
+using TMPro;
 using UnityEngine;
 
 public class PlayerAbilityItem : MonoBehaviour
@@ -8,6 +11,15 @@ public class PlayerAbilityItem : MonoBehaviour
     private bool _triggered;
     
     
+    [Header("References")]
+    [SerializeField] private TextMeshPro titleText;
+    
+
+    private void OnValidate()
+    {
+        SetTitleText();
+    }
+
     private  void OnTriggerEnter2D(Collider2D collision)
     {
         if (_triggered) return;
@@ -17,6 +29,31 @@ public class PlayerAbilityItem : MonoBehaviour
             PlayerController.Instance.ReceiveAbility(ability);
             CameraController.Instance.ShakeCamera(3f, 5f,2,2);
             Destroy(gameObject);
+        }
+    }
+
+
+    private void SetTitleText() {
+        if (!titleText) return;
+        
+        switch (ability)
+        {
+            case PlayerAbilities.DoubleJump:
+            titleText.text = "Double Jump";
+            break;
+            
+            case PlayerAbilities.WallSlide:
+                titleText.text = "Wall Slide";
+            break;
+            
+            case PlayerAbilities.WallJump:
+            titleText.text = "Wall Jump";
+            break;
+            
+            
+            case PlayerAbilities.Dash:
+            titleText.text = "Dash";
+            break;
         }
     }
 

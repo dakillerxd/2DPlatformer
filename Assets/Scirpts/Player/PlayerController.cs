@@ -898,6 +898,7 @@ public class PlayerController : MonoBehaviour {
             rigidBody.linearVelocity = Vector2.zero;
             isDashing = false;
             wasRunning = false;
+            isWallSliding = false;
             StopVfxEffect(jumpVfx, true);
             StopVfxEffect(dashVfx, true);
             StopVfxEffect(wallSlideVfx, true);
@@ -1110,6 +1111,8 @@ public class PlayerController : MonoBehaviour {
         StopVfxEffect(dashVfx, true);
         StopVfxEffect(wallSlideVfx, true);
         StopVfxEffect(peakFallSpeedVfx, true);
+        _isTouchingWallOnLeft = false;
+        _isTouchingWallOnRight = false;
         currentPlayerState = state;
         
         switch (state) {

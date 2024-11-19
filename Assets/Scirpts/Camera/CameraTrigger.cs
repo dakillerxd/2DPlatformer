@@ -58,7 +58,7 @@ public class CameraTrigger : MonoBehaviour
     {
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
         
-        if (limitCameraToBoundary) {CameraController.Instance.ResetBoundaries();}
+        // if (limitCameraToBoundary) {CameraController.Instance.ResetBoundaries();}
         if (setCameraZoom) {CameraController.Instance.ResetZoom();}
         if (setCameraOffset) {CameraController.Instance.ResetTriggerOffset();}
     }

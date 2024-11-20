@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1093111272349469838, guid: 7466b0c2c61016742a6ee7400a6466f3, type: 3}
       propertyPath: m_Name
-      value: Part 1 Background Object Very Far
+      value: Green Background Object Very Far
       objectReference: {fileID: 0}
     - target: {fileID: 3494706528571159166, guid: 7466b0c2c61016742a6ee7400a6466f3, type: 3}
       propertyPath: m_Color.b

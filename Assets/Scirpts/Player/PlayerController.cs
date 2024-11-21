@@ -101,36 +101,6 @@ public class PlayerController : MonoBehaviour {
     [EndIf] 
     
     
-    [Header("States")] 
-    public bool isMoving { get; private set; }
-    public bool isJumping { get; private set; }
-    public bool isFacingRight { get; private set; }
-    public bool isStunLocked { get; private set; }
-    public bool isInvincible { get; private set; }
-    public bool isTeleporting { get; private set; }
-    public bool wasRunning { get; private set; }
-    public bool isRunning { get; private set; }
-    public bool isGrounded { get; private set; }
-    public bool isOnPlatform { get; private set; }
-    public bool ledgeOnLeft { get; private set; }
-    public bool ledgeOnRight { get; private set; }
-    public bool isDashing { get; private set; }
-    public bool isFastDropping { get; private set; }
-    public bool isFalling { get; private set; }
-    public bool isFastFalling { get; private set; }
-    public bool atMaxFallSpeed { get; private set; } 
-    
-    
-    [Header("Input")] 
-    private float _horizontalInput;
-    private float _verticalInput;
-    private bool _jumpInputDownRequested;
-    private bool _jumpInputUp;
-    private bool _jumpInputHeld;
-    private bool _dashRequested;
-    private bool _runInput;
-    private bool _dropDownInput;
-    
 
     [Tab("Player Abilities")] // ----------------------------------------------------------------------
 
@@ -143,8 +113,8 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] public bool wallSlideAbility = true;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float maxWallSlideSpeed = 3f;
-    [SerializeField] [Range(0, 1f)] private float wallSlideStickStrength = 0.3f;
-    [HideInInspector] public bool isWallSliding;
+    [SerializeField] [Range(0, 1f)] private float wallSlideStickTime = 0.3f;
+    private float _wallSlideStickTimer;
 
     [Header("Wall Jump")]
     [SerializeField] public bool wallJumpAbility = true;
@@ -193,6 +163,37 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Color deadColor = Color.clear;
     private readonly Color _defaultColor = Color.white;
     
+    
+    [Header("States")] 
+    public bool isMoving { get; private set; }
+    public bool isJumping { get; private set; }
+    public bool isFacingRight { get; private set; }
+    public bool isStunLocked { get; private set; }
+    public bool isInvincible { get; private set; }
+    public bool isTeleporting { get; private set; }
+    public bool wasRunning { get; private set; }
+    public bool isRunning { get; private set; }
+    public bool isGrounded { get; private set; }
+    public bool isOnPlatform { get; private set; }
+    public bool ledgeOnLeft { get; private set; }
+    public bool ledgeOnRight { get; private set; }
+    public bool isDashing { get; private set; }
+    public bool isFastDropping { get; private set; }
+    public bool isFalling { get; private set; }
+    public bool isFastFalling { get; private set; }
+    public bool atMaxFallSpeed { get; private set; } 
+    public bool isWallSliding{ get; private set; } 
+    
+    
+    [Header("Input")] 
+    private float _horizontalInput;
+    private float _verticalInput;
+    private bool _jumpInputDownRequested;
+    private bool _jumpInputUp;
+    private bool _jumpInputHeld;
+    private bool _dashRequested;
+    private bool _runInput;
+    private bool _dropDownInput;
 
     
     
@@ -222,6 +223,7 @@ public class PlayerController : MonoBehaviour {
         HandleDropDown();
         JumpChecks();
         DashTimer();
+        WallSlideTimer();
     }
     
     private void FixedUpdate() {
@@ -289,7 +291,7 @@ public class PlayerController : MonoBehaviour {
         }
         
         
-        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) {
+        if (isWallSliding && _wallSlideStickTimer < wallSlideStickTime) {
             targetSpeed = 0;
         }
         
@@ -300,8 +302,6 @@ public class PlayerController : MonoBehaviour {
     {
         // use moveAcceleration until getting to accelerationThreshold then use runAcceleration
         float acceleration = Mathf.Abs(_moveSpeed) > accelerationThreshold ? runAcceleration : moveAcceleration;
-        
-        if (isWallSliding && Mathf.Abs(_horizontalInput) < wallSlideStickStrength) { acceleration = 0;}
 
         return acceleration;
     }
@@ -443,7 +443,15 @@ public class PlayerController : MonoBehaviour {
                 _coyoteJumpTime = 0;
                 _canCoyoteJump = false;
                 
-            } else if (!isGrounded && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump
+            } else if (!isGrounded && !wallJumpAbility && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump
+                
+                // Jump
+                ExecuteJump(1, jumpDirection);
+                PlayVfxEffect(airJumpVfx, true); 
+                PlayAnimation("AirJump");
+                SoundManager.Instance?.PlaySoundFX("Player Air Jump");
+                
+            } else if (!isGrounded && wallJumpAbility && !(_isTouchingWallOnLeft || _isTouchingWallOnRight) && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump when wall jump ability
                 
                 // Jump
                 ExecuteJump(1, jumpDirection);
@@ -615,6 +623,15 @@ public class PlayerController : MonoBehaviour {
             }
         }   
     }
+
+    private void WallSlideTimer()
+    {
+        if (isWallSliding && _horizontalInput != 0) {
+            _wallSlideStickTimer += Time.deltaTime;
+        } else {
+            _wallSlideStickTimer = 0;
+        }
+    }
     
     private void HandleWallJump () {
 
@@ -713,7 +730,7 @@ public class PlayerController : MonoBehaviour {
         
         if (isFalling && isGrounded && !isDashing) { // Check if landed
 
-            PlayAnimation("Land");
+            // PlayAnimation("Land");
             SoundManager.Instance.PlaySoundFX("Player Land");
             
             if (isFastFalling)
@@ -763,10 +780,7 @@ public class PlayerController : MonoBehaviour {
         
         
         // Check if on ground
-        if (_isTouchingGround) {
-            bool isOverlapping = Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
-            isGrounded = isOverlapping;
-        }
+        isGrounded =  Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
         
         // Ledge checks
         if (isGrounded) {
@@ -784,8 +798,7 @@ public class PlayerController : MonoBehaviour {
         
         // Check if on platform
         if (_isTouchingPlatform) {
-            bool isOverlapping = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
-            isOnPlatform = isOverlapping;
+            isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
         }
         
         // Check if touching a wall
@@ -1113,6 +1126,8 @@ public class PlayerController : MonoBehaviour {
         StopVfxEffect(peakFallSpeedVfx, true);
         _isTouchingWallOnLeft = false;
         _isTouchingWallOnRight = false;
+        _isTouchingGround = false;
+        isGrounded = false;
         currentPlayerState = state;
         
         switch (state) {

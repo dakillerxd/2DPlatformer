@@ -114,7 +114,9 @@ public class CameraController : MonoBehaviour
         
         _targetPosition = CalculateTargetPosition();
         _targetStateOffset = CalculateTargetOffset();
-        Vector3 targetPos = _targetPosition + _triggerOffset + _targetStateOffset + _shakeOffset;
+        Vector3 clampedOffsetY = Mathf.Clamp(_triggerOffset.y + _targetStateOffset.y + _shakeOffset.y, -maxVerticalOffset, maxVerticalOffset) * Vector3.up;
+        Vector3 clampedOffsetX = Mathf.Clamp(_triggerOffset.x + _targetStateOffset.x + _shakeOffset.x, -maxHorizontalOffset, maxHorizontalOffset) * Vector3.right;
+        Vector3 targetPos = _targetPosition + clampedOffsetX + clampedOffsetY;
         
         float smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
         float smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);

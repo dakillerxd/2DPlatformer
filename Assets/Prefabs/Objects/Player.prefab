@@ -289,8 +289,7 @@ MonoBehaviour:
   wallSlideAbility: 0
   wallSlideSpeed: 2
   maxWallSlideSpeed: 3
-  wallSlideStickStrength: 0.3
-  isWallSliding: 0
+  wallSlideStickTime: 0.2
   wallJumpAbility: 0
   wallJumpResetsJumps: 0
   wallJumpVerticalForce: 5

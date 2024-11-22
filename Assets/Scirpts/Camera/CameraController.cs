@@ -155,9 +155,16 @@ public class CameraController : MonoBehaviour
         // Horizontal Offset
         if (_player.isFastFalling) offset.x = 0;
 
-        offset.x = _player.isFacingRight
-            ? baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher
-            : -baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher;
+        if (_player.wasRunning) {
+            offset.x = _player.isFacingRight
+                ? baseHorizontalOffset + _player.rigidBody.linearVelocityX
+                : -baseHorizontalOffset + _player.rigidBody.linearVelocityX;
+        } else {
+            offset.x = _player.isFacingRight
+                ? baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher
+                : -baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher;
+        }
+
 
         
         // Vertical Offset

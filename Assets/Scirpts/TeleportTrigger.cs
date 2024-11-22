@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class TeleportTrigger : MonoBehaviour
 {
+    [Header("Settings")]
+    [SerializeField] private bool hideOnStart = true;
+    
     [Header("References")]
     [SerializeField] private Transform teleportLocation;
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -11,7 +14,7 @@ public class TeleportTrigger : MonoBehaviour
     
     private void Start()
     {
-        spriteRenderer.enabled = false;
+        if(hideOnStart) spriteRenderer.enabled = false;
     }
     
     private void OnTriggerEnter2D(Collider2D other)

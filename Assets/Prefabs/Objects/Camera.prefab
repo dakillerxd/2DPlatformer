@@ -159,7 +159,7 @@ MonoBehaviour:
   minVerticalOffset: -3
   maxVerticalOffset: 3
   verticalMoveDiminisher: 2
-  horizontalMoveDiminisher: 1
+  horizontalMoveDiminisher: 1.5
   defaultZoom: 4
   minZoom: 2
   maxZoom: 6

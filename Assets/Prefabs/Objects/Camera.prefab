@@ -154,14 +154,15 @@ MonoBehaviour:
   baseHorizontalFollowDelay: 0.5
   baseHorizontalOffset: 1
   baseVerticalOffset: 1.5
-  fastFallVeticalOffset: 8
-  verticalMoveDiminisher: 1
+  minHorizontalOffset: -4
   maxHorizontalOffset: 4
+  minVerticalOffset: -3
   maxVerticalOffset: 3
+  verticalMoveDiminisher: 2
   horizontalMoveDiminisher: 1
-  runHorizontalOffset: 8
   defaultZoom: 4
   minZoom: 2
   maxZoom: 6
   zoomSpeed: 0.5
+  target: {fileID: 0}
   triggerPrefab: {fileID: 4529777456246908639, guid: 40eddc7bb4437304d9bb20eb7a7efecb, type: 3}

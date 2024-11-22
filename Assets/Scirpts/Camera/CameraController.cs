@@ -10,29 +10,26 @@ public class CameraController : MonoBehaviour
 {
     public static CameraController Instance { get; private set; }
     
-    public Transform target { get; private set; }
     private float _cameraHeight;
     private float _cameraWidth;
-    private Camera _camera;
-    private PlayerController _player;
-    private CameraTrigger _activeTrigger;
-    
+
     [Header("Follow Speed")]
     [SerializeField] private float baseVerticalFollowDelay = 0.5f;
     [SerializeField] private float baseHorizontalFollowDelay = 0.5f;
     private float _currentVelocityX;
     private float _currentVelocityY;
     
-    [Header("Position")]
+    [Header("Offset")]
     [SerializeField] private float baseHorizontalOffset = 1f;
-    [SerializeField] private float baseVerticalOffset = 1f;
-    [SerializeField] [Min(0f)] private float fastFallVerticalOffset = 8f;
-    [SerializeField] [Min(1f)] private float verticalMoveDiminisher = 2f;
+    [SerializeField] private float baseVerticalOffset = 1.5f;
     [Space(10)]
-    [SerializeField] [Min(0f)] private float maxHorizontalOffset = 10f;
-    [SerializeField] [Min(0f)] private float maxVerticalOffset = 10f;
-    [SerializeField] [Min(1f)] private float horizontalMoveDiminisher = 1.5f;
-    [SerializeField] [Min(0f)] private float runHorizontalOffset = 8f;
+    [SerializeField] private float minHorizontalOffset = -4;
+    [SerializeField] private float maxHorizontalOffset = 4;
+    [SerializeField] private float minVerticalOffset = -3;
+    [SerializeField] private float maxVerticalOffset = 3;
+    [Space(10)]
+    [SerializeField] [Min(1f)] private float verticalMoveDiminisher;
+    [SerializeField] [Min(1f)] private float horizontalMoveDiminisher;
     private Vector3 _targetPosition;
     private Vector3 _targetStateOffset;
     private Vector3 _triggerOffset;
@@ -57,7 +54,12 @@ public class CameraController : MonoBehaviour
     private Vector3 _shakeOffset;
     
     [Header("References")]
+    public Transform target;
     [SerializeField] private CameraTrigger triggerPrefab;
+    private Camera _camera;
+    private PlayerController _player;
+    private CameraTrigger _activeTrigger;
+
     
 
     private void Awake() {
@@ -86,16 +88,14 @@ public class CameraController : MonoBehaviour
         PlayerController.Instance.TryGetComponent<PlayerController>(out _player);
         if (_player) { SetTarget(_player.transform);}
     }
-
-    private void Update() {
-        // HandleZoomInput();
-    }
     
     private void LateUpdate() {
         
         FollowTarget();
         HandleZoom();
+        HandleOffsetBoundaries();
         HandleBoundaries();
+        
     }
 
     
@@ -114,9 +114,7 @@ public class CameraController : MonoBehaviour
         
         _targetPosition = CalculateTargetPosition();
         _targetStateOffset = CalculateTargetOffset();
-        Vector3 clampedOffsetY = Mathf.Clamp(_triggerOffset.y + _targetStateOffset.y + _shakeOffset.y, -maxVerticalOffset, maxVerticalOffset) * Vector3.up;
-        Vector3 clampedOffsetX = Mathf.Clamp(_triggerOffset.x + _targetStateOffset.x + _shakeOffset.x, -maxHorizontalOffset, maxHorizontalOffset) * Vector3.right;
-        Vector3 targetPos = _targetPosition + clampedOffsetX + clampedOffsetY;
+        Vector3 targetPos = _targetPosition + _triggerOffset + _targetStateOffset + _shakeOffset;
         
         float smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
         float smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
@@ -132,66 +130,67 @@ public class CameraController : MonoBehaviour
         return basePosition;
     }
     
+
+
+#endregion Target functions
+
+
+#region Offset
+
+    private void HandleOffsetBoundaries() {
+        
+        Vector3 position = transform.position;
+        position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
+        position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
+        transform.position = position;
+    }
+
     private Vector3 CalculateTargetOffset() {
-            
+                
         Vector3 offset = Vector3.zero;
         if (!target.CompareTag("Player")) return offset;
         if (_player.currentPlayerState == PlayerState.Frozen) return offset;
-
+        
+        
+        // Horizontal Offset
         if (_player.isFastFalling) offset.x = 0;
-        if (!_player.wasRunning)
+
+        offset.x = _player.isFacingRight
+            ? baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher
+            : -baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher;
+
+        
+        // Vertical Offset
+        if (_player.isGrounded || _player.isJumping) { // player is on the ground
+                
+            offset.y = baseVerticalOffset;
+                
+        } else if (_player.isFastFalling || _player.isWallSliding) { // Player is wall sliding or falling fast
+            
+            offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY / verticalMoveDiminisher;
+            
+        } else if (_player.isFalling)
         {
-            offset.x = _player.isFacingRight 
-                ? Mathf.Clamp(baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset) 
-                : Mathf.Clamp(-baseHorizontalOffset + _player.rigidBody.linearVelocityX/horizontalMoveDiminisher,-maxHorizontalOffset, maxHorizontalOffset);
-        }
-        else
-        {
-            offset.x = _player.isFacingRight ? runHorizontalOffset : -runHorizontalOffset;
+            offset.y = -baseVerticalOffset;
         }
         
-            
-        if (_player.isGrounded) { // player is on the ground
-            
-            offset.y = baseVerticalOffset;
-            
-            // if (_player.isFastDropping && (_player.ledgeOnLeft || _player.ledgeOnRight)) // Near a ledge and looking down
-            // {
-            //     offset.y = -baseVerticalOffset*2;
-            // } else {
-            //     offset.y = baseVerticalOffset;
-            // }
-            
-        } else if (_player.isWallSliding) { // Player is wall sliding
-            offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY;
-                    
-        }  else if (!_player.isGrounded && !_player.isWallSliding) { // Player is in the air
-
-            if (_player.isJumping)
-            {
-                offset.y = Mathf.Clamp(baseVerticalOffset,-maxVerticalOffset,maxVerticalOffset);
-                // offset.y = Mathf.Clamp(baseVerticalOffset + _player.rigidBody.linearVelocityY/verticalMoveDiminisher,-maxVerticalOffset,maxVerticalOffset);
-                
-            } else if (_player.isFastFalling) {
-                offset.y = -fastFallVerticalOffset;
-            }
-            
-        }
         return offset;
-    }
+}
     
     public void SetTriggerOffset(Vector3 offset)
     {
         _triggerOffset = offset;
     }
-    
+        
     public void ResetTriggerOffset()
     {
         _triggerOffset = Vector3.zero;
     }
 
+#endregion
 
-#endregion Target functions
+
+
 
 #region Zoom functions
 
@@ -341,7 +340,18 @@ public class CameraController : MonoBehaviour
     }
     
 #if UNITY_EDITOR
+    
     private void OnDrawGizmos() { // Draw active bounds
+
+        if (target)
+        {
+            Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + minVerticalOffset,0), new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset,0), Color.red);
+            Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset, 0), new Vector3(target.position.x + maxHorizontalOffset, target.position.y + maxVerticalOffset, 0), Color.red);
+            Debug.DrawLine(new Vector3(target.position.x + maxHorizontalOffset, target.position.y + maxVerticalOffset, 0), new Vector3(target.position.x + maxHorizontalOffset, target.position.y + minVerticalOffset, 0), Color.red);
+            Debug.DrawLine(new Vector3(target.position.x + maxHorizontalOffset, target.position.y + minVerticalOffset, 0), new Vector3(target.position.x + minHorizontalOffset, target.position.y + minVerticalOffset, 0), Color.red);
+        }
+
+        
         
         if (!_activeTrigger) return;
         float minXBoundaryPoint = _minXBoundary - (_cameraWidth/2);

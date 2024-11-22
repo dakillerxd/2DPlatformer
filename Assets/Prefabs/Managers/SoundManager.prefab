@@ -117,7 +117,17 @@ MonoBehaviour:
     reverbZoneMix: 1
     loop: 0
     clips:
-    - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
+    - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
+    source: {fileID: 0}
+  - name: Player Land
+    volume: 1
+    pitch: 0.8
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: e354fe03bf37e8d46ac9ea1c81aeafcc, type: 3}
     source: {fileID: 0}
   - name: ?Player Spawn
     volume: 1
@@ -157,15 +167,5 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
-    source: {fileID: 0}
-  - name: Player Land
-    volume: 1
-    pitch: 0.8
-    stereoPan: 0
-    spatialBlend: 0
-    reverbZoneMix: 1
-    loop: 0
-    clips:
-    - {fileID: 8300000, guid: e354fe03bf37e8d46ac9ea1c81aeafcc, type: 3}
     source: {fileID: 0}
   music: []

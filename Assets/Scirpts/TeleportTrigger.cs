@@ -11,7 +11,7 @@ public class TeleportTrigger : MonoBehaviour
     
     private void Start()
     {
-        // spriteRenderer.enabled = false;
+        spriteRenderer.enabled = false;
     }
     
     private void OnTriggerEnter2D(Collider2D other)

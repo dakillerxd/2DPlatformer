@@ -723,9 +723,9 @@ public class PlayerController : MonoBehaviour {
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }
-        
-        
     }
+    
+    
     private void HandleGroundedGravity() {
         
         if (isFalling && isGrounded && !isDashing) { // Check if landed
@@ -733,15 +733,13 @@ public class PlayerController : MonoBehaviour {
             // PlayAnimation("Land");
             SoundManager.Instance.PlaySoundFX("Player Land");
             
-            if (isFastFalling)
-            {
-                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+            if (isFastFalling) {
                 CameraController.Instance.ShakeCamera(0.2f, 1 * fallSpeed/fastFallBopDiminisher, 1, 1);
             }
-
             
-            if (atMaxFallSpeed && canTakeFallDamage) { // Apply fall damage
-                DamageHealth(maxFallDamage, false, "Ground");
+            if (atMaxFallSpeed) { // Apply fall damage
+                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+                if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
             }
             
             atMaxFallSpeed = false;

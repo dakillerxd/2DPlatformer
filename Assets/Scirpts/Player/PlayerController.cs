@@ -1135,6 +1135,8 @@ public class PlayerController : MonoBehaviour {
                 _remainingDashes = maxDashes;
                 _movingRigidbodyLastVelocityX = 0;
                 _isDashCooldownRunning = false;
+                _jumpInputDownRequested = false;
+                _dashRequested = false;
                 fallSpeed = 0;
                 _moveSpeed = 0;
                 wasRunning = false;

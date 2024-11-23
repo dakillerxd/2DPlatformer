@@ -134,11 +134,11 @@ public class CameraController : MonoBehaviour
 
 #endregion Target functions
 
-
 #region Offset
 
     private void HandleOffsetBoundaries() {
         
+        if (!target) return;
         Vector3 position = transform.position;
         position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
         position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
@@ -195,9 +195,6 @@ public class CameraController : MonoBehaviour
     }
 
 #endregion
-
-
-
 
 #region Zoom functions
 

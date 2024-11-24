@@ -103,7 +103,7 @@ public class CameraController : MonoBehaviour
 #region Target functions
 
 
-    private void SetTarget(Transform newTarget)
+    public void SetTarget(Transform newTarget)
     {
         target = newTarget;
     }
@@ -222,6 +222,7 @@ public class CameraController : MonoBehaviour
     private float CalculateTargetZoomOffset()
     {
         float offset = 0;
+        // if (!_player) return offset;
         
         if (_player.wasRunning)
         {

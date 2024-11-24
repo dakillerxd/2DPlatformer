@@ -21,10 +21,7 @@ public class Sound
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
-
-    [Range(0f, 1f)] public float masterGameVolume;
-    [Range(0f, 1f)] public float soundFXVolume;
-    [Range(0f, 1f)] public float musicVolume;
+    
     public AudioSource soundFXPrefab;
     public List<Sound> soundEffects = new List<Sound>();
     public List<Sound> music = new List<Sound>();
@@ -49,16 +46,16 @@ public class SoundManager : MonoBehaviour
         
         foreach (Sound soundFx in soundEffects)
         {
-            SetupSound(soundFx, soundFXVolume);
+            SetupSound(soundFx);
         }
 
         foreach (Sound music in music)
         {
-            SetupSound(music, musicVolume);
+            SetupSound(music);
         }
     }
 
-    private void SetupSound(Sound sound, float soundCategory) {
+    private void SetupSound(Sound sound) {
         
         foreach (AudioClip clip in sound.clips)
         {
@@ -71,12 +68,11 @@ public class SoundManager : MonoBehaviour
             sound.source.loop = sound.loop;
             sound.source.volume = sound.volume;
         }
-
     }
     
     
     [Button]
-    private void ResetAllSoundsSettings() {
+    public void ResetAllSoundsSettings() {
         
         foreach (AudioSource audioSource in GetComponents<AudioSource>())
         {
@@ -84,12 +80,6 @@ public class SoundManager : MonoBehaviour
         }
 
         SetupSounds();
-    }
-
-    private void LoadVolumes() {
-        masterGameVolume = SaveManager.Instance.LoadFloat("MasterGameVolume", 1f);
-        soundFXVolume = SaveManager.Instance.LoadFloat("SoundFXVolume", 0.5f);
-        musicVolume = SaveManager.Instance.LoadFloat("MusicVolume", 0.3f);
     }
     
     
@@ -125,7 +115,7 @@ public class SoundManager : MonoBehaviour
         }
         
         StopAllMusic();
-        newMusic.source.volume = newMusic.volume * musicVolume * masterGameVolume;
+        newMusic.source.volume = newMusic.volume * SettingsManager.Instance.musicVolume * SettingsManager.Instance.masterGameVolume;
         newMusic.source.Play();
     }
 
@@ -165,7 +155,7 @@ public class SoundManager : MonoBehaviour
             AudioSource audioSource = Instantiate(soundFXPrefab, spawnTransform.position, Quaternion.identity);
             audioSource.gameObject.name = "Sfx " + soundFx.name;
             audioSource.clip = soundFx.clips[rand];
-            audioSource.volume = soundFx.volume * soundFXVolume * masterGameVolume;
+            audioSource.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
             audioSource.panStereo = soundFx.stereoPan;
             audioSource.spatialBlend = soundFx.spatialBlend;
             audioSource.reverbZoneMix = soundFx.reverbZoneMix;
@@ -182,7 +172,7 @@ public class SoundManager : MonoBehaviour
         } else {
                 
             soundFx.source.clip = soundFx.clips[rand];
-            soundFx.source.volume = soundFx.volume * soundFXVolume * masterGameVolume;
+            soundFx.source.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
             soundFx.source.Play();
         }
     }

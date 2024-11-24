@@ -5,88 +5,69 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
-public class MainMenuController : MonoBehaviour
+public class MainMenu : MonoBehaviour
 {
     [Header("Screens")] 
-    [SerializeField] private GameObject mainMenu;
-    [SerializeField] private GameObject levelSelectMenu;
-    [SerializeField] private GameObject optionsMenu;
-    [SerializeField] private GameObject creditsMenu;
+    [SerializeField] private GameObject mainMenuPosition;
+    [SerializeField] private GameObject levelSelectMenuPosition;
+    [SerializeField] private GameObject optionsMenuPosition;
+    [SerializeField] private GameObject creditsMenuPosition;
 
-    [Header("Main Menu")]
+    [Header("Button")]
     [SerializeField] private Button buttonStart;
     [SerializeField] private Button buttonLevelSelect;
     [SerializeField] private Button buttonOptions;
     [SerializeField] private Button buttonCredits;
     [SerializeField] private Button buttonQuit;
     
-    [Header("Options Menu")]
-    [SerializeField] private Button buttonOptionsBack;
+
 
     
     private void Start()
     {
-        CameraController.Instance?.SetTarget(mainMenu.transform);
-        SetupMainMenu();
-        SetupOptionsMenu();
+        CameraController.Instance?.SetTarget(mainMenuPosition.transform);
+        SetupButtons();
     }
     
     
 
-    private void SetupMainMenu()
+    private void SetupButtons()
     {
         if (buttonStart != null)
         {
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonStart.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
             buttonStart.onClick.AddListener(() => SceneManager.LoadScene(1));
         }
         
         if (buttonLevelSelect != null)
         {
             buttonLevelSelect.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonLevelSelect.onClick.AddListener(() => CameraController.Instance?.SetTarget(levelSelectMenu.transform));
+            buttonLevelSelect.onClick.AddListener(() => CameraController.Instance?.SetTarget(levelSelectMenuPosition.transform));
         }
 
         if (buttonOptions != null)
         {
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptions.onClick.AddListener(() => CameraController.Instance?.SetTarget(optionsMenu.transform));
+            buttonOptions.onClick.AddListener(() => CameraController.Instance?.SetTarget(optionsMenuPosition.transform));
 
         }
 
         if (buttonCredits != null)
         {
             buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonCredits.onClick.AddListener(() => CameraController.Instance?.SetTarget(creditsMenu.transform));
+            buttonCredits.onClick.AddListener(() => CameraController.Instance?.SetTarget(creditsMenuPosition.transform));
 
         }
 
         if (buttonQuit != null)
         {
             buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonQuit.onClick.AddListener(() => QuitGame());
+            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
         }
     }
     
     
     
-    private void SetupOptionsMenu()
-    {
-        if (buttonOptionsBack != null)
-        {
-            buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptionsBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenu.transform));
-        }
-    }
-    
-
-    private void QuitGame()
-    {
-        Application.Quit();
-
-        #if UNITY_EDITOR
-        UnityEditor.EditorApplication.ExitPlaymode();
-        #endif
-    }
     
 }

@@ -31,8 +31,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
-    [SerializeField] [Range(1,999)] private int targetFPS = 120;
-    [SerializeField] [Min(0)] private int vSync = 0;
     [SerializeField] public bool showDebugInfo = false;
     [ReadOnly] public InputManager inputManager;
     [ReadOnly] public SoundManager soundManager;
@@ -56,6 +54,7 @@ public class GameManager : MonoBehaviour
     }
     
     private void Start() {
+        
         // Check that all managers are instanced
         if (InputManager.Instance == null) { Instantiate(inputManagerPrefab); }
         if (SoundManager.Instance == null) { Instantiate(soundManagerPrefab); }
@@ -66,9 +65,6 @@ public class GameManager : MonoBehaviour
         soundManager = SoundManager.Instance;
         uiManager = UIManager.Instance;
         
-        // Set settings
-        QualitySettings.vSyncCount = vSync;
-        Application.targetFrameRate = targetFPS;
         
         // Update UI
         UIManager.Instance.ToggleDebugUI(showDebugInfo);
@@ -81,16 +77,22 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
         if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
-        if (Input.GetKeyUp(KeyCode.F)) { CameraController.Instance.ShakeCamera(5f, 2f, 2f,  2f); }
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
     }
     
+    public void QuitGame()
+    {
+        Application.Quit();
 
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.ExitPlaymode();
+        #endif
+    }
 
     #region GameStates
 
-    private void TogglePause() {
-
+    public void TogglePause() {
+        
         if (currentGameState == GameStates.GamePlay) {
             SetGameState(GameStates.Paused);
         } else if (currentGameState == GameStates.Paused) {
@@ -99,7 +101,7 @@ public class GameManager : MonoBehaviour
     }
     
     
-    private void SetGameState(GameStates state) {
+    public void SetGameState(GameStates state) {
         currentGameState = state;
         UIManager.Instance.UpdateUI();
         
@@ -111,6 +113,13 @@ public class GameManager : MonoBehaviour
             case GameStates.Paused:
                 Time.timeScale = 0;
                 
+                break;
+            case GameStates.GameOver:
+                Time.timeScale = 0;
+                break;
+            
+                case GameStates.None:
+                Time.timeScale = 1;
                 break;
         }
     }

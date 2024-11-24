@@ -85,7 +85,7 @@ public class CameraController : MonoBehaviour
         _cameraWidth = _cameraHeight * _camera.aspect;
         
         // Get the player
-        PlayerController.Instance.TryGetComponent<PlayerController>(out _player);
+        PlayerController.Instance?.TryGetComponent<PlayerController>(out _player);
         if (_player) { SetTarget(_player.transform);}
     }
     
@@ -222,7 +222,8 @@ public class CameraController : MonoBehaviour
     private float CalculateTargetZoomOffset()
     {
         float offset = 0;
-        // if (!_player) return offset;
+        // if (!_player) return 0;
+        
         
         if (_player.wasRunning)
         {

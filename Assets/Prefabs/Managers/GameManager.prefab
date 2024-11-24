@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 9125595032816260253}
   - component: {fileID: 2434925499100429098}
+  - component: {fileID: 3787602947778312689}
+  - component: {fileID: 7647681018923719870}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -49,13 +51,49 @@ MonoBehaviour:
   quitGameKey: 282
   restartSceneKey: 283
   toggleDebugText: 284
-  targetFPS: 120
-  vSync: 0
-  showFps: 0
   showDebugInfo: 0
   inputManager: {fileID: 0}
   soundManager: {fileID: 0}
   uiManager: {fileID: 0}
+  cam: {fileID: 0}
   inputManagerPrefab: {fileID: 6668247925252254685, guid: 11d09469762d9de4590abaad657a7eef, type: 3}
   soundManagerPrefab: {fileID: 8169659688527411552, guid: 29762c76c6068794ab6c06aa1576adc5, type: 3}
   uiManagerPrefab: {fileID: 3659276992571845032, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
+--- !u!114 &3787602947778312689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4695825476085615752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056eb655704a6bd40befa07b23bb3917, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7647681018923719870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4695825476085615752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24071c8b6f8759543ae1bfba924ce985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetFPS: 0
+  vSync: 0
+  screenMode: 0
+  resolutionIndex: 0
+  masterGameVolume: 0
+  soundFXVolume: 0
+  musicVolume: 0
+  defaultTargetFPS: 999
+  defaultVSync: 0
+  defaultScreenMode: 1
+  defaultResolutionIndex: 0
+  defaultMasterGameVolume: 1
+  defaultSoundFXVolume: 0.5
+  defaultMusicVolume: 0.3

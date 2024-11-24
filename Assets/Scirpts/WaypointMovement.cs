@@ -174,7 +174,7 @@ public class WaypointMovement : MonoBehaviour {
 
     private void CleanupWaypoints()
     {
-        // Make sure we're not in play mode
+        // Make sure we're not in play modes
         if (Application.isPlaying) return;
         
         // Cleanup might be called multiple times, so remove the callback

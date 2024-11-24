@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.SceneManagement;
 using VInspector;
 
 
@@ -13,9 +14,9 @@ public class UIManager : MonoBehaviour
     
     [Tab("UI Settings")] // ----------------------------------------------------------------------
     [Header("Screens")]
-    [SerializeField] private  GameObject gamePlayUI;
-    [SerializeField] private  GameObject pauseScreenUI;
-    [SerializeField] private  GameObject gameOverUI;
+    [SerializeField] private GameObject gamePlayUI;
+    [SerializeField] private GameObject pauseScreenUI;
+    [SerializeField] private GameObject gameOverUI;
     
     [Header("Debug")]
     [SerializeField] private TextMeshProUGUI playerDebugText;
@@ -42,6 +43,11 @@ public class UIManager : MonoBehaviour
     [Tab("UI Pause")] // ----------------------------------------------------------------------
     [SerializeField] private GameObject panelMain;
     [SerializeField] private GameObject panelOptions;
+    [SerializeField] private Button buttonResume;
+    [SerializeField] private Button buttonOptions;
+    [SerializeField] private Button buttonMainMenu;
+    [SerializeField] private Button buttonQuit;
+    [SerializeField] private Button buttonOptionsBack;
     [SerializeField] private  TMP_Text pauseTimeText;
     [SerializeField] private  TMP_Text pauseScoreText;
     [SerializeField] private  TMP_Text pauseAmmoText;
@@ -67,7 +73,10 @@ public class UIManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start() {
+    private void Start()
+    {
+        SetupPauseScreen();
+        
         if (timerTexts.Length > 0)
         {
             foreach (var timerText in timerTexts)
@@ -162,6 +171,37 @@ public class UIManager : MonoBehaviour
 #endregion
 
 #region Pause Screen
+
+    private void SetupPauseScreen()
+    {
+        if (buttonResume != null)
+        {
+            buttonResume.onClick.RemoveAllListeners();
+            buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+        }
+
+        if (buttonOptions != null)
+        {
+            buttonOptions.onClick.RemoveAllListeners();
+            buttonOptions.onClick.AddListener(() => ShowPanelOptions());
+        }
+        
+        if (buttonMainMenu != null)
+        {
+            buttonMainMenu.onClick.RemoveAllListeners();
+            buttonMainMenu.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.None));
+            buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
+        }
+
+        if (buttonQuit != null)
+        {
+            buttonQuit.onClick.RemoveAllListeners();
+            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
+        }
+
+        ShowPanelMain();
+
+    }
     private void UpdatePauseScreenInfo()
     {
         if (pauseTimeText != null)

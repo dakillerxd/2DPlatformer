@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7690583800221502291
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1093111272349469838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_Name
+      value: Background Object Far Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3494706528571159166, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8593248
+      objectReference: {fileID: 0}
+    - target: {fileID: 3494706528571159166, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_Color.g
+      value: 0.37615192
+      objectReference: {fileID: 0}
+    - target: {fileID: 3494706528571159166, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_Color.r
+      value: 0.899371
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730250378265793838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1093111272349469838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6480568974518711643}
+  m_SourcePrefab: {fileID: 100100000, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+--- !u!1 &7318898950169036765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1093111272349469838, guid: 175d2b715e669d84283daf09d19cbab5, type: 3}
+  m_PrefabInstance: {fileID: 7690583800221502291}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6480568974518711643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7318898950169036765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9374e85f5c9154ea780b84b83cea70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableRotation: 1
+  xRotation:
+    continuousRotation: 0
+    reverseDirection: 0
+    oscillationAmount: 0
+    oscillationSpeed: 0
+    rotationSpeed: 0
+  yRotation:
+    continuousRotation: 0
+    reverseDirection: 0
+    oscillationAmount: 0
+    oscillationSpeed: 0
+    rotationSpeed: 0
+  zRotation:
+    continuousRotation: 1
+    reverseDirection: 0
+    oscillationAmount: 0
+    oscillationSpeed: 0
+    rotationSpeed: 35

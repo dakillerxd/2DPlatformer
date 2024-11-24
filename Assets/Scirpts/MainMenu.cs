@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
-    [Header("General")] 
+    [Header("Screens")] 
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject levelSelectMenu;
     [SerializeField] private GameObject optionsMenu;
@@ -20,12 +20,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button buttonCredits;
     [SerializeField] private Button buttonQuit;
     
-    [Header("Level Select Menu")]
-    [SerializeField] private Button buttonLevelSelectBack;
-    [SerializeField] private Button buttonLevelPrefab;
-    [SerializeField] private GameObject levelsContainer;
-    [SerializeField] private SceneField[] levels;
-    
     [Header("Options Menu")]
     [SerializeField] private Button buttonOptionsBack;
 
@@ -34,7 +28,6 @@ public class MainMenuController : MonoBehaviour
     {
         CameraController.Instance?.SetTarget(mainMenu.transform);
         SetupMainMenu();
-        SetupLevelSelect();
         SetupOptionsMenu();
     }
     
@@ -75,31 +68,7 @@ public class MainMenuController : MonoBehaviour
         }
     }
     
-
-    private void SetupLevelSelect()
-    {
-        if (buttonLevelSelectBack != null)
-        {
-            buttonLevelSelectBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonLevelSelectBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenu.transform));
-        }
-
-        if (levels.Length == 0 || !buttonLevelPrefab || !levelsContainer) return;
-        
-        
-        
-        
-        foreach (SceneField level in levels)
-        {
-            GameObject button = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
-            button.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            button.GetComponent<Button>().onClick.AddListener(() => SceneManager.LoadScene(level));
-            button.GetComponentInChildren<TextMeshProUGUI>().text = level.SceneName.Replace("Level", "").Trim();
-            
-        }
-        
-        
-    }
+    
     
     private void SetupOptionsMenu()
     {

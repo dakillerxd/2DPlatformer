@@ -27,7 +27,7 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private  int defaultTargetFPS = 999;
     [SerializeField] private int defaultVSync = 0;
     [SerializeField] private ScreenModes defaultScreenMode = ScreenModes.Borderless;
-    [SerializeField] private int defaultResolutionIndex = Screen.resolutions.Length - 1;
+    [SerializeField] private int defaultResolutionIndex = 0;
     [SerializeField] private float defaultMasterGameVolume = 1f;
     [SerializeField] private float defaultSoundFXVolume = 0.50f;
     [SerializeField] private float defaultMusicVolume = 0.30f;
@@ -42,9 +42,9 @@ public class SettingsManager : MonoBehaviour
             return;
         }
         Instance = this;
-        
-        
-        
+
+
+        defaultResolutionIndex = Screen.resolutions.Length - 1;
         LoadAllSettings();
     }
 

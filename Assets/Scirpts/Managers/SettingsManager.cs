@@ -75,7 +75,7 @@ public class SettingsManager : MonoBehaviour
                 unityScreenMode = FullScreenMode.Windowed;
                 break;
             default:
-                unityScreenMode = FullScreenMode.Windowed;
+                unityScreenMode = FullScreenMode.FullScreenWindow;
                 break;
         }
 

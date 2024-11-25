@@ -287,8 +287,8 @@ MonoBehaviour:
   doubleJumpAbility: 0
   maxAirJumps: 1
   wallSlideAbility: 0
-  wallSlideSpeed: 2
-  maxWallSlideSpeed: 3
+  wallSlideSpeed: 3
+  maxWallSlideSpeed: 4
   wallSlideStickTime: 0.2
   wallJumpAbility: 0
   wallJumpResetsJumps: 0

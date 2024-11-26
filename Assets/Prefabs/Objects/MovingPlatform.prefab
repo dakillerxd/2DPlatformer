@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 0.25, z: 1}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7290072591576257772}
@@ -245,8 +245,8 @@ MonoBehaviour:
   maxSpeed: 2
   accelerationPercent: 100
   decelerationPercent: 100
-  decelerationRadius: 1.3
-  waypointWaitTime: 0
+  decelerationRadius: 1
+  waypointWaitTime: 0.25
   waypoints: []
   objectRigidBody: {fileID: 4507320492004289905}
   waypointPrefab: {fileID: 1462159494570231694, guid: a62dcb94264dbf241ac82189688b582d, type: 3}

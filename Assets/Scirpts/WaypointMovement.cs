@@ -99,7 +99,7 @@ public class WaypointMovement : MonoBehaviour {
         // Apply acceleration or deceleration based on percentages
         float currentRate = distanceToTarget < decelerationRadius ? 
             decelerationPercent / 100f * 15f : // Base deceleration rate of 15
-            accelerationPercent / 100f * 10f;  // Base acceleration rate of 10
+            accelerationPercent / 100f * 15f;  // Base acceleration rate of 10
 
         objectRigidBody.linearVelocity = Vector2.Lerp(
             objectRigidBody.linearVelocity, 
@@ -170,6 +170,11 @@ public class WaypointMovement : MonoBehaviour {
         }
 
         previousWaypoints = currentWaypoints;
+        
+        if (waypoints.Count > 0 && objectRigidBody)
+        {
+            objectRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
+        }
     }
 
     private void CleanupWaypoints()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VInspector;
 using Random = UnityEngine.Random;
 
@@ -19,14 +20,17 @@ public class CameraController : MonoBehaviour
     private float _currentVelocityX;
     private float _currentVelocityY;
     
-    [Header("Offset")]
+    [Header("Offset")] 
     [SerializeField] private float baseHorizontalOffset = 1f;
     [SerializeField] private float baseVerticalOffset = 1.5f;
     [Space(10)]
-    [SerializeField] private float minHorizontalOffset = -4;
-    [SerializeField] private float maxHorizontalOffset = 4;
-    [SerializeField] private float minVerticalOffset = -3;
-    [SerializeField] private float maxVerticalOffset = 3;
+    [SerializeField] private bool useTargetOffsetBoundaries = true;
+        [EnableIf("useTargetOffsetBoundaries")]
+        [SerializeField] private float minHorizontalOffset = -4;
+        [SerializeField] private float maxHorizontalOffset = 4;
+        [SerializeField] private float minVerticalOffset = -3;
+        [SerializeField] private float maxVerticalOffset = 3;
+        [EndIf]
     [Space(10)]
     [SerializeField] [Min(1f)] private float verticalMoveDiminisher;
     [SerializeField] [Min(1f)] private float horizontalMoveDiminisher;
@@ -138,7 +142,7 @@ public class CameraController : MonoBehaviour
 
     private void HandleOffsetBoundaries() {
         
-        if (!target) return;
+        if (!target || !useTargetOffsetBoundaries) return;
         Vector3 position = transform.position;
         position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
         position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
@@ -222,7 +226,7 @@ public class CameraController : MonoBehaviour
     private float CalculateTargetZoomOffset()
     {
         float offset = 0;
-        // if (!_player) return 0;
+        if (!_player) return 0;
         
         
         if (_player.wasRunning)

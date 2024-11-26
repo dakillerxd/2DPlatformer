@@ -9,7 +9,7 @@ public class SceneTeleporter : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool activated = false;
     [SerializeField] private bool goToNextLevel = true;
-    [DisableIf("goToNextLevel")][SerializeField] private SceneField sceneToLoad;
+    [SerializeField] private SceneField sceneToLoad;
 
     
     private void OnTriggerEnter2D(Collider2D other)
@@ -29,7 +29,15 @@ public class SceneTeleporter : MonoBehaviour
     }
     
     private void GoToNextLevel() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        
+        if (SceneManager.GetActiveScene().buildIndex + 1 >= SceneManager.sceneCountInBuildSettings) {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
+        }
+        
     }
     
     private IEnumerator PlayAnimationAndTeleport(Rigidbody2D objectRigidbody) {

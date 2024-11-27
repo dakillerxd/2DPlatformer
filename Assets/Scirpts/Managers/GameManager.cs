@@ -32,15 +32,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
     [SerializeField] public bool showDebugInfo = false;
-    [ReadOnly] public InputManager inputManager;
-    [ReadOnly] public SoundManager soundManager;
-    [ReadOnly] public UIManager uiManager;
     [ReadOnly] public Camera cam;
     
     [Tab("References")] // ----------------------------------------------------------------------
     public InputManager inputManagerPrefab;
     public SoundManager soundManagerPrefab;
     public UIManager uiManagerPrefab;
+    public VFXManager vfxManagerPrefab;
     
     private void Awake() {
         
@@ -59,16 +57,32 @@ public class GameManager : MonoBehaviour
         if (InputManager.Instance == null) { Instantiate(inputManagerPrefab); }
         if (SoundManager.Instance == null) { Instantiate(soundManagerPrefab); }
         if (UIManager.Instance == null) { Instantiate(uiManagerPrefab); }
-        
-        // Set instances
-        inputManager = InputManager.Instance;
-        soundManager = SoundManager.Instance;
-        uiManager = UIManager.Instance;
-        
+        if (VFXManager.Instance == null) { Instantiate(vfxManagerPrefab); }
         
         // Update UI
         UIManager.Instance.ToggleDebugUI(showDebugInfo);
         UIManager.Instance.UpdateUI();
+    }
+    
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        
+        // Set motion blur
+        if (nextScene.name == "MainMenu") {
+            VFXManager.Instance?.ToggleMotionBlur(true, 0.3f);
+        } else {
+            VFXManager.Instance?.ToggleMotionBlur(false);
+        }
     }
     
     

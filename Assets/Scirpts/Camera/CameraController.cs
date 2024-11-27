@@ -272,18 +272,15 @@ public class CameraController : MonoBehaviour
         transform.position = position;
     }
 
-#if UNITY_EDITOR // Select the new boundary
+#if UNITY_EDITOR 
+    
     [Button] private void CreateNewTrigger()
     {
         if (!triggerPrefab) return;
-
         CameraTrigger newTrigger = Instantiate(triggerPrefab, transform.position, Quaternion.identity);
-
-        
         UnityEditor.Selection.activeObject = newTrigger.gameObject;
-        
-        
     }
+    
 #endif
 
 #endregion Boundaries functions

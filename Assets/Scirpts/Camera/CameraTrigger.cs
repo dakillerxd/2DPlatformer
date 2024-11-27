@@ -30,6 +30,9 @@ public class CameraTrigger : MonoBehaviour
     
     [Header("Boundary")]
     public bool limitCameraToBoundary;
+    [EnableIf(nameof(limitCameraToBoundary))]
+    [SerializeField] private bool resetBoundaryOnExit = true;
+    [EndIf]
     
     [Header("References")]
     [SerializeField] private  BoxCollider2D boxCollider2D;
@@ -58,7 +61,7 @@ public class CameraTrigger : MonoBehaviour
     {
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
         
-        // if (limitCameraToBoundary) {CameraController.Instance.ResetBoundaries();}
+        if (limitCameraToBoundary && resetBoundaryOnExit) {CameraController.Instance.ResetBoundaries();}
         if (setCameraZoom) {CameraController.Instance.ResetZoom();}
         if (setCameraOffset) {CameraController.Instance.ResetTriggerOffset();}
     }

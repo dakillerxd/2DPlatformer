@@ -34,7 +34,8 @@ public class PlayerController : MonoBehaviour {
     private float _invincibilityTime;
     private float _stunLockTime;
 
-    [Header("Movement")]
+    [Header("Movement")] 
+    [SerializeField] private bool lookRightOnStart = true;
     [SerializeField] [Min(0.01f)] private float maxMoveSpeed = 6f;
     [SerializeField] [Min(0.01f)] private float maxAirMoveSpeed = 5f;
     [SerializeField] [Min(0.01f)] private float airRunSpeed = 6f;
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float runningThreshold = 5.9f; // How fast the player needs to move for running
     [SerializeField] private float movingRigidbodyVelocityDecayRate = 4f; // 0 Keep momentum
     private float _moveSpeed;
+    private bool _wasLastRunningState;
     
     [Header("Jump")]
     [SerializeField] private float jumpForce = 5f;
@@ -211,8 +213,11 @@ public class PlayerController : MonoBehaviour {
     private void Start()
     {
         isFacingRight = true;
+        if (lookRightOnStart) {FlipPlayer("Right"); } else { FlipPlayer("Left"); }
         CheckpointManager.Instance.SetSpawnPoint(transform.position);
-        UIManager.Instance.UpdateAbilitiesUI();
+        UIManager.Instance?.UpdateAbilitiesUI();
+        StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
+        StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         RespawnFromSpawnPoint();
     }
     
@@ -267,13 +272,23 @@ public class PlayerController : MonoBehaviour {
         if (isRunning) { wasRunning = true; }
         if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
         
-        if (isRunning) { 
-            PlayVfxEffect(peakMoveSpeedVfx, false);
-            PlayVfxEffect(groundRunVfx, false);
+        
+        if (isRunning != _wasLastRunningState) {
+            if (isRunning) { 
+                VFXManager.Instance?.ToggleMotionBlur(true);
+                PlayVfxEffect(peakMoveSpeedVfx, false);
+                PlayVfxEffect(groundRunVfx, false);
+            } else if (wasRunning) {
+                VFXManager.Instance?.ToggleMotionBlur(true);
+                StopVfxEffect(groundRunVfx, false);
+                StopVfxEffect(peakMoveSpeedVfx, false);
+            } else {
+                VFXManager.Instance?.ToggleMotionBlur(false);
+                StopVfxEffect(groundRunVfx, false);
+                StopVfxEffect(peakMoveSpeedVfx, false);
+            }
             
-        } else {
-            StopVfxEffect(groundRunVfx, false);
-            StopVfxEffect(peakMoveSpeedVfx, false);
+            _wasLastRunningState = isRunning;
         }
 
     }
@@ -342,12 +357,12 @@ public class PlayerController : MonoBehaviour {
         if (!isGrounded) return;
         if (!_softObject || !_softObject.enabled) return;
 
-        if (_dropDownInput) {
-            rigidBody.linearVelocityY = jumpForce/3;
-            PlayAnimation("DropDown");
-            _softObject.StartDropDownCooldown();
-            _softObject = null;
-        }
+        if (!_dropDownInput) return;
+        rigidBody.linearVelocityY = jumpForce/3;
+        PlayAnimation("DropDown");
+        _softObject.StartDropDownCooldown();
+        _softObject = null;
+        
     }
     
     private void HandleStepClimbing() {
@@ -716,7 +731,12 @@ public class PlayerController : MonoBehaviour {
         isFalling = rigidBody.linearVelocityY < -0.1; // Check if falling
         
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
-        if (isFastFalling) { CameraController.Instance.ShakeCamera(0.1f, 0.5f * fallSpeed/fastFallBopDiminisher, 1f, 1f);}
+        if (isFastFalling) {
+            CameraController.Instance.ShakeCamera(0.1f, 0.5f * fallSpeed/fastFallBopDiminisher, 1f, 1f);
+            VFXManager.Instance?.ToggleMotionBlur(true);
+        }else {
+            VFXManager.Instance?.ToggleMotionBlur(false);
+        }
         
         
         atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;

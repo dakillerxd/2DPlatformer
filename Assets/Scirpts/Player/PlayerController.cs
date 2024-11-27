@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public enum PlayerState {
     Controllable,
@@ -36,22 +37,22 @@ public class PlayerController : MonoBehaviour {
     [Header("Movement")]
     [SerializeField] [Min(0.01f)] private float maxMoveSpeed = 6f;
     [SerializeField] [Min(0.01f)] private float maxAirMoveSpeed = 5f;
-    [SerializeField] [Min(0.01f)] private float airRunSpeed = 7f;
-    [SerializeField] [Min(0.01f)] private float moveAcceleration = 7f; // How fast the player gets to acceleration threshold
-    [SerializeField] private float runAcceleration = 1.5f;     // Slower final acceleration
-    [SerializeField] private float accelerationThreshold = 4f;   // Speed at which we switch to slower acceleration
-    [SerializeField] [Min(0.01f)] private float groundFriction = 5f; // The higher the friction there is less resistance
-    [SerializeField] [Min(0.01f)] private float airFriction = 0.1f; // The higher the friction there is less resistance
-    [SerializeField] [Min(0.01f)] private float platformFriction = 1f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)] private float airRunSpeed = 6f;
+    [SerializeField] [Min(0.01f)] private float moveAcceleration = 2f; // How fast the player gets to acceleration threshold
+    [SerializeField] private float runAcceleration = 3f;     // Slower final acceleration
+    [SerializeField] private float accelerationThreshold = 5f;   // Speed at which we switch to slower acceleration
+    [SerializeField] [Min(0.01f)] private float groundFriction = 4.5f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)] private float airFriction = 0.2f; // The higher the friction there is less resistance
+    [SerializeField] [Min(0.01f)] private float platformFriction = 25f; // The higher the friction there is less resistance
     [SerializeField] [Min(0.01f)] private float movementThreshold = 0.1f;
     [SerializeField] private float runningThreshold = 5.9f; // How fast the player needs to move for running
     [SerializeField] private float movingRigidbodyVelocityDecayRate = 4f; // 0 Keep momentum
     private float _moveSpeed;
     
     [Header("Jump")]
-    [SerializeField] private float jumpForce = 4f;
+    [SerializeField] private float jumpForce = 5f;
     [SerializeField] private float variableJumpMaxHoldDuration = 0.3f; // How long the jump button can be held
-    [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.5f; // Multiplier for jump cut height
+    [SerializeField] [Range(0.1f, 1f)] private float variableJumpMultiplier = 0.4f; // Multiplier for jump cut height
     [SerializeField] [Range(0.1f, 1f)] private float holdJumpDownBuffer = 0.2f; // For how long the jump buffer will hold
     [SerializeField] [Range(0, 2f)] private float coyoteJumpBuffer = 0.1f; // For how long the coyote buffer will hold
     private bool _isJumpCut;
@@ -62,10 +63,10 @@ public class PlayerController : MonoBehaviour {
     
     [Header("Gravity")] 
     [SerializeField] private float gravityForce = 0.5f;
-    [SerializeField] private float fallMultiplier = 4f; // Gravity multiplayer when the payer is falling
+    [SerializeField] private float fallMultiplier = 3f; // Gravity multiplayer when the payer is falling
     [SerializeField] public float maxFallSpeed = 20f;
-    [SerializeField] private float fastFallSpeed = 10f; // The speed at which the player bobs after a fall
-    [SerializeField] [Min(0)] private float fastFallBopDiminisher = 4f;
+    [SerializeField] private float fastFallSpeed = 12f; // The speed at which the player bobs after a fall
+    [SerializeField] [Min(0)] private float fastFallBopDiminisher = 6f;
     [HideInInspector] public float fallSpeed;
     
     [Header("Collisions")]
@@ -73,7 +74,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckHorizontalDistance = 0.5f;
-    [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 0.05f;
+    [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 2f;
     private bool _isTouchingGround;
     private bool _isTouchingPlatform;
     private bool _isTouchingWall;
@@ -111,9 +112,9 @@ public class PlayerController : MonoBehaviour {
     
     [Header("Wall Slide")]
     [SerializeField] public bool wallSlideAbility = true;
-    [SerializeField] private float wallSlideSpeed = 2f;
-    [SerializeField] private float maxWallSlideSpeed = 3f;
-    [SerializeField] [Range(0, 1f)] private float wallSlideStickTime = 0.3f;
+    [SerializeField] private float wallSlideAcceleration = 3f;
+    [SerializeField] private float maxWallSlideSpeed = 4f;
+    [SerializeField] [Range(0, 1f)] private float wallSlideStickTime = 0.2f;
     private float _wallSlideStickTimer;
 
     [Header("Wall Jump")]
@@ -339,7 +340,7 @@ public class PlayerController : MonoBehaviour {
     private void HandleDropDown() { 
         
         if (!isGrounded) return;
-        if (!_softObject) return;
+        if (!_softObject || !_softObject.enabled) return;
 
         if (_dropDownInput) {
             rigidBody.linearVelocityY = jumpForce/3;
@@ -602,7 +603,7 @@ public class PlayerController : MonoBehaviour {
             }
 
             // Set slide speed
-            float slideSpeed = wallSlideSpeed;
+            float slideSpeed = wallSlideAcceleration;
             float maxSlideSpeed = maxWallSlideSpeed;
 
             // Accelerate slide if fast dropping

@@ -818,9 +818,23 @@ public class PlayerController : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
         
         if (collision.contactCount == 0) return;
-        collision.gameObject.TryGetComponent<SoftObject>(out _softObject);
+       
+        
         collision.gameObject.TryGetComponent<Rigidbody2D>(out _movingRigidbody);
         _onGroundObject = _movingRigidbody; 
+        
+        collision.gameObject.TryGetComponent<SoftObject>(out _softObject);
+        
+        Spike spike = collision.gameObject.GetComponentInParent<Spike>();
+        if (spike != null)
+        {
+            Vector2 spikeNormal = collision.GetContact(0).normal;
+            Push(spikeNormal * spike.pushForce);
+            DamageHealth(spike.damage, true, collision.gameObject.name);
+        }
+        
+        
+        
         
         switch (collision.gameObject.tag) {
             case "Enemy":
@@ -847,17 +861,8 @@ public class PlayerController : MonoBehaviour {
                     Push(enemyPushForce);
                     DamageHealth(1, true, collision.gameObject.name);
                 }
-                
-                
                 break;
-            case "Spike":
 
-                Vector2 spikeNormal = collision.GetContact(0).normal;
-                Vector2 spikePushForce = spikeNormal * 5f;
-                Push(spikePushForce);
-                DamageHealth(1, true, collision.gameObject.name);
-
-                break;
         }
     }
 
@@ -938,6 +943,8 @@ public class PlayerController : MonoBehaviour {
     }
     
     private void DamageHealth(int damage, bool setInvincible, string cause = "") {
+        
+        if (damage <= 0) return;
         if (_currentHealth > 0 && !isInvincible) {
             
             if (setInvincible) { TurnInvincible();}
@@ -1131,6 +1138,7 @@ public class PlayerController : MonoBehaviour {
         
         switch (state) {
             case PlayerState.Controllable:
+                rigidBody.simulated = true;
                 rigidBody.linearVelocity = Vector2.zero;
                 _remainingAirJumps = maxAirJumps;
                 _remainingDashes = maxDashes;
@@ -1164,6 +1172,7 @@ public class PlayerController : MonoBehaviour {
                 
                 break;
             case PlayerState.Frozen:
+                rigidBody.simulated = false;
                 rigidBody.linearVelocity = Vector2.zero;
                 isTeleporting = true;
                 break;

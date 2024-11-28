@@ -151,7 +151,6 @@ GameObject:
   - component: {fileID: 2783392023027556574}
   - component: {fileID: 631767106991630361}
   - component: {fileID: 6010112362093298342}
-  - component: {fileID: 3269703470291336727}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -244,6 +243,7 @@ MonoBehaviour:
   maxHealth: 2
   canTakeFallDamage: 0
   maxFallDamage: 1
+  lookRightOnStart: 1
   maxMoveSpeed: 6
   maxAirMoveSpeed: 5
   airRunSpeed: 6
@@ -288,7 +288,7 @@ MonoBehaviour:
   doubleJumpAbility: 0
   maxAirJumps: 1
   wallSlideAbility: 0
-  wallSlideSpeed: 3
+  wallSlideAcceleration: 3
   maxWallSlideSpeed: 4
   wallSlideStickTime: 0.2
   wallJumpAbility: 0
@@ -323,58 +323,6 @@ MonoBehaviour:
   hurtColor: {r: 1, g: 0, b: 0, a: 1}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
   deadColor: {r: 0, g: 0, b: 0, a: 0}
---- !u!114 &3269703470291336727
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3175132503772560621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShadowGroup: 0
-  m_Priority: 0
-  m_ComponentVersion: 5
-  m_HasRenderer: 0
-  m_UseRendererSilhouette: 1
-  m_CastsShadows: 1
-  m_SelfShadows: 0
-  m_AlphaCutoff: 0.1
-  m_ApplyToSortingLayers: 5954211a0000000081a6f949cd70452e
-  m_ShapePath:
-  - {x: -0.16, y: -0.16, z: 0}
-  - {x: -0.16, y: 0.16, z: 0}
-  - {x: 0.16, y: 0.16, z: 0}
-  - {x: 0.16, y: -0.16, z: 0}
-  m_ShapePathHash: -410444667
-  m_InstanceId: 0
-  m_ShadowShape2DComponent: {fileID: 0}
-  m_ShadowShape2DProvider:
-    rid: -2
-  m_ShadowCastingSource: 1
-  m_ShadowMesh:
-    m_Mesh: {fileID: 0}
-    m_LocalBounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0.16, y: 0.16, z: 0}
-    m_EdgeProcessing: 1
-    m_TrimEdge: 0
-    m_FlipX: 0
-    m_FlipY: 0
-    m_InitialTrim: 0
-  m_CastingOption: 1
-  m_PreviousTrimEdge: 0
-  m_PreviousEdgeProcessing: 1
-  m_PreviousShadowCastingSource: 1
-  m_PreviousShadowShape2DSource: {fileID: 0}
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
 --- !u!1 &4153000382075459821
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,6 +730,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5585958558111689940}
+  - component: {fileID: 7882390600563638155}
   m_Layer: 0
   m_Name: Gfx
   m_TagString: Untagged
@@ -806,6 +755,58 @@ Transform:
   - {fileID: 5456902685513578049}
   m_Father: {fileID: 6449356787988531081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7882390600563638155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7661829127028439711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_Priority: 0
+  m_ComponentVersion: 5
+  m_HasRenderer: 0
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_AlphaCutoff: 0.1
+  m_ApplyToSortingLayers: 5954211a0000000081a6f949cd70452e
+  m_ShapePath:
+  - {x: -0.16, y: -0.16, z: 0}
+  - {x: -0.16, y: 0.16, z: 0}
+  - {x: 0.16, y: 0.16, z: 0}
+  - {x: 0.16, y: -0.16, z: 0}
+  m_ShapePathHash: -410444667
+  m_InstanceId: 0
+  m_ShadowShape2DComponent: {fileID: 0}
+  m_ShadowShape2DProvider:
+    rid: -2
+  m_ShadowCastingSource: 1
+  m_ShadowMesh:
+    m_Mesh: {fileID: 0}
+    m_LocalBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.16, y: 0.16, z: 0}
+    m_EdgeProcessing: 1
+    m_TrimEdge: 0
+    m_FlipX: 0
+    m_FlipY: 0
+    m_InitialTrim: 0
+  m_CastingOption: 1
+  m_PreviousTrimEdge: 0
+  m_PreviousEdgeProcessing: 1
+  m_PreviousShadowCastingSource: 1
+  m_PreviousShadowShape2DSource: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &8348743168451648775
 GameObject:
   m_ObjectHideFlags: 0

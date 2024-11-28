@@ -16,9 +16,8 @@ public class SceneTeleporter : MonoBehaviour
     {
         if (activated) return;
         if (other.CompareTag("Player")) {
-
-            StartCoroutine(PlayAnimationAndTeleport(PlayerController.Instance.GetComponent<Rigidbody2D>()));
-
+            Transform parentTransform = other.transform.root;
+            StartCoroutine(PlayAnimationAndTeleport(parentTransform));
         }
     }
 
@@ -29,13 +28,10 @@ public class SceneTeleporter : MonoBehaviour
     }
     
     private void GoToNextLevel() {
-        
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        
     }
     
-    private IEnumerator PlayAnimationAndTeleport(Rigidbody2D objectRigidbody) {
-
+    private IEnumerator PlayAnimationAndTeleport(Transform objectTransform) {
         activated = true;
         SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
@@ -43,10 +39,9 @@ public class SceneTeleporter : MonoBehaviour
         PlayerController.Instance.PlayAnimation("TeleportIn");
         PlayerController.Instance.SetPlayerState(PlayerState.Frozen);
         
-
         // Wait until the animation enters the state
         while (!PlayerController.Instance.animator.GetCurrentAnimatorStateInfo(0).IsName("Anim_PlayerTeleportIn")) {
-            MoveObjectToMiddle(objectRigidbody);
+            MoveObjectToMiddle(objectTransform);
             yield return null;
         }
 
@@ -65,26 +60,9 @@ public class SceneTeleporter : MonoBehaviour
         }
     }
 
-
-    private void MoveObjectToMiddle(Rigidbody2D objectRigidbody, float moveSpeed = 1f) {
-
-        Vector2 targetPosition = transform.position;
-        Vector2 currentPosition = objectRigidbody.position;
-        Vector2 direction = (targetPosition - currentPosition).normalized;
-        float distanceToTarget = Vector2.Distance(currentPosition, targetPosition);
-
-
-        if (distanceToTarget < 0.1f) //  Stop when close to the target
-        {
-            objectRigidbody.linearVelocity = Vector2.zero;
-            objectRigidbody.position = targetPosition;
-            return;
-        }
-
-        // Gradually slow down as we get closer to the target
-        float speedMultiplier = Mathf.Min(distanceToTarget, 1f);
-    
-        // Set the velocity based on direction and speed
-        objectRigidbody.linearVelocity = speedMultiplier * moveSpeed * direction;
+    private void MoveObjectToMiddle(Transform objectTransform, float moveSpeed = 1f) {
+        Vector3 targetPosition = transform.position;
+        Vector3 currentPosition = objectTransform.position;
+        objectTransform.position = Vector3.Lerp(currentPosition, targetPosition, Time.deltaTime * moveSpeed);
     }
 }

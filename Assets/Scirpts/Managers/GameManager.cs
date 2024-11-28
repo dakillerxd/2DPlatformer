@@ -58,10 +58,7 @@ public class GameManager : MonoBehaviour
         if (SoundManager.Instance == null) { Instantiate(soundManagerPrefab); }
         if (UIManager.Instance == null) { Instantiate(uiManagerPrefab); }
         if (VFXManager.Instance == null) { Instantiate(vfxManagerPrefab); }
-        
-        // Update UI
-        UIManager.Instance.ToggleDebugUI(showDebugInfo);
-        UIManager.Instance.UpdateUI();
+
     }
     
     private void OnEnable()
@@ -76,13 +73,18 @@ public class GameManager : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
+        UIManager.Instance.ToggleDebugUI(showDebugInfo);
+        UIManager.Instance.UpdateUI();
         
-        // Set motion blur
+        VFXManager.Instance?.ToggleChromaticAberration(false);
+        VFXManager.Instance?.ToggleLensDistortion(false);
+        
         if (nextScene.name == "MainMenu") {
             VFXManager.Instance?.ToggleMotionBlur(true, 0.3f);
         } else {
             VFXManager.Instance?.ToggleMotionBlur(false);
         }
+        
     }
     
     

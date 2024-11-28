@@ -55,6 +55,18 @@ public class VFXManager : MonoBehaviour
         _motionBlur.active = state;
         _motionBlur.intensity.value = intensity;
     }
+    
+    public void ToggleChromaticAberration(bool state, float intensity = 0)
+    {
+        _chromaticAberration.active = state;
+        _chromaticAberration.intensity.value = intensity;
+    }
+    
+    public void ToggleLensDistortion(bool state, float intensity = 0)
+    {
+        _lensDistortion.active = state;
+        _lensDistortion.intensity.value = intensity;
+    }
         
 
     public IEnumerator LerpChromaticAberration(bool lerpIn, float time)

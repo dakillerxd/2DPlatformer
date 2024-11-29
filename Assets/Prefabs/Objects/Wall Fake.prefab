@@ -71,32 +71,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1018679801429308006, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2317086232289892755}
+      addedObject: {fileID: 5227010133284631102}
     - targetCorrespondingSourceObject: {fileID: 1018679801429308006, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5227010133284631102}
+      addedObject: {fileID: 2317086232289892755}
   m_SourcePrefab: {fileID: 100100000, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
 --- !u!1 &6381535776318679528 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1018679801429308006, guid: dc67d030222302d4c907ccca7a411bcc, type: 3}
   m_PrefabInstance: {fileID: 6245603296718150542}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2317086232289892755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6381535776318679528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4b5aee3b0ac97749983fff04e5e6bcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  destroyOnTrigger: 1
-  invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
-  spriteRenderers:
-  - {fileID: 5227010133284631102}
 --- !u!212 &5227010133284631102
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -152,3 +136,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2317086232289892755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381535776318679528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4b5aee3b0ac97749983fff04e5e6bcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyOnTrigger: 1
+  invincibilityColor: {r: 1, g: 1, b: 1, a: 0.19607843}
+  spriteRenderers:
+  - {fileID: 5227010133284631102}

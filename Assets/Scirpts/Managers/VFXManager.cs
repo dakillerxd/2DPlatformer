@@ -38,11 +38,15 @@ public class VFXManager : MonoBehaviour
 
 #region Particle Effects
 
-    public void SpawnVfxEffect(ParticleSystem effect) {
+    public void SpawnParticleEffect(ParticleSystem effect, Transform position, Quaternion rotation) {
         if (!effect) return;
-        Instantiate(effect, transform.position, Quaternion.identity);
+        Instantiate(effect, position.position, rotation);
     }
-
+    
+    public void SpawnParticleEffect(ParticleSystem effect, Transform position, Quaternion rotation, Transform parent) {
+        if (!effect) return;
+        Instantiate(effect, position.position, rotation, parent);
+    }
 
 #endregion Particle Effects
 

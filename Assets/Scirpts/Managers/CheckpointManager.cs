@@ -17,17 +17,10 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
     [SerializeField] public Vector2 playerSpawnPoint;
     [SerializeField] public Checkpoint activeCheckpoint;
     [SerializeField] private List<Checkpoint> checkpointList = new List<Checkpoint>();
-    
-    [Header("Effects")]
-    [SerializeField] private Color disabledCheckpointColor = Color.white;
-    [SerializeField] private Color activeCheckpointColor = Color.green;
-    [SerializeField] private ParticleSystem activateVfx;
-    [SerializeField] private ParticleSystem deactivateVfx;
 
     [Header("References")]
     [SerializeField] private GameObject checkpointPrefab;
-
-    // Basic implementation of ISerializationCallbackReceiver for runtime
+    
     public void OnBeforeSerialize() { }
     public void OnAfterDeserialize() { }
 
@@ -45,7 +38,6 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
 
     private void Start() 
     {
-        if (activeCheckpoint) { ActivateCheckpoint(activeCheckpoint); }
         FindAllCheckpoints();
     }
 
@@ -55,14 +47,17 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         Debug.Log("Set spawn point to: " + playerSpawnPoint);
     }
     
-    [Button] 
-    private void AddCheckpoint() 
+     
+    [Button] private void AddCheckpoint() 
     {
         GameObject newCheckpoint = Instantiate(checkpointPrefab, transform.position, Quaternion.identity,transform);
         checkpointList.Add(newCheckpoint.GetComponent<Checkpoint>());
-        SeCheckpointColor(newCheckpoint.GetComponent<Checkpoint>(), disabledCheckpointColor);
         newCheckpoint.name = "Checkpoint " + checkpointList.Count;
         RenameCheckpoints();
+        
+        #if UNITY_EDITOR
+        UnityEditor.Selection.activeGameObject = newCheckpoint;
+        #endif
     }
     
     private void RenameCheckpoints()
@@ -74,16 +69,18 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         }
     }
     
-    [Button] 
-    private void FindAllCheckpoints() 
+    
+    [Button] private void FindAllCheckpoints() 
     {
         checkpointList = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).ToList();
         Debug.Log($"Found {checkpointList.Count} checkpoints in the scene.");
 
-        foreach (Checkpoint checkpoint in checkpointList) 
-        {
-            SeCheckpointColor(checkpoint, disabledCheckpointColor);
-        }
+        // foreach (Checkpoint checkpoint in checkpointList) 
+        // {
+        //     checkpoint.SeCheckpointColor(disabledCheckpointColor);
+        // }
+
+        RenameCheckpoints();
     }
 
     public void ActivateCheckpoint(Checkpoint checkpoint) 
@@ -92,9 +89,6 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         
         DeactivateLastCheckpoint();
         activeCheckpoint = checkpoint;
-        SpawnParticleEffect(activateVfx, activeCheckpoint.transform.position, activeCheckpoint.transform.rotation, activeCheckpoint.transform);
-        SeCheckpointColor(activeCheckpoint, activeCheckpointColor);
-        SoundManager.Instance?.PlaySoundFX("Checkpoint Set");
     }
 
     public void DeactivateCheckpoint(Checkpoint checkpoint)
@@ -102,26 +96,13 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         if (activeCheckpoint == checkpoint) DeactivateLastCheckpoint();
     }
 
-    private void DeactivateLastCheckpoint() 
+    public void DeactivateLastCheckpoint() 
     {
         if (!activeCheckpoint) return;
-        
-        SpawnParticleEffect(deactivateVfx, activeCheckpoint.transform.position, activeCheckpoint.transform.rotation, activeCheckpoint.transform);
-        SeCheckpointColor(activeCheckpoint, disabledCheckpointColor);
+        activeCheckpoint.DeactivateCheckpoint();
         activeCheckpoint = null;
     }
     
-    private void SeCheckpointColor(Checkpoint checkpoint, Color color) 
-    {
-        checkpoint.spriteRenderer.color = color;
-    }
-    
-    private void SpawnParticleEffect(ParticleSystem effect, Vector3 position, Quaternion rotation, Transform parent) 
-    {
-        if (effect == null) return;
-        Instantiate(effect, position, rotation, parent);
-    }
-
     #if UNITY_EDITOR
     
     private List<Checkpoint> previousList = new List<Checkpoint>();

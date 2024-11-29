@@ -9,17 +9,24 @@ using UnityEditor;
 public class ParallaxLayer : MonoBehaviour
 {
     [Header("Layer")] 
+    [SerializeField] private bool useCustomLayer = true;
+    [EnableIf("useCustomLayer")]
     [SerializeField] private int orderInLayer;
     [SerializeField] private SortingLayerField sortingLayer;
+    [EndIf]
     
     [Header("Background")]
+    [Tooltip("The layer will be directly in the camera view")]
     [SerializeField] private bool followCamera;
-    
-    [Header("Parallax")]
+
+    [Header("Parallax")] 
+    [SerializeField] private bool useParallaxEffect = true;
+    [EnableIf("useParallaxEffect")]
     [SerializeField] [Range(-2f, 2f)] private float parallaxEffectX;
     [SerializeField] [Range(-2f, 2f)] private float parallaxEffectY;
     [Tooltip("How far the object from the camera needs to be for the effect to happen")]
     [SerializeField] private float parallaxRange = 20f;
+    [EndIf]
     
     private Transform[] children;
     private Vector3[] initialLocalPositions;  // Store initial local positions
@@ -51,8 +58,7 @@ public class ParallaxLayer : MonoBehaviour
     
     private void MoveBasedOnCamera() {
         if (!cam) return; 
-        if (parallaxEffectY == 0 && parallaxEffectX == 0) return;
-        if (followCamera) return;
+        if (!useParallaxEffect || followCamera) return;
         
         Vector3 cameraDelta = cam.transform.position - lastCameraPos;
         
@@ -99,6 +105,7 @@ public class ParallaxLayer : MonoBehaviour
         }
     }
     
+    
     [Button]
     private void SetChildrenLayer() {
         SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
@@ -112,6 +119,7 @@ public class ParallaxLayer : MonoBehaviour
 #if UNITY_EDITOR
     
     private void OnDrawGizmosSelected() {
+        if(!useParallaxEffect) return;
         if(children != null) {
             Gizmos.color = Color.yellow;
             foreach(Transform child in children) {

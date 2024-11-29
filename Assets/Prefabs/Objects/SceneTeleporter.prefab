@@ -24217,7 +24217,6 @@ GameObject:
   - component: {fileID: 5675501794804825328}
   - component: {fileID: 6815104843284206713}
   - component: {fileID: 4974211650589412614}
-  - component: {fileID: 8144998195808256886}
   - component: {fileID: -6962597204337529161}
   m_Layer: 0
   m_Name: SceneTeleporter
@@ -24392,48 +24391,6 @@ MonoBehaviour:
     oscillationAmount: 45
     oscillationSpeed: 1
     rotationSpeed: 0
---- !u!114 &8144998195808256886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4768939878819942212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2278c47065eda484d957f2098ae8ad29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enablePulse: 0
-  pulseAmount: 0.2
-  pulseCooldown: 1
-  pulseCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  pulseX: 1
-  pulseY: 1
-  pulseZ: 0
 --- !u!114 &-6962597204337529161
 MonoBehaviour:
   m_ObjectHideFlags: 0

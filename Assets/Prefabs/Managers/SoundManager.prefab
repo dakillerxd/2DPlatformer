@@ -44,9 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79840e93d00a9649a425fbf0a8e37c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  masterGameVolume: 0.5
-  soundFXVolume: 1
-  musicVolume: 1
   soundFXPrefab: {fileID: 1853389310802539615, guid: 64a3e35a976dd354b9a777072cc6d6f3, type: 3}
   soundEffects:
   - name: Player Jump
@@ -167,5 +164,15 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
+    source: {fileID: 0}
+  - name: Player Receive Collectible
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
     source: {fileID: 0}
   music: []

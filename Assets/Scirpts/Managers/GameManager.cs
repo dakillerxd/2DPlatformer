@@ -1,6 +1,5 @@
-using System;
 using UnityEngine;
-using System.Text;
+using CustomAttribute;
 using UnityEngine.SceneManagement;
 using VInspector;
 
@@ -18,6 +17,16 @@ public enum GameDifficulty {
     Hard,
 }
 
+[System.Serializable]
+public class Collectible
+{
+    public SceneField connectedLevel;
+    public bool counts = true;
+    [CustomAttribute.ReadOnly] public bool collected;
+    
+}
+
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -31,8 +40,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
-    [SerializeField] public bool showDebugInfo = false;
-    [ReadOnly] public Camera cam;
+    [SerializeField] public bool showDebugInfo;
+    [CustomAttribute.ReadOnly] public Camera cam;
+    
+    
+    [Header("Collectibles")]
+    [SerializeField] public Collectible[] collectibles;
+    public bool googlyEyesModeReceived {get ; private set;}
+    public bool bonusLevel1Received {get ; private set;}
+    public bool bonusLevel2Received {get ; private set;}
+
     
     [Tab("References")] // ----------------------------------------------------------------------
     public InputManager inputManagerPrefab;
@@ -73,6 +90,8 @@ public class GameManager : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
+        LoadCollectibles();
+        
         UIManager.Instance.ToggleDebugUI(showDebugInfo);
         UIManager.Instance.UpdateUI();
         
@@ -161,6 +180,93 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion GameStates
+    
+    #region Collectibles
+    
+    public void CollectCollectible(string connectedLevelName) {
+        foreach (Collectible collectible in collectibles) {
+            if (collectible.connectedLevel.SceneName == connectedLevelName) {
+                collectible.collected = true;
+                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+                return;
+            }
+            Debug.LogError("Collectible not found");
+        }
+    }
+    
+    
+    public bool IsCollectibleCollected(string connectedLevelName) {
+        foreach (Collectible collectible in collectibles) {
+            if (collectible.connectedLevel.SceneName == connectedLevelName) {
+                return collectible.collected;
+            }
+        }
+        Debug.LogError("Collectible not found");
+        return false;
+    }
+
+    public int TotalCollectiblesAmount()
+    {
+        int total = 0;
+        foreach (Collectible collectible in collectibles) {
+            if (collectible.counts) {
+                total++;
+            }
+        }
+        return total;
+    }
+    
+    public int TotalCollectiblesCollected()
+    {
+        int total = 0;
+        foreach (Collectible collectible in collectibles) {
+            if (collectible.collected && collectible.counts) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    private void LoadCollectibles()
+    {
+        foreach (Collectible collectible in collectibles) {
+            
+            collectible.collected = SaveManager.Instance.LoadBool("Collectible " + collectible.connectedLevel.SceneName);
+        }
+
+        if (TotalCollectiblesCollected() > 2)
+        {
+            googlyEyesModeReceived = true;
+        }
+        
+        if (TotalCollectiblesCollected() > 4)
+        {
+           bonusLevel1Received = true;
+        }
+        
+        if (TotalCollectiblesCollected() > 6)
+        {
+            bonusLevel2Received = true;
+        }
+    }
+    
+    public void ResetCollectibles() {
+        foreach (Collectible collectible in collectibles) {
+            collectible.collected = false;
+            SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+        }
+    }
+    
+    [Button] public void CollectAllCollectibles() {
+        foreach (Collectible collectible in collectibles) {
+            collectible.collected = true;
+            SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+    
+    #endregion Collectibles
     
     #region Debugging functions
 

@@ -1218,9 +1218,9 @@ public class PlayerController : MonoBehaviour {
         }
         
         // SetPlayerState(PlayerState.Frozen);
+        // PlayAnimation("ReceiveAbility");
         SpawnVfxEffect(healVfx);
         SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
-        PlayAnimation("ReceiveAbility");
         
     }
     

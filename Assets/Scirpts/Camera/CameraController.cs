@@ -350,7 +350,7 @@ public class CameraController : MonoBehaviour
     
     private void OnDrawGizmos() { // Draw active bounds
 
-        if (target)
+        if (target && useTargetOffsetBoundaries)
         {
             Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + minVerticalOffset,0), new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset,0), Color.red);
             Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset, 0), new Vector3(target.position.x + maxHorizontalOffset, target.position.y + maxVerticalOffset, 0), Color.red);

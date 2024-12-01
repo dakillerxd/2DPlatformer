@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class RotateEffect : MonoBehaviour
 {
@@ -15,6 +17,7 @@ public class RotateEffect : MonoBehaviour
 
     [Header("Rotation Settings")]
     [SerializeField] private bool enableRotation = false;
+    [SerializeField] private bool resetRotationOnDisable = false;
     [SerializeField] private AxisRotationSettings xRotation = new AxisRotationSettings();
     [SerializeField] private AxisRotationSettings yRotation = new AxisRotationSettings();
     [SerializeField] private AxisRotationSettings zRotation = new AxisRotationSettings();
@@ -44,6 +47,10 @@ public class RotateEffect : MonoBehaviour
         
     }
 
+    private void OnDisable()
+    {
+        if (resetRotationOnDisable) ResetRotation();
+    }
 
 
     private void RotationEffect()
@@ -82,6 +89,14 @@ public class RotateEffect : MonoBehaviour
             return Mathf.Sin(rotationTime) * settings.oscillationAmount;
         }
         return 0f;
+    }
+
+    private void ResetRotation()
+    {
+        transform.rotation = initialRotation;
+        rotationTime = Vector3.zero;
+        continuousRotationAngles = Vector3.zero;
+        
     }
 
 }

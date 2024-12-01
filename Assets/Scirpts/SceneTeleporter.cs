@@ -36,6 +36,7 @@ public class SceneTeleporter : MonoBehaviour
         SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
+        CameraController.Instance?.ShakeCamera(2f, 2f,2,2);
         PlayerController.Instance.PlayAnimation("TeleportIn");
         PlayerController.Instance.SetPlayerState(PlayerState.Frozen);
         

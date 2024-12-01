@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 public enum PlayerState {
@@ -26,7 +27,7 @@ public class PlayerController : MonoBehaviour {
     private string _logText;
     
     [Header("Health")]
-    [SerializeField] private int maxHealth = 2;
+    [SerializeField] public int maxHealth = 2;
     [SerializeField] private bool canTakeFallDamage;
     [ShowIf("canTakeFallDamage")][SerializeField] private int maxFallDamage = 1;[EndIf]
     private int _currentHealth;
@@ -197,6 +198,11 @@ public class PlayerController : MonoBehaviour {
     private bool _dashRequested;
     private bool _runInput;
     private bool _dropDownInput;
+    
+    
+    
+    [Tab("Events")]
+    public UnityEvent onPlayerDeath = new UnityEvent();
 
     
     
@@ -234,7 +240,6 @@ public class PlayerController : MonoBehaviour {
     
     private void FixedUpdate() {
         if (!CanPlay()) { return; }
-
         CollisionChecks();
         HandleGravity();
         HandleMovement();
@@ -841,21 +846,17 @@ public class PlayerController : MonoBehaviour {
        
         
         collision.gameObject.TryGetComponent<Rigidbody2D>(out _movingRigidbody);
-        _onGroundObject = _movingRigidbody; 
+        _onGroundObject = _movingRigidbody != null; 
         
-        collision.gameObject.TryGetComponent<SoftObject>(out _softObject);
-        
-        Spike spike = collision.gameObject.GetComponentInParent<Spike>();
-        if (spike != null)
-        {
-            Vector2 spikeNormal = collision.GetContact(0).normal;
-            Push(spikeNormal * spike.pushForce);
-            DamageHealth(spike.damage, true, collision.gameObject.name);
+        if (collision.gameObject.TryGetComponent<SoftObject>(out SoftObject so)) {
+            // Only update if a valid SoftObject is found
+            _softObject = so;
+        } else {
+            // Optionally, you can add an explicit check to prevent clearing
+            // if (_softObject != null) return;
         }
         
-        
-        
-        
+
         switch (collision.gameObject.tag) {
             case "Enemy":
                 
@@ -895,7 +896,13 @@ public class PlayerController : MonoBehaviour {
                 _movingRigidbodyLastVelocityX = rb.linearVelocityX;
             }
         }
-        _softObject = null;
+        
+        if (other.gameObject.TryGetComponent<SoftObject>(out SoftObject so))
+        {
+            if (_softObject  == so) {
+                _softObject = null;
+            }
+        }
     }
 
     
@@ -910,8 +917,6 @@ public class PlayerController : MonoBehaviour {
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
         } else { RespawnFromSpawnPoint();}
-
-        
     }
     [Button] private void RespawnFromSpawnPoint() {
 
@@ -923,12 +928,18 @@ public class PlayerController : MonoBehaviour {
         SetPlayerState(PlayerState.Frozen);
         Teleport(position, false);
         PlayAnimation("TeleportOut");
+        onPlayerDeath.Invoke();
         
     }
     public void Teleport(Vector2 position, bool keepMomentum) {
         
         CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
         transform.position = position;
+            
+        foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+        {
+            spriteRenderer.color = _defaultColor;
+        }
 
         if (!keepMomentum)
         {
@@ -962,7 +973,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
     
-    private void DamageHealth(int damage, bool setInvincible, string cause = "") {
+    public void DamageHealth(int damage, bool setInvincible, string cause = "") {
         
         if (damage <= 0) return;
         if (_currentHealth > 0 && !isInvincible) {
@@ -972,6 +983,7 @@ public class PlayerController : MonoBehaviour {
             TurnStunLocked();
             _currentHealth -= damage;
             SpawnVfxEffect(hurtVfx);
+            PlayAnimation("Hurt");
             SoundManager.Instance.PlaySoundFX("Player Hurt");
             if (_currentHealth == 1 && _currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
             _logText = "Damaged by: " + cause;
@@ -1066,7 +1078,7 @@ public class PlayerController : MonoBehaviour {
     
     
     
-    private void Push(Vector2 pushForce) {
+    public void Push(Vector2 pushForce) {
         
         if (_currentHealth > 0 && !isInvincible) {
             
@@ -1184,12 +1196,6 @@ public class PlayerController : MonoBehaviour {
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
                 CameraController.Instance.StopCameraShake();
                 PlayVfxEffect(spawnVfx, true);
-                
-                foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-                {
-                    spriteRenderer.color = _defaultColor;
-                }
-                
                 break;
             case PlayerState.Frozen:
                 rigidBody.simulated = false;

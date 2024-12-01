@@ -8,6 +8,7 @@ public class WaypointMovement : MonoBehaviour {
     
     [Header("Settings")]
     [SerializeField] private bool loop = true;
+    [SerializeField] private bool resetPositionOnPlayerDeath;
     [SerializeField, Min(0)] private float maxSpeed = 2f;
     [SerializeField, Range(0, 100)] private float accelerationPercent = 100f;
     [SerializeField, Range(0, 100)] private float decelerationPercent = 100f;
@@ -26,13 +27,40 @@ public class WaypointMovement : MonoBehaviour {
         
         if (!objectRigidBody) { objectRigidBody = GetComponentInChildren<Rigidbody2D>(); } // Find the rigidbody
         if (waypoints.Count == 0) { AddWaypoint(); } // Add a waypoint if there is non
-        objectRigidBody.transform.position = waypoints[0].transform.position; // Move to first waypoint
+        ResetPosition(); // Move to first waypoint
+
+        if (resetPositionOnPlayerDeath) {
+            PlayerController.Instance?.onPlayerDeath.AddListener(OnPlayerDeath);
+        }
+
     }
+    
+
 
     private void FixedUpdate() {
         MoveBetweenWaypoints();
     }
+    
+    private void OnDestroy()
+    {
+        if (resetPositionOnPlayerDeath)
+        {
+            PlayerController.Instance?.onPlayerDeath.RemoveListener(OnPlayerDeath); 
+        }
+    }
+    
+    private void OnPlayerDeath() {
+        ResetPosition();
+    }
 
+    [Button] private void ResetPosition()
+    {
+        objectRigidBody.transform.position = waypoints[0].transform.position; 
+        currentWaypointIndex = 0;
+        waypointWaitTimer = waypointWaitTime;
+        objectRigidBody.linearVelocity = Vector2.zero;
+        
+    }
     
     [Button] private void AddWaypoint() {
         
@@ -99,7 +127,7 @@ public class WaypointMovement : MonoBehaviour {
         // Apply acceleration or deceleration based on percentages
         float currentRate = distanceToTarget < decelerationRadius ? 
             decelerationPercent / 100f * 15f : // Base deceleration rate of 15
-            accelerationPercent / 100f * 15f;  // Base acceleration rate of 10
+            accelerationPercent / 100f * 15f;  // Base acceleration rate of 15
 
         objectRigidBody.linearVelocity = Vector2.Lerp(
             objectRigidBody.linearVelocity, 

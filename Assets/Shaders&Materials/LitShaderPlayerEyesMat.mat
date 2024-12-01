@@ -45,10 +45,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Glow_Amont: 1
+    - _Glow_Amont: 0.4
     - _Saturation: 1
     m_Colors:
-    - _HDR: {r: 2, g: 2, b: 2, a: 1}
+    - _HDR: {r: 2.1185474, g: 2.1185474, b: 2.1185474, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &1422658844139498978

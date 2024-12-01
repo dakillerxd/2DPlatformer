@@ -17,6 +17,9 @@ public class Checkpoint : MonoBehaviour
     [SerializeField] private SpriteRenderer[] spriteRenderers;
 
 
+    private void Start() {
+        SeCheckpointColor(disabledColor);
+    }
 
     private void OnTriggerEnter2D(Collider2D collision) {
 

@@ -78,7 +78,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1440822894616191196, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_Intensity
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1653201595221404609, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b

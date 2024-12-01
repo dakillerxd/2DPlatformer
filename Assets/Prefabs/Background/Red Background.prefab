@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.b
-      value: 0.65198493
+      value: 0.5838393
       objectReference: {fileID: 0}
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.g
-      value: 0.5471698
+      value: 0.46226418
       objectReference: {fileID: 0}
     - target: {fileID: 490949551573935645, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Color.r
@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4947297197838703049, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Name
-      value: Background Variant
+      value: Red Background
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

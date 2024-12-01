@@ -43,11 +43,11 @@ public class CollectibleItem : MonoBehaviour
         if (_collected) return;
         if (!collision.CompareTag("Player")) return;
         
-        SetCollectibleState(true);
-        CameraController.Instance.ShakeCamera(3f, 5f,2,2);
+        CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
         SoundManager.Instance?.PlaySoundFX("Player Receive Collectible");
         GameManager.Instance?.CollectCollectible(SceneManager.GetActiveScene().name);
-        // Destroy(gameObject);
+        SetCollectibleState(true);
+        
     }
 
     
@@ -63,6 +63,8 @@ public class CollectibleItem : MonoBehaviour
         if (titleText) { titleText.gameObject.SetActive(!_collected); }
         
         if (collectibleEffect) { collectibleEffect.SetActive(!_collected); }
+        
+        gameObject.SetActive(!_collected);
         
     }
 }

@@ -29,7 +29,7 @@ public class PlayerAbilityItem : MonoBehaviour
         {
             _triggered = true;
             PlayerController.Instance.ReceiveAbility(ability);
-            CameraController.Instance.ShakeCamera(3f, 5f,2,2);
+            CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
             foreach (var e in eventsAfterTrigger)
             {
                 e.Invoke();

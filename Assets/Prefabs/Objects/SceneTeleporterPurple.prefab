@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1440822894616191196, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_Color.b
-      value: 0.88235295
+      value: 0.57019967
       objectReference: {fileID: 0}
     - target: {fileID: 1440822894616191196, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_Color.g
@@ -66,7 +66,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1440822894616191196, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_Color.r
-      value: 1
+      value: 0.6462264
+      objectReference: {fileID: 0}
+    - target: {fileID: 1440822894616191196, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
+      propertyPath: m_Intensity
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1653201595221404609, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -82,7 +86,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4768939878819942212, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_Name
-      value: SceneTeleporter Variant
+      value: SceneTeleporterPurple
       objectReference: {fileID: 0}
     - target: {fileID: 5634426969270299325, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b

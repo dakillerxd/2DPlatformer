@@ -26,6 +26,8 @@ public class HoverEffect : MonoBehaviour
         Hover();
         
     }
+    
+    
 
     private void Hover()
     {

@@ -45,7 +45,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Glow_Amont: 1
+    - _Glow_Amont: 0
     - _Saturation: 1
     m_Colors:
     - _HDR: {r: 0, g: 0.0074739372, b: 1.498039, a: 1}

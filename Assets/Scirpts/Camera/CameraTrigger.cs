@@ -2,6 +2,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VInspector;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -14,6 +15,16 @@ public class CameraTrigger : MonoBehaviour
     [SerializeField] private float boundaryMaxX;
     [SerializeField] private float boundaryMinY;
     [SerializeField] private float boundaryMaxY;
+    [EndIf] 
+    
+    [Header("Movement")] 
+    [SerializeField] private bool setCameraStateOnEnter;
+    [EnableIf(nameof(setCameraStateOnEnter))]
+    [SerializeField] private CameraState cameraStateOnEnter;
+    [EndIf]
+    [SerializeField] private bool setCameraStateOnExit;
+    [EnableIf(nameof(setCameraStateOnExit))]
+    [SerializeField] private CameraState cameraStateOnExit = CameraState.Free;
     [EndIf]
     
     [Header("Offset")]
@@ -25,7 +36,7 @@ public class CameraTrigger : MonoBehaviour
     [Header("Zoom")]
     public bool setCameraZoom;
     [EnableIf(nameof(setCameraZoom))]
-    [SerializeField] [Min(1f)] private float boundaryZoom = 4f;
+    [SerializeField] [Min(3f)] private float boundaryZoom = 4f;
     [EndIf]
     
     [Header("Boundary")]
@@ -53,7 +64,8 @@ public class CameraTrigger : MonoBehaviour
         
         if (setCameraZoom) {CameraController.Instance.SetCameraTargetZoom(GetBoundaryZoom());}
         if (setCameraOffset) {CameraController.Instance.SetTriggerOffset(offset);}
-        if (limitCameraToBoundary) {CameraController.Instance.SetBoundaries(gameObject.GetComponent<CameraTrigger>(), GetBoundaries());}
+        if (limitCameraToBoundary) {CameraController.Instance.SetTriggerBoundaries(gameObject.GetComponent<CameraTrigger>(), GetBoundaries());}
+        if (setCameraStateOnEnter) {CameraController.Instance.SetCameraState(cameraStateOnEnter);}
         
     }
     
@@ -61,9 +73,10 @@ public class CameraTrigger : MonoBehaviour
     {
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
         
-        if (limitCameraToBoundary && resetBoundaryOnExit) {CameraController.Instance.ResetBoundaries();}
+        if (limitCameraToBoundary && resetBoundaryOnExit) {CameraController.Instance.ResetTriggerBoundaries();}
         if (setCameraZoom) {CameraController.Instance.ResetZoom();}
         if (setCameraOffset) {CameraController.Instance.ResetTriggerOffset();}
+        if (setCameraStateOnExit) {CameraController.Instance.SetCameraState(cameraStateOnExit);}
     }
 
     private Vector4 GetBoundaries()
@@ -166,7 +179,6 @@ public class CameraTrigger : MonoBehaviour
             }
 
         }
-
     }
     
 #endif

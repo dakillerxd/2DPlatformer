@@ -2,24 +2,37 @@ using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VInspector;
 using Random = UnityEngine.Random;
+
+
+
+public enum CameraState {
+    Locked,
+    VerticalLocked,
+    HorizontalLocked,
+    Free
+}
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
     public static CameraController Instance { get; private set; }
     
+    [Header("Camera State")]
+    [SerializeField] private CameraState cameraState = CameraState.Free;
     private float _cameraHeight;
     private float _cameraWidth;
 
-    [Header("Follow Speed")]
+    [Header("Movement")] 
     [SerializeField] private float baseVerticalFollowDelay = 0.5f;
     [SerializeField] private float baseHorizontalFollowDelay = 0.5f;
     private float _currentVelocityX;
     private float _currentVelocityY;
-    
+    private Vector3 _smoothVelocity = Vector3.zero;
+    private const float SmoothTime = 0.2f; // move to trigger boundary smoothness
+
+
     [Header("Offset")] 
     [SerializeField] private float baseHorizontalOffset = 1f;
     [SerializeField] private float baseVerticalOffset = 1.5f;
@@ -58,8 +71,8 @@ public class CameraController : MonoBehaviour
     private Vector3 _shakeOffset;
     
     [Header("References")]
-    public Transform target;
     [SerializeField] private CameraTrigger triggerPrefab;
+    public Transform target;
     private Camera _camera;
     private PlayerController _player;
     private CameraTrigger _activeTrigger;
@@ -98,10 +111,29 @@ public class CameraController : MonoBehaviour
         FollowTarget();
         HandleZoom();
         HandleOffsetBoundaries();
-        HandleBoundaries();
+        HandleTriggerBoundaries();
         
     }
 
+#if UNITY_EDITOR 
+    
+    [Button] private void CreateNewTrigger()
+    {
+        if (!triggerPrefab) return;
+        CameraTrigger newTrigger = Instantiate(triggerPrefab, transform.position, Quaternion.identity);
+        UnityEditor.Selection.activeObject = newTrigger.gameObject;
+    }
+    
+#endif
+    
+    
+#region States
+
+    public void SetCameraState(CameraState newState) {
+        cameraState = newState;
+    }
+    
+#endregion
     
     
 #region Target functions
@@ -113,17 +145,33 @@ public class CameraController : MonoBehaviour
     }
 
     private void FollowTarget() {
-        
-        if (!target) return;
-        
+        if (!target || cameraState == CameraState.Locked) return;
+    
         _targetPosition = CalculateTargetPosition();
         _targetStateOffset = CalculateTargetOffset();
         Vector3 targetPos = _targetPosition + _triggerOffset + _targetStateOffset + _shakeOffset;
+        float smoothedX, smoothedY;
         
-        float smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-        float smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-        float smoothedZ = transform.position.z; // Keep Z as is, or smooth it too if needed
-
+        switch (cameraState) {
+            case CameraState.VerticalLocked: // Only allow horizontal movement
+                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedY = transform.position.y;
+                break;
+        
+            case CameraState.HorizontalLocked:  // Only allow vertical movement
+                smoothedX = transform.position.x;
+                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                break;
+        
+            case CameraState.Free: // Full movement
+            default:
+                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                break;
+        }
+    
+        float smoothedZ = transform.position.z; // Keep Z constant
+    
         Vector3 smoothedPosition = new Vector3(smoothedX, smoothedY, smoothedZ);
         transform.position = smoothedPosition;
     }
@@ -133,19 +181,42 @@ public class CameraController : MonoBehaviour
         Vector3 basePosition = new Vector3(target.position.x, target.position.y, transform.position.z);
         return basePosition;
     }
+
     
-
-
+    
 #endregion Target functions
 
 #region Offset
 
-    private void HandleOffsetBoundaries() {
+    private void HandleOffsetBoundaries()
+    {
+        if (!target || !useTargetOffsetBoundaries || cameraState == CameraState.Locked) return;
         
-        if (!target || !useTargetOffsetBoundaries) return;
         Vector3 position = transform.position;
-        position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
-        position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
+        
+        // If an active trigger exists, use its boundaries
+        if (_activeTrigger)
+        {
+            // Clamp the position within both the target offset boundaries and the trigger boundaries
+            position.x = Mathf.Clamp(
+                position.x, 
+                Mathf.Max(target.position.x + minHorizontalOffset, _minXBoundary), 
+                Mathf.Min(target.position.x + maxHorizontalOffset, _maxXBoundary)
+            );
+            
+            position.y = Mathf.Clamp(
+                position.y, 
+                Mathf.Max(target.position.y + minVerticalOffset, _minYBoundary), 
+                Mathf.Min(target.position.y + maxVerticalOffset, _maxYBoundary)
+            );
+        }
+        else
+        {
+            // If no trigger is active, use only the target offset boundaries
+            position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
+            position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
+        }
+        
         transform.position = position;
     }
 
@@ -244,9 +315,9 @@ public class CameraController : MonoBehaviour
     
 #endregion Zoom functions
 
-#region Boundaries functions
+#region Trigger Boundaries functions
 
-    public void SetBoundaries(CameraTrigger triggerObject, Vector4  boundaries) {
+    public void SetTriggerBoundaries(CameraTrigger triggerObject, Vector4  boundaries) {
         
         _activeTrigger = triggerObject;
         _minXBoundary = boundaries.x + (_cameraWidth/2);
@@ -255,7 +326,7 @@ public class CameraController : MonoBehaviour
         _maxYBoundary = boundaries.w - (_cameraHeight/2);;
     }
     
-    public void  ResetBoundaries() {
+    public void  ResetTriggerBoundaries() {
         _activeTrigger = null;
         _minXBoundary = 0;
         _maxXBoundary = 0;
@@ -263,26 +334,26 @@ public class CameraController : MonoBehaviour
         _maxYBoundary = 0;
     }
     
-    private void HandleBoundaries() {
-
+    private void HandleTriggerBoundaries() {
         if (!_activeTrigger) return;
+        
         Vector3 position = transform.position;
-        position.x = Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary);
-        position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
-        transform.position = position;
-    }
+        Vector3 targetPosition = new Vector3(
+            Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary),
+            Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary),
+            position.z
+        );
 
-#if UNITY_EDITOR 
-    
-    [Button] private void CreateNewTrigger()
-    {
-        if (!triggerPrefab) return;
-        CameraTrigger newTrigger = Instantiate(triggerPrefab, transform.position, Quaternion.identity);
-        UnityEditor.Selection.activeObject = newTrigger.gameObject;
+        // Smoothly move towards the clamped position
+        Vector3 smoothedPosition = Vector3.SmoothDamp(
+            position, 
+            targetPosition, 
+            ref _smoothVelocity, SmoothTime
+        );
+
+        transform.position = smoothedPosition;
     }
     
-#endif
-
 #endregion Boundaries functions
     
 #region Shake functions
@@ -350,14 +421,13 @@ public class CameraController : MonoBehaviour
     
     private void OnDrawGizmos() { // Draw active bounds
 
-        if (target && useTargetOffsetBoundaries)
+        if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
         {
             Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + minVerticalOffset,0), new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset,0), Color.red);
             Debug.DrawLine(new Vector3(target.position.x + minHorizontalOffset, target.position.y + maxVerticalOffset, 0), new Vector3(target.position.x + maxHorizontalOffset, target.position.y + maxVerticalOffset, 0), Color.red);
             Debug.DrawLine(new Vector3(target.position.x + maxHorizontalOffset, target.position.y + maxVerticalOffset, 0), new Vector3(target.position.x + maxHorizontalOffset, target.position.y + minVerticalOffset, 0), Color.red);
             Debug.DrawLine(new Vector3(target.position.x + maxHorizontalOffset, target.position.y + minVerticalOffset, 0), new Vector3(target.position.x + minHorizontalOffset, target.position.y + minVerticalOffset, 0), Color.red);
         }
-
         
         
         if (!_activeTrigger) return;

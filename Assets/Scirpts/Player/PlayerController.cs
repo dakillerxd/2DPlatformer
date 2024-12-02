@@ -145,7 +145,10 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] public Collider2D collBody;
     [SerializeField] public Collider2D collFeet;
     [SerializeField] public Animator animator;
+    [SerializeField]  private GameObject normalEye;
+    [SerializeField]  private GameObject googlyEye;
     [SerializeField] private SpriteRenderer[] spriteRenderers;
+
 
     [Header("VFX")]
     [SerializeField] private ParticleSystem hurtVfx;
@@ -201,7 +204,7 @@ public class PlayerController : MonoBehaviour {
     
     
     
-    [Tab("Events")]
+    [Tab("Events")] // ----------------------------------------------------------------------
     public UnityEvent onPlayerDeath = new UnityEvent();
 
     
@@ -222,6 +225,7 @@ public class PlayerController : MonoBehaviour {
         if (lookRightOnStart) {FlipPlayer("Right"); } else { FlipPlayer("Left"); }
         CheckpointManager.Instance.SetSpawnPoint(transform.position);
         UIManager.Instance?.UpdateAbilitiesUI();
+        ToggleGooglyEye();
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         RespawnFromSpawnPoint();
@@ -1228,6 +1232,20 @@ public class PlayerController : MonoBehaviour {
         SpawnVfxEffect(healVfx);
         SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
         
+    }
+
+    private void ToggleGooglyEye()
+    {
+        if (GameManager.Instance.googlyEyesMode)
+        {
+            normalEye.SetActive(false);
+            googlyEye.SetActive(true);
+        }
+        else
+        {
+            normalEye.SetActive(true);
+            googlyEye.SetActive(false);
+        }
     }
     
     #endregion Other functions

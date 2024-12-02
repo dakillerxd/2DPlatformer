@@ -1,6 +1,7 @@
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class CollectiblesMenu : MonoBehaviour
@@ -14,6 +15,8 @@ public class CollectiblesMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI coinsText;
     [SerializeField] private TextMeshProUGUI unlocksHeaderText;
     [SerializeField] private TextMeshProUGUI unlocksText;
+    [FormerlySerializedAs("unlock1")] [SerializeField] private Toggle googlyEyesToggle;
+    
     
 
     private void Start()
@@ -30,10 +33,20 @@ public class CollectiblesMenu : MonoBehaviour
             buttonResetCollectibles.onClick.AddListener(() => GameManager.Instance?.ResetCollectibles());
             buttonResetCollectibles.onClick.AddListener(UpdateCoinText);
             buttonResetCollectibles.onClick.AddListener(UpdateUnlocksText);
+            buttonResetCollectibles.onClick.AddListener(UpdateUnlocks);
         }
 
+        UpdateUnlocks();
         UpdateCoinText();
         UpdateUnlocksText();
+    }
+
+    private void UpdateUnlocks()
+    {
+        if (googlyEyesToggle != null) {
+            googlyEyesToggle.interactable = GameManager.Instance.googlyEyesModeReceived;
+            googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleGooglyEyeMode(value));
+        }
     }
 
 
@@ -41,13 +54,12 @@ public class CollectiblesMenu : MonoBehaviour
     {
         
         if (!unlocksText) return;
-        if (GameManager.Instance.collectibles == null) return;
+        if (GameManager.Instance?.collectibles == null) return;
         
-        int totalCollected = GameManager.Instance.TotalCollectiblesCollected();
         unlocksText.text = 
-            $"2 Coins: {(totalCollected >= 2 ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
-            $"4 Coins: {(totalCollected >= 4 ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n" +
-            $"6 Coins: {(totalCollected >= 6 ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
+            $"{GameManager.Instance.collectiblesForGooglyEyes} Coins: {(GameManager.Instance.googlyEyesModeReceived ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
+            $"{GameManager.Instance.collectiblesForBonusLevel1} Coins: {(GameManager.Instance.bonusLevel1Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n" +
+            $"{GameManager.Instance.collectiblesForBonusLevel2} Coins: {(GameManager.Instance.bonusLevel2Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
     }
     
     private readonly StringBuilder coinStringBuilder = new StringBuilder(256);

@@ -14,6 +14,7 @@ public class Sound
     [Range(0f, 1.1f)] public float reverbZoneMix = 1f;
     public bool loop = false;
     public AudioClip[] clips;
+    public AudioClip[] googlyEyesModeClips;
     [HideInInspector] public AudioSource source;
     
 }
@@ -146,9 +147,12 @@ public class SoundManager : MonoBehaviour
         }
     }
     
-    private IEnumerator PlayDelayed(Sound soundFx, float delay, Transform spawnTransform) {
+    private IEnumerator PlayDelayed(Sound soundFx, float delay, Transform spawnTransform)
+    {
+
         
-        int rand = Random.Range(0, soundFx.clips.Length);
+         int rand = Random.Range(0, GameManager.Instance.googlyEyesMode && soundFx.googlyEyesModeClips.Length > 0 ? soundFx.googlyEyesModeClips.Length : soundFx.clips.Length);
+
         yield return new WaitForSeconds(delay);
         if (spawnTransform) {
                 

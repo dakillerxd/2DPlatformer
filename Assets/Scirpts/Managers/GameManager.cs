@@ -1,6 +1,7 @@
 using UnityEngine;
 using CustomAttribute;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using VInspector;
 
 public enum GameStates {
@@ -23,7 +24,6 @@ public class Collectible
     public SceneField connectedLevel;
     public bool counts = true;
     [CustomAttribute.ReadOnly] public bool collected;
-    
 }
 
 
@@ -35,20 +35,21 @@ public class GameManager : MonoBehaviour
     [Header("Settings")]
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
-    
-    [Header("Debug")]
+    public bool debugMode;
+    public bool googlyEyesMode;
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
-    [SerializeField] public bool showDebugInfo;
-    [CustomAttribute.ReadOnly] public Camera cam;
     
     
-    [Header("Collectibles")]
+    [Tab("Collectibles")] // ----------------------------------------------------------------------
     [SerializeField] public Collectible[] collectibles;
     public bool googlyEyesModeReceived {get ; private set;}
     public bool bonusLevel1Received {get ; private set;}
     public bool bonusLevel2Received {get ; private set;}
+    public int collectiblesForGooglyEyes {get ; private set;} // Set in awake
+    public int collectiblesForBonusLevel1 {get ; private set;} // Set in awake
+    public int collectiblesForBonusLevel2 {get ; private set;} // Set in awake
 
     
     [Tab("References")] // ----------------------------------------------------------------------
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviour
     public SoundManager soundManagerPrefab;
     public UIManager uiManagerPrefab;
     public VFXManager vfxManagerPrefab;
+    private Camera _camera;
     
     private void Awake() {
         
@@ -66,6 +68,10 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        collectiblesForGooglyEyes = 2;
+        collectiblesForBonusLevel1 = 7;
+        collectiblesForBonusLevel2 = 7;
     }
     
     private void Start() {
@@ -92,7 +98,7 @@ public class GameManager : MonoBehaviour
     {
         LoadCollectibles();
         
-        UIManager.Instance.ToggleDebugUI(showDebugInfo);
+        UIManager.Instance.ToggleDebugUI(debugMode);
         UIManager.Instance.UpdateUI();
         
         VFXManager.Instance?.ToggleChromaticAberration(false);
@@ -159,7 +165,7 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    private void SetGameDifficulty(GameDifficulty gameMode) {
+    public void SetGameDifficulty(GameDifficulty gameMode) {
         currentGameDifficulty = gameMode;
 
         switch(gameMode)
@@ -177,6 +183,15 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Invalid Game Mode, Setting Normal");
                 break;
         }
+    }
+    
+    
+    public void ToggleGooglyEyeMode(bool state) {
+        
+        googlyEyesMode = state;
+        // VFXManager.Instance?.ToggleChromaticAberration(state);
+        VFXManager.Instance?.ToggleLensDistortion(state);
+        Debug.Log("Googly Eyes Mode: " + state);
     }
 
     #endregion GameStates
@@ -234,20 +249,9 @@ public class GameManager : MonoBehaviour
             collectible.collected = SaveManager.Instance.LoadBool("Collectible " + collectible.connectedLevel.SceneName);
         }
 
-        if (TotalCollectiblesCollected() > 2)
-        {
-            googlyEyesModeReceived = true;
-        }
-        
-        if (TotalCollectiblesCollected() > 4)
-        {
-           bonusLevel1Received = true;
-        }
-        
-        if (TotalCollectiblesCollected() > 6)
-        {
-            bonusLevel2Received = true;
-        }
+        googlyEyesModeReceived = TotalCollectiblesCollected() >= collectiblesForGooglyEyes;
+        bonusLevel1Received = TotalCollectiblesCollected() >= collectiblesForBonusLevel1;
+        bonusLevel2Received = TotalCollectiblesCollected() >= collectiblesForBonusLevel2;
     }
     
     public void ResetCollectibles() {
@@ -255,6 +259,9 @@ public class GameManager : MonoBehaviour
             collectible.collected = false;
             SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
         }
+        
+        googlyEyesMode = false;
+        LoadCollectibles();
     }
     
     [Button] public void CollectAllCollectibles() {
@@ -271,14 +278,14 @@ public class GameManager : MonoBehaviour
     #region Debugging functions
 
     private void ToggleDebugText() {
-        showDebugInfo = !showDebugInfo;
-        UIManager.Instance.ToggleDebugUI(showDebugInfo);
+        debugMode = !debugMode;
+        UIManager.Instance.ToggleDebugUI(debugMode);
     }
 
     private void UpdateTextInfo() {
         
-        if (!showDebugInfo) return;
-        if (!cam) { cam = Camera.main;}
+        if (!debugMode) return;
+        if (!_camera) { _camera = Camera.main;}
         
         UIManager.Instance.UpdateDebugUI();
     }

@@ -310,7 +310,7 @@ public class UIManager : MonoBehaviour
     
     public void UpdateDebugUI() {
 
-        if (GameManager.Instance.showDebugInfo)
+        if (GameManager.Instance.debugMode)
         {
             if (playerDebugText)
             {

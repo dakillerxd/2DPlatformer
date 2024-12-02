@@ -150,15 +150,23 @@ public class SoundManager : MonoBehaviour
     private IEnumerator PlayDelayed(Sound soundFx, float delay, Transform spawnTransform)
     {
 
-        
-         int rand = Random.Range(0, GameManager.Instance.googlyEyesMode && soundFx.googlyEyesModeClips.Length > 0 ? soundFx.googlyEyesModeClips.Length : soundFx.clips.Length);
+        int rand;
+        AudioClip[] clipsType;
+        if (GameManager.Instance.googlyEyesMode && soundFx.googlyEyesModeClips.Length > 0) {
+            rand = Random.Range(0, soundFx.googlyEyesModeClips.Length);
+            clipsType = soundFx.googlyEyesModeClips;
+        } else {
+            rand = Random.Range(0, soundFx.clips.Length);
+            clipsType = soundFx.clips;
+        }
+         
 
         yield return new WaitForSeconds(delay);
         if (spawnTransform) {
                 
             AudioSource audioSource = Instantiate(soundFXPrefab, spawnTransform.position, Quaternion.identity);
             audioSource.gameObject.name = "Sfx " + soundFx.name;
-            audioSource.clip = soundFx.clips[rand];
+            audioSource.clip = clipsType[rand];
             audioSource.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
             audioSource.panStereo = soundFx.stereoPan;
             audioSource.spatialBlend = soundFx.spatialBlend;
@@ -175,7 +183,7 @@ public class SoundManager : MonoBehaviour
             
         } else {
                 
-            soundFx.source.clip = soundFx.clips[rand];
+            soundFx.source.clip = clipsType[rand];
             soundFx.source.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
             soundFx.source.Play();
         }

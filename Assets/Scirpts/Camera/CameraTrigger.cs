@@ -1,8 +1,5 @@
-
-using System;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEditor;
 using VInspector;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -18,107 +15,99 @@ public class CameraTrigger : MonoBehaviour
     [EndIf] 
     
     [Header("Movement")] 
-    [SerializeField] private bool setCameraStateOnEnter;
-    [EnableIf(nameof(setCameraStateOnEnter))]
-    [SerializeField] private CameraState cameraStateOnEnter;
+    [SerializeField] public bool limitCameraToBoundary;
+    [EnableIf(nameof(limitCameraToBoundary))]
+    [SerializeField] public bool resetBoundaryOnExit = true;
     [EndIf]
-    [SerializeField] private bool setCameraStateOnExit;
+    
+    [SerializeField] public bool setCameraStateOnEnter;
+    [EnableIf(nameof(setCameraStateOnEnter))]
+    [SerializeField] public CameraState cameraStateOnEnter;
+    [EndIf]
+    
+    [SerializeField] public bool setCameraStateOnExit;
     [EnableIf(nameof(setCameraStateOnExit))]
-    [SerializeField] private CameraState cameraStateOnExit = CameraState.Free;
+    [SerializeField] public CameraState cameraStateOnExit = CameraState.Free;
     [EndIf]
     
     [Header("Offset")]
-    public bool setCameraOffset;
+    [SerializeField] public bool setCameraOffset;
     [EnableIf(nameof(setCameraOffset))] 
-    [SerializeField] private Vector3 offset;
+    [SerializeField] public Vector3 offset;
     [EndIf]
     
     [Header("Zoom")]
-    public bool setCameraZoom;
+    [SerializeField] public bool setCameraZoom;
     [EnableIf(nameof(setCameraZoom))]
-    [SerializeField] [Min(3f)] private float boundaryZoom = 4f;
-    [EndIf]
-    
-    [Header("Boundary")]
-    public bool limitCameraToBoundary;
-    [EnableIf(nameof(limitCameraToBoundary))]
-    [SerializeField] private bool resetBoundaryOnExit = true;
+    [SerializeField] [Min(3f)] public float boundaryZoom = 4f;
     [EndIf]
     
     [Header("References")]
-    [SerializeField] private  BoxCollider2D boxCollider2D;
-    
+    [SerializeField] private BoxCollider2D boxCollider2D;
+    [SerializeField] public Transform cameraPosition;
     
     private void Start()
     {
-        if (boxCollider2D) return;
-        
-        boxCollider2D = GetComponent<BoxCollider2D>();
-        boxCollider2D.isTrigger = true;
-        
+        if (!boxCollider2D) {
+            boxCollider2D = GetComponent<BoxCollider2D>();
+            boxCollider2D.isTrigger = true;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
-        
-        if (setCameraZoom) {CameraController.Instance.SetCameraTargetZoom(GetBoundaryZoom());}
-        if (setCameraOffset) {CameraController.Instance.SetTriggerOffset(offset);}
-        if (limitCameraToBoundary) {CameraController.Instance.SetTriggerBoundaries(gameObject.GetComponent<CameraTrigger>(), GetBoundaries());}
-        if (setCameraStateOnEnter) {CameraController.Instance.SetCameraState(cameraStateOnEnter);}
-        
+        CameraController.Instance.AddActiveTrigger(this);
     }
     
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
-        
-        if (limitCameraToBoundary && resetBoundaryOnExit) {CameraController.Instance.ResetTriggerBoundaries();}
-        if (setCameraZoom) {CameraController.Instance.ResetZoom();}
-        if (setCameraOffset) {CameraController.Instance.ResetTriggerOffset();}
-        if (setCameraStateOnExit) {CameraController.Instance.SetCameraState(cameraStateOnExit);}
+        CameraController.Instance.RemoveActiveTrigger(this);
     }
 
-    private Vector4 GetBoundaries()
+    public Vector4 GetBoundaries()
     {
-        if (!limitCameraToBoundary) return Vector4.zero;
-        
         if (useColliderAsBoundary)
         {
-            return  new Vector4(boxCollider2D.bounds.min.x, boxCollider2D.bounds.max.x, boxCollider2D.bounds.min.y, boxCollider2D.bounds.max.y);
+            return new Vector4(
+                boxCollider2D.bounds.min.x,
+                boxCollider2D.bounds.max.x,
+                boxCollider2D.bounds.min.y,
+                boxCollider2D.bounds.max.y
+            );
         }
-        return  new Vector4(boundaryMinX, boundaryMaxX, boundaryMinY, boundaryMaxY);
+    
+        return new Vector4(boundaryMinX, boundaryMaxX, boundaryMinY, boundaryMaxY);
     }
 
-    private float GetBoundaryZoom()
-    {
-        if (!setCameraZoom) return 0;
-            return boundaryZoom;
-    }
-    
-
-    
-    
-    
-    
-#if UNITY_EDITOR
-
+    #region Debug
+    #if UNITY_EDITOR
     private void OnValidate()
     {
         if (useColliderAsBoundary) MatchBoundaryToCollider();
+        
+        if (!boxCollider2D) {
+            boxCollider2D = GetComponent<BoxCollider2D>();
+            boxCollider2D.isTrigger = true;
+        }
     }
     
-    
-
-    [Button] private void MatchColliderToBoundary() 
+    [Button] 
+    private void MatchColliderToBoundary() 
     {
         float height = Mathf.Abs(boundaryMaxY - boundaryMinY);
         float width = Mathf.Abs(boundaryMaxX - boundaryMinX);
         boxCollider2D.size = new Vector2(width, height);
-        transform.position = new Vector3((boundaryMaxX + boundaryMinX) / 2, (boundaryMaxY + boundaryMinY) / 2, 0);
+        transform.position = new Vector3(
+            (boundaryMaxX + boundaryMinX) / 2,
+            (boundaryMaxY + boundaryMinY) / 2,
+            0
+        );
     }
 
-    [Button] private void MatchBoundaryToCollider()
+    [Button] 
+    private void MatchBoundaryToCollider()
     {
         boundaryMinX = boxCollider2D.bounds.min.x;
         boundaryMaxX = boxCollider2D.bounds.max.x;
@@ -126,7 +115,8 @@ public class CameraTrigger : MonoBehaviour
         boundaryMaxY = boxCollider2D.bounds.max.y;
     }
 
-    [Button] private void ResetBoundary()
+    [Button] 
+    private void ResetBoundary()
     {
         boundaryMinX = 0;
         boundaryMaxX = 0;
@@ -134,54 +124,82 @@ public class CameraTrigger : MonoBehaviour
         boundaryMaxY = 0;
     }
 
-    [Button] private void DeleteBoundary()
+    [Button] 
+    private void DeleteBoundary()
     {
         DestroyImmediate(gameObject);
     }
     
-    
-    private void OnDrawGizmos() {
-        
-        if (!boxCollider2D) return;
+    private void OnDrawGizmos() 
+    {
+        if (!boxCollider2D || Application.isPlaying) return;
         if (useColliderAsBoundary) { MatchBoundaryToCollider(); }
         
         Color infoColor = Color.cyan;
         Gizmos.color = infoColor;
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = infoColor;
-        style.fontSize = 10;
-        style.fontStyle = FontStyle.Bold;
-        style.alignment = TextAnchor.UpperCenter;
+        GUIStyle style = new GUIStyle
+        {
+            normal = { textColor = infoColor },
+            fontSize = 10,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.UpperCenter
+        };
         
+        Debug.DrawLine(
+            new Vector3(boundaryMinX, boundaryMinY, 0),
+            new Vector3(boundaryMinX, boundaryMaxY, 0),
+            infoColor
+        );
+        Debug.DrawLine(
+            new Vector3(boundaryMaxX, boundaryMinY, 0),
+            new Vector3(boundaryMaxX, boundaryMaxY, 0),
+            infoColor
+        );
+        Debug.DrawLine(
+            new Vector3(boundaryMinX, boundaryMinY, 0),
+            new Vector3(boundaryMaxX, boundaryMinY, 0),
+            infoColor
+        );
+        Debug.DrawLine(
+            new Vector3(boundaryMinX, boundaryMaxY, 0),
+            new Vector3(boundaryMaxX, boundaryMaxY, 0),
+            infoColor
+        );
         
-        Debug.DrawLine(new Vector3(boundaryMinX, boundaryMinY, 0), new Vector3(boundaryMinX, boundaryMaxY, 0), infoColor); // Left line
-        Debug.DrawLine(new Vector3(boundaryMaxX, boundaryMinY, 0), new Vector3(boundaryMaxX, boundaryMaxY, 0), infoColor); // Right line
-        Debug.DrawLine(new Vector3(boundaryMinX, boundaryMinY, 0), new Vector3(boundaryMaxX, boundaryMinY, 0), infoColor); // Bottom line
-        Debug.DrawLine(new Vector3(boundaryMinX, boundaryMaxY, 0), new Vector3(boundaryMaxX, boundaryMaxY, 0), infoColor); // Top line
-        
-        // Draw collider info
         if (useColliderAsBoundary)
         {
-            Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 1, 0), "Camera Trigger&Boundary", style);
+            Handles.Label(
+                boxCollider2D.bounds.center + new Vector3(0, 1, 0),
+                "Camera Trigger",
+                style
+            );
         }
         else
         {
-            // Draw collider info
-            Handles.Label(boxCollider2D.bounds.center + new Vector3(0, 2, 0), "Camera Trigger", style);
-            Debug.DrawLine(boxCollider2D.bounds.center, new Vector3((boundaryMaxX + boundaryMinX) / 2, (boundaryMaxY + boundaryMinY) / 2, 0), infoColor);
+            Handles.Label(
+                boxCollider2D.bounds.center + new Vector3(0, 2, 0),
+                "Camera Trigger",
+                style
+            );
             
+            Vector3 boundaryCenter = new Vector3(
+                (boundaryMaxX + boundaryMinX) / 2,
+                (boundaryMaxY + boundaryMinY) / 2,
+                0
+            );
+            Debug.DrawLine(boxCollider2D.bounds.center, boundaryCenter, infoColor);
             
-            // Draw boundary info
             if (boundaryMinX != 0 || boundaryMaxX != 0 || boundaryMinY != 0 || boundaryMaxY != 0)
             {
-                Handles.Label(new Vector3((boundaryMaxX + boundaryMinX) / 2, (boundaryMaxY + boundaryMinY) / 2 + 1, 0), "Camera Boundary", style);
-                Gizmos.DrawSphere(new Vector3((boundaryMaxX + boundaryMinX) / 2, (boundaryMaxY + boundaryMinY) / 2, 0), 0.3f);
+                Handles.Label(
+                    boundaryCenter + new Vector3(0, 1, 0),
+                    "Camera Boundary",
+                    style
+                );
+                Gizmos.DrawSphere(boundaryCenter, 0.3f);
             }
-
         }
     }
-    
-#endif
-
-
+    #endif
+    #endregion
 }

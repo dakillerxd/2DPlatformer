@@ -53,19 +53,15 @@ public class InfoTrigger : MonoBehaviour
             if (useDelay && fadeInDelay > 0f)
             {
                 _fadeCoroutine = StartCoroutine(StartFadeWithDelay(fadeInDelay));
-                Debug.Log("StartFadeWithDelay coroutine started");
             }
             else
             {
                 _fadeCoroutine = StartCoroutine(FadeText(true, fadeInTime));
-                Debug.Log("First entry FadeText started without delay");
             }
         }
-        // Handle re-entry
         else
         {
             _fadeCoroutine = StartCoroutine(FadeText(true, fadeInTime));
-            Debug.Log("Re-entry FadeText started");
         }
     }
 

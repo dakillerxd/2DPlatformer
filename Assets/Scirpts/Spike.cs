@@ -9,7 +9,6 @@ public class Spike : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Spike Damage: " + damage);
         if (!collision.gameObject.CompareTag("Player")) return;
         
         Vector2 spikeNormal = collision.GetContact(0).normal;

@@ -44,6 +44,7 @@ public class CollectiblesMenu : MonoBehaviour
     private void UpdateUnlocks()
     {
         if (googlyEyesToggle != null) {
+            googlyEyesToggle.isOn = GameManager.Instance.googlyEyesMode;
             googlyEyesToggle.interactable = GameManager.Instance.googlyEyesModeReceived;
             googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleGooglyEyeMode(value));
         }

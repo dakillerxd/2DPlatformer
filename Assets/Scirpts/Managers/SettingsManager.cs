@@ -63,25 +63,27 @@ public class SettingsManager : MonoBehaviour
     public void SetScreenMode(ScreenModes modes)
     {
         FullScreenMode unityScreenMode;
+        Resolution[] resolutions = Screen.resolutions;
+        Resolution highestResolution = resolutions[resolutions.Length - 1];
+    
         switch (modes)
         {
             case ScreenModes.FullScreen:
                 unityScreenMode = FullScreenMode.ExclusiveFullScreen;
+                Screen.SetResolution(highestResolution.width, highestResolution.height, unityScreenMode);
                 break;
             case ScreenModes.Borderless:
                 unityScreenMode = FullScreenMode.FullScreenWindow;
+                Screen.SetResolution(highestResolution.width, highestResolution.height, unityScreenMode);
                 break;
             case ScreenModes.Windowed:
                 unityScreenMode = FullScreenMode.Windowed;
-                break;
-            default:
-                unityScreenMode = FullScreenMode.FullScreenWindow;
+                Resolution currentResolution = Screen.currentResolution;
+                Screen.SetResolution(currentResolution.width, currentResolution.height, unityScreenMode);
                 break;
         }
 
-        Resolution currentResolution = Screen.currentResolution;
         screenMode = modes;
-        Screen.SetResolution(currentResolution.width, currentResolution.height, unityScreenMode);
         SaveManager.Instance.SaveInt("ScreenModes", (int)modes);
     }
 

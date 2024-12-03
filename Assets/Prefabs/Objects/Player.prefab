@@ -565,13 +565,13 @@ MonoBehaviour:
   collBody: {fileID: 6793365586128216939}
   collFeet: {fileID: 8767898529786398378}
   animator: {fileID: 631767106991630361}
+  normalEye: {fileID: 4819790430579151037}
+  googlyEye: {fileID: 136033198686825285}
   spriteRenderers:
   - {fileID: 4743390106982236867}
   - {fileID: 6138145497957891696}
   - {fileID: 322137302083228050}
   - {fileID: 5029860559335663396}
-  normalEye: {fileID: 4819790430579151037}
-  googlyEye: {fileID: 136033198686825285}
   hurtVfx: {fileID: 5060159489429807464, guid: 2fe82b81a05eb4c499f6106eab7c6bcc, type: 3}
   jumpVfx: {fileID: 0}
   airJumpVfx: {fileID: 5789889679916270293}

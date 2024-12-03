@@ -847,17 +847,21 @@ public class PlayerController : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
         
         if (collision.contactCount == 0) return;
-       
-        
-        collision.gameObject.TryGetComponent<Rigidbody2D>(out _movingRigidbody);
-        _onGroundObject = _movingRigidbody != null; 
+
+
+        if (collision.gameObject.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb)) {
+
+            if (rb.bodyType != RigidbodyType2D.Static)
+            {
+                _movingRigidbody = rb;
+                _onGroundObject = _movingRigidbody != null;
+            }
+        }
+
+         
         
         if (collision.gameObject.TryGetComponent<SoftObject>(out SoftObject so)) {
-            // Only update if a valid SoftObject is found
             _softObject = so;
-        } else {
-            // Optionally, you can add an explicit check to prevent clearing
-            // if (_softObject != null) return;
         }
         
 

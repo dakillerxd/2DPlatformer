@@ -40,6 +40,7 @@ public class CameraTrigger : MonoBehaviour
     [SerializeField] public bool setCameraZoom;
     [EnableIf(nameof(setCameraZoom))]
     [SerializeField] [Min(3f)] public float boundaryZoom = 4f;
+    public bool resetZoomOnExit = true; 
     [EndIf]
     
     [Header("References")]

@@ -109,40 +109,72 @@ public class CameraController : MonoBehaviour
     public void RemoveActiveTrigger(CameraTrigger trigger)
     {
         if (!trigger) return;
-        
+    
         if (_activeTriggers.Contains(trigger))
         {
-            ResetTriggerEffects(trigger);
             _activeTriggers.Remove(trigger);
-            
+        
+            // Reset offset first
+            _targetStateOffset = Vector3.zero;
+        
+            // Handle remaining triggers
             if (_activeTriggers.Count > 0)
             {
+                // Apply effects from the most recent trigger
                 ApplyTriggerEffects(_activeTriggers[_activeTriggers.Count - 1]);
+            }
+            else
+            {
+                // No triggers left, reset everything
+                ResetTriggerEffects(trigger);
             }
         }
     }
 
     private void HandleActiveTriggers()
     {
+        // Reset offset at the start
+        _targetStateOffset = Vector3.zero;
+    
         if (_activeTriggers.Count == 0) return;
 
+        // Get the most recent trigger for state and zoom settings
         CameraTrigger currentTrigger = _activeTriggers[_activeTriggers.Count - 1];
-        
+    
+        // Handle camera state from most recent trigger
         if (currentTrigger.setCameraStateOnEnter)
         {
             cameraState = currentTrigger.cameraStateOnEnter;
         }
 
-        if (currentTrigger.setCameraZoom)
+        // Handle zoom from triggers
+        bool zoomSet = false;
+        for (int i = _activeTriggers.Count - 1; i >= 0; i--)
         {
-            _currentZoom = currentTrigger.boundaryZoom;
+            if (_activeTriggers[i].setCameraZoom && !zoomSet)
+            {
+                _currentZoom = _activeTriggers[i].boundaryZoom;
+                zoomSet = true;
+                break;
+            }
         }
 
-        if (currentTrigger.setCameraOffset)
+        // If no trigger sets zoom, ensure we're at default
+        if (!zoomSet)
         {
-            _targetStateOffset = currentTrigger.offset;
+            _currentZoom = defaultZoom;
         }
 
+        // Accumulate offsets from all active triggers
+        foreach (var trigger in _activeTriggers)
+        {
+            if (trigger.setCameraOffset)
+            {
+                _targetStateOffset += trigger.offset;
+            }
+        }
+
+        // Handle boundaries from the most recent trigger
         if (currentTrigger.limitCameraToBoundary)
         {
             Vector4 boundaries = currentTrigger.GetBoundaries();
@@ -168,16 +200,13 @@ public class CameraController : MonoBehaviour
         {
             cameraState = trigger.cameraStateOnEnter;
         }
-        
+    
         if (trigger.setCameraZoom)
         {
             _currentZoom = trigger.boundaryZoom;
         }
         
-        if (trigger.setCameraOffset)
-        {
-            _targetStateOffset = trigger.offset;
-        }
+        HandleActiveTriggers();
     }
 
     private void ResetTriggerEffects(CameraTrigger trigger)
@@ -187,20 +216,25 @@ public class CameraController : MonoBehaviour
             _lastStateChangeTime = Time.time;
             cameraState = trigger.cameraStateOnExit;
         }
-    
-        if (trigger.setCameraZoom)
+
+        // Only keep the current zoom if the trigger specifically wants to
+        bool shouldKeepZoom = trigger.setCameraZoom && !trigger.resetZoomOnExit; // Add this flag to CameraTrigger
+        if (!shouldKeepZoom)
         {
             _currentZoom = defaultZoom;
         }
-    
-        if (trigger.setCameraOffset)
-        {
-            _targetStateOffset = Vector3.zero;
-        }
-    
+
+        _targetStateOffset = Vector3.zero;
+
         if (trigger.limitCameraToBoundary && trigger.resetBoundaryOnExit)
         {
             ResetTriggerBoundaries();
+        }
+
+        // If there are any remaining triggers, recalculate their effects
+        if (_activeTriggers.Count > 0)
+        {
+            HandleActiveTriggers();
         }
     }
 
@@ -220,54 +254,54 @@ public class CameraController : MonoBehaviour
     }
 #endregion
     
-#region Target functions
+#region Target
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
     }
 
-    private void FollowTarget() {
-            if (!target) return;
+private void FollowTarget() {
+    if (!target) return;
 
-            Vector3 dynamicOffset = CalculateTargetOffset();
-            _targetPosition = CalculateTargetPosition();
-            Vector3 targetPos = _targetPosition + _targetStateOffset + dynamicOffset + _shakeOffset;
-            float smoothedX = transform.position.x;
-            float smoothedY = transform.position.y;
+    Vector3 dynamicOffset = CalculateTargetOffset();
+    _targetPosition = CalculateTargetPosition();
+    Vector3 targetPos = _targetPosition + dynamicOffset + _shakeOffset;
+    float smoothedX = transform.position.x;
+    float smoothedY = transform.position.y;
 
-            // Handle different camera states
-            switch (cameraState) {
-                case CameraState.Locked:
-                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                        Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
-                        smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                        smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    }
-                    break;
-
-                case CameraState.VerticalLocked:
-                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                        smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    }
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    break;
-
-                case CameraState.HorizontalLocked:
-                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                        smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    }
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    break;
-
-                case CameraState.Free:
-                default:
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    break;
+    // Handle different camera states
+    switch (cameraState) {
+        case CameraState.Locked:
+            if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
+                smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
             }
-            
-            transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
+            break;
+
+        case CameraState.VerticalLocked:
+            if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            }
+            smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            break;
+
+        case CameraState.HorizontalLocked:
+            if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            }
+            smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            break;
+
+        case CameraState.Free:
+        default:
+            smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+            break;
     }
+    
+    transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
+}
     
     private Vector3 CalculateTargetPosition() {
         Vector3 basePosition = new Vector3(target.position.x, target.position.y, transform.position.z);
@@ -459,29 +493,46 @@ private void HandleOffsetBoundaries()
     public void UpdateDebugText(TextMeshProUGUI textObject) {
         _debugStringBuilder.Clear();
         
-        _debugStringBuilder.AppendFormat("Camera:\n");
-        _debugStringBuilder.AppendFormat("\nTarget: {0}\n", target.name);
-        _debugStringBuilder.AppendFormat("Offset: ({0:0.0}, {1:0.0})\n", _targetStateOffset.x, _targetStateOffset.y);
-        _debugStringBuilder.AppendFormat("Zoom: {0:0.0}, {1:0.0}\n", _currentZoom, _camera.orthographicSize);
-        _debugStringBuilder.AppendFormat("Shake: {0} ({1:0.0},{2:0.0})\n", _isShaking, _shakeOffset.x, _shakeOffset.y);
+        // Basic Camera Info
+        _debugStringBuilder.AppendFormat("Camera State: {0}\n", cameraState);
+        _debugStringBuilder.AppendFormat("Target: {0}\n", target ? target.name : "None");
         
-        if (_activeTriggers.Count > 0) 
-        {
+        // Position and Movement
+        _debugStringBuilder.AppendFormat("Position: ({0:0.0}, {1:0.0})\n", transform.position.x, transform.position.y);
+        _debugStringBuilder.AppendFormat("Dynamic Offset: ({0:0.0}, {1:0.0})\n", 
+            target ? CalculateTargetOffset().x : 0, 
+            target ? CalculateTargetOffset().y : 0);
+        _debugStringBuilder.AppendFormat("Trigger Offset: ({0:0.0}, {1:0.0})\n", _targetStateOffset.x, _targetStateOffset.y);
+        
+        // Zoom Info
+        _debugStringBuilder.AppendFormat("Zoom: Current {0:0.0} / Target {1:0.0}\n", _camera.orthographicSize, _currentZoom);
+        
+        // Boundaries
+        if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0)) {
+            _debugStringBuilder.AppendFormat("\nBoundaries:\n");
+            _debugStringBuilder.AppendFormat("X: {0:0.0} to {1:0.0}\n", _minXBoundary, _maxXBoundary);
+            _debugStringBuilder.AppendFormat("Y: {0:0.0} to {1:0.0}\n", _minYBoundary, _maxYBoundary);
+        }
+        
+        // Shake Effect
+        if (_isShaking) {
+            _debugStringBuilder.AppendFormat("\nShake Active: ({0:0.0}, {1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
+        }
+        
+        // Active Triggers
+        if (_activeTriggers.Count > 0) {
             _debugStringBuilder.AppendFormat("\nActive Triggers ({0}):\n", _activeTriggers.Count);
-            for (int i = 0; i < _activeTriggers.Count; i++)
-            {
-                _debugStringBuilder.AppendFormat("{0}. {1}\n", i + 1, _activeTriggers[i].name);
-            }
-            
-            CameraTrigger currentTrigger = _activeTriggers[_activeTriggers.Count - 1];
-            if (currentTrigger.limitCameraToBoundary)
-            {
-                _debugStringBuilder.AppendFormat("Current Boundaries: {0:0.0}/{1:0.0}, {2:0.0}/{3:0.0}", 
-                    _minXBoundary, _maxXBoundary, _minYBoundary, _maxYBoundary);
+            for (int i = 0; i < _activeTriggers.Count; i++) {
+                var trigger = _activeTriggers[i];
+                _debugStringBuilder.AppendFormat("{0}. {1} [{2}]{3}\n", 
+                    i + 1, 
+                    trigger.name,
+                    trigger.setCameraStateOnEnter ? trigger.cameraStateOnEnter.ToString() : "No State",
+                    trigger.limitCameraToBoundary ? " (Bounded)" : "");
             }
         }
-                
-        textObject.text = _debugStringBuilder.ToString(); 
+        
+        textObject.text = _debugStringBuilder.ToString();
     }
     
 #if UNITY_EDITOR

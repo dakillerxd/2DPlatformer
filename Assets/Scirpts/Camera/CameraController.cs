@@ -68,6 +68,7 @@ public class CameraController : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private CameraTrigger triggerPrefab;
+    private float _lastStateChangeTime;
     public Transform target;
     private Camera _camera;
     private PlayerController _player;
@@ -183,19 +184,20 @@ public class CameraController : MonoBehaviour
     {
         if (trigger.setCameraStateOnExit)
         {
+            _lastStateChangeTime = Time.time;
             cameraState = trigger.cameraStateOnExit;
         }
-        
+    
         if (trigger.setCameraZoom)
         {
             _currentZoom = defaultZoom;
         }
-        
+    
         if (trigger.setCameraOffset)
         {
             _targetStateOffset = Vector3.zero;
         }
-        
+    
         if (trigger.limitCameraToBoundary && trigger.resetBoundaryOnExit)
         {
             ResetTriggerBoundaries();
@@ -225,49 +227,46 @@ public class CameraController : MonoBehaviour
     }
 
     private void FollowTarget() {
-        if (!target) return;
+            if (!target) return;
 
-        Vector3 dynamicOffset = CalculateTargetOffset();
-        _targetPosition = CalculateTargetPosition();
-        Vector3 targetPos = _targetPosition + _targetStateOffset + dynamicOffset + _shakeOffset;
-        float smoothedX, smoothedY;
+            Vector3 dynamicOffset = CalculateTargetOffset();
+            _targetPosition = CalculateTargetPosition();
+            Vector3 targetPos = _targetPosition + _targetStateOffset + dynamicOffset + _shakeOffset;
+            float smoothedX = transform.position.x;
+            float smoothedY = transform.position.y;
 
-        // Handle different camera states
-        switch (cameraState) {
-            case CameraState.Locked:
-                if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
-                }
-                return;
+            // Handle different camera states
+            switch (cameraState) {
+                case CameraState.Locked:
+                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                        Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
+                        smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                        smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    }
+                    break;
 
-            case CameraState.VerticalLocked:
-                if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    transform.position = new Vector3(transform.position.x, smoothedY, transform.position.z);
-                }
-                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                transform.position = new Vector3(smoothedX, transform.position.y, transform.position.z);
-                return;
+                case CameraState.VerticalLocked:
+                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                        smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    }
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    break;
 
-            case CameraState.HorizontalLocked:
-                if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    transform.position = new Vector3(smoothedX, transform.position.y, transform.position.z);
-                }
-                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                transform.position = new Vector3(transform.position.x, smoothedY, transform.position.z);
-                return;
+                case CameraState.HorizontalLocked:
+                    if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
+                        smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    }
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    break;
 
-            case CameraState.Free:
-            default:
-                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
-                break;
-        }
+                case CameraState.Free:
+                default:
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    break;
+            }
+            
+            transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
     }
     
     private Vector3 CalculateTargetPosition() {
@@ -283,6 +282,10 @@ private void HandleOffsetBoundaries()
 {
     if (!target || !useTargetOffsetBoundaries || cameraState == CameraState.Locked) return;
     
+    if (Time.time < _lastStateChangeTime + 2f)
+    {
+        return;
+    }
     Vector3 position = transform.position;
     
     // Only apply boundary handling if we have active triggers

@@ -1,6 +1,7 @@
 using CustomAttribute;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 
@@ -8,6 +9,7 @@ public class CollectibleItem : MonoBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private string collectibleName;
+    [SerializeField] private UnityEvent[] eventsAfterTrigger;
     
     [Header("References")]
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -46,6 +48,10 @@ public class CollectibleItem : MonoBehaviour
         CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
         SoundManager.Instance?.PlaySoundFX("Player Receive Collectible");
         GameManager.Instance?.CollectCollectible(SceneManager.GetActiveScene().name);
+        foreach (var e in eventsAfterTrigger)
+        {
+            e.Invoke();
+        }
         SetCollectibleState(true);
         
     }

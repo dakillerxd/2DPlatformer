@@ -285,6 +285,7 @@ public class PlayerController : MonoBehaviour {
         if (isRunning != _wasLastRunningState) {
             if (isRunning) { 
                 VFXManager.Instance?.ToggleMotionBlur(true);
+                PlayAnimation("Run");
                 PlayVfxEffect(peakMoveSpeedVfx, false);
                 PlayVfxEffect(groundRunVfx, false);
             } else if (wasRunning) {
@@ -295,6 +296,7 @@ public class PlayerController : MonoBehaviour {
                 VFXManager.Instance?.ToggleMotionBlur(false);
                 StopVfxEffect(groundRunVfx, false);
                 StopVfxEffect(peakMoveSpeedVfx, false);
+                PlayAnimation("StopRunning");
             }
             
             _wasLastRunningState = isRunning;
@@ -943,7 +945,7 @@ public class PlayerController : MonoBehaviour {
         
         CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
         transform.position = position;
-            
+        VFXManager.Instance?.SpawnParticleEffect(spawnVfx, transform, spawnVfx.transform.rotation);
         foreach (SpriteRenderer spriteRenderer in spriteRenderers)
         {
             spriteRenderer.color = _defaultColor;
@@ -1203,7 +1205,6 @@ public class PlayerController : MonoBehaviour {
                 HealToFullHealth();
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
                 CameraController.Instance.StopCameraShake();
-                PlayVfxEffect(spawnVfx, true);
                 break;
             case PlayerState.Frozen:
                 rigidBody.simulated = false;

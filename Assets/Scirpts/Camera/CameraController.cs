@@ -106,30 +106,91 @@ public class CameraController : MonoBehaviour
         _activeTriggers.Add(trigger);
     }
 
-    public void RemoveActiveTrigger(CameraTrigger trigger)
+public void RemoveActiveTrigger(CameraTrigger trigger)
+{
+    if (!trigger) return;
+
+    if (_activeTriggers.Contains(trigger))
     {
-        if (!trigger) return;
-    
-        if (_activeTriggers.Contains(trigger))
+        // Store the previous state before removal
+        CameraState previousState = cameraState;
+        Vector3 previousOffset = _targetStateOffset;
+        float previousZoom = _currentZoom;
+        
+        // Remove the trigger
+        _activeTriggers.Remove(trigger);
+        
+        if (_activeTriggers.Count > 0)
         {
-            _activeTriggers.Remove(trigger);
-        
-            // Reset offset first
-            _targetStateOffset = Vector3.zero;
-        
-            // Handle remaining triggers
-            if (_activeTriggers.Count > 0)
+            // Get the most recent remaining trigger
+            CameraTrigger currentTrigger = _activeTriggers[_activeTriggers.Count - 1];
+            
+            // Only apply new state if the exiting trigger was controlling it
+            if (trigger.setCameraStateOnEnter && previousState == trigger.cameraStateOnEnter)
             {
-                // Apply effects from the most recent trigger
-                ApplyTriggerEffects(_activeTriggers[_activeTriggers.Count - 1]);
+                if (currentTrigger.setCameraStateOnEnter)
+                {
+                    cameraState = currentTrigger.cameraStateOnEnter;
+                }
+                else if (trigger.setCameraStateOnExit)
+                {
+                    cameraState = trigger.cameraStateOnExit;
+                }
             }
-            else
+            
+            // Recalculate offsets from remaining triggers
+            _targetStateOffset = Vector3.zero;
+            foreach (var activeTrigger in _activeTriggers)
             {
-                // No triggers left, reset everything
-                ResetTriggerEffects(trigger);
+                if (activeTrigger.setCameraOffset)
+                {
+                    _targetStateOffset += activeTrigger.offset;
+                }
+            }
+            
+            // Handle zoom transition
+            if (trigger.setCameraZoom)
+            {
+                bool foundNewZoom = false;
+                for (int i = _activeTriggers.Count - 1; i >= 0; i--)
+                {
+                    if (_activeTriggers[i].setCameraZoom)
+                    {
+                        _currentZoom = _activeTriggers[i].boundaryZoom;
+                        foundNewZoom = true;
+                        break;
+                    }
+                }
+                
+                if (!foundNewZoom)
+                {
+                    _currentZoom = defaultZoom;
+                }
+            }
+        }
+        else
+        {
+            // No triggers left, perform full reset
+            if (trigger.setCameraStateOnExit)
+            {
+                _lastStateChangeTime = Time.time;
+                cameraState = trigger.cameraStateOnExit;
+            }
+            
+            if (trigger.setCameraZoom && trigger.resetZoomOnExit)
+            {
+                _currentZoom = defaultZoom;
+            }
+            
+            _targetStateOffset = Vector3.zero;
+            
+            if (trigger.limitCameraToBoundary && trigger.resetBoundaryOnExit)
+            {
+                ResetTriggerBoundaries();
             }
         }
     }
+}
 
     private void HandleActiveTriggers()
     {
@@ -216,9 +277,8 @@ public class CameraController : MonoBehaviour
             _lastStateChangeTime = Time.time;
             cameraState = trigger.cameraStateOnExit;
         }
-
-        // Only keep the current zoom if the trigger specifically wants to
-        bool shouldKeepZoom = trigger.setCameraZoom && !trigger.resetZoomOnExit; // Add this flag to CameraTrigger
+        
+        bool shouldKeepZoom = trigger.setCameraZoom && !trigger.resetZoomOnExit; 
         if (!shouldKeepZoom)
         {
             _currentZoom = defaultZoom;
@@ -230,8 +290,7 @@ public class CameraController : MonoBehaviour
         {
             ResetTriggerBoundaries();
         }
-
-        // If there are any remaining triggers, recalculate their effects
+        
         if (_activeTriggers.Count > 0)
         {
             HandleActiveTriggers();

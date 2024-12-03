@@ -393,7 +393,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5456902685513578049}
   - {fileID: 3656567962269508406}
@@ -579,7 +579,7 @@ MonoBehaviour:
   peakFallSpeedVfx: {fileID: 1538918603325884742}
   groundRunVfx: {fileID: 0}
   deathVfx: {fileID: 5936299839186477038, guid: 7d4c0534cb4d9dc4982b85547abfe92b, type: 3}
-  spawnVfx: {fileID: 0}
+  spawnVfx: {fileID: 8604298408129782361, guid: 6b699eaf95d2b344194a59228e787943, type: 3}
   dashVfx: {fileID: 6133111000707265534}
   bleedVfx: {fileID: 3183420118479420180}
   wallSlideVfx: {fileID: 7742417552954125015}
@@ -1016,7 +1016,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8123881546023184429}
   - {fileID: 3607687199892762826}

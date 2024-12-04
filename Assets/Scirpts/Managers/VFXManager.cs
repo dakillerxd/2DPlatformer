@@ -36,16 +36,47 @@ public class VFXManager : MonoBehaviour
     }
 
 
+#region Animations
+    public void PlayAnimationTrigger(Animator animator , string trigger) {
+        
+        if (!animator) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName(trigger)) return;
+        animator.SetTrigger(trigger);
+    }
+    
+    public void SetAnimationBool(Animator animator, string boolName, bool state) {
+        
+        if (!animator) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName(boolName)) return;
+        animator.SetBool(boolName, state);
+    }
+    
+
+#endregion
+
 #region Particle Effects
 
-    public void SpawnParticleEffect(ParticleSystem effect, Transform position, Quaternion rotation) {
+    public void SpawnParticleEffect(ParticleSystem effect, Vector3 position, Quaternion rotation) {
         if (!effect) return;
-        Instantiate(effect, position.position, rotation);
+        Instantiate(effect, position, rotation);
     }
     
     public void SpawnParticleEffect(ParticleSystem effect, Transform position, Quaternion rotation, Transform parent) {
         if (!effect) return;
         Instantiate(effect, position.position, rotation, parent);
+    }
+    
+    public void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
+        
+        if (!effect) return;
+        if (forcePlay) {effect.Play();} else { if (!effect.isPlaying) { effect.Play(); } }
+    }
+    public void StopVfxEffect(ParticleSystem effect, bool clear) {
+        if (!effect) return;
+        if (!effect.isPlaying) return;
+        
+        if (clear) { effect.Clear(); } 
+        effect.Stop();
     }
 
 #endregion Particle Effects

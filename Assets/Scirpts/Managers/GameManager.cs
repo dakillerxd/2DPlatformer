@@ -108,8 +108,8 @@ public class GameManager : MonoBehaviour
             VFXManager.Instance?.ToggleMotionBlur(true, 0.3f);
         } else {
             VFXManager.Instance?.ToggleMotionBlur(false);
+            
         }
-        
     }
     
     

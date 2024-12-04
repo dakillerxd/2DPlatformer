@@ -16,6 +16,7 @@ public class CollectiblesMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI unlocksHeaderText;
     [SerializeField] private TextMeshProUGUI unlocksText;
     [FormerlySerializedAs("unlock1")] [SerializeField] private Toggle googlyEyesToggle;
+    private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
     
     
 
@@ -63,7 +64,7 @@ public class CollectiblesMenu : MonoBehaviour
             $"{GameManager.Instance.collectiblesForBonusLevel2} Coins: {(GameManager.Instance.bonusLevel2Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
     }
     
-    private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
+    
     private void UpdateCoinText() 
     {
 

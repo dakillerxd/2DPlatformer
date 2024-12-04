@@ -1,16 +1,20 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
+using VInspector;
 
 public class InfoTrigger : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private bool hideTriggerOnStart = true;
-    [SerializeField] private bool useDelay = false;  // New toggle for delay
+    [SerializeField] private bool useDelay; 
     [SerializeField] [Min(0f)] private float fadeInDelay;
     [SerializeField] [Min(0f)] private float fadeInTime = 2f;
     [SerializeField] [Min(0f)] private float fadeOutTime = 3f;
     [SerializeField] private bool fadeOutOnExit = true;
+    [EnableIf(nameof(fadeOutOnExit))]
+    [SerializeField] private bool destroyAfterFadeOut;
+    [EndIf]
 
     private readonly Color _invisibleColor = new Color(1f, 1f, 1f, 0f);
     private Color _startColor;
@@ -123,9 +127,10 @@ public class InfoTrigger : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-
         infoText.color = targetColor;
         _fadeCoroutine = null;
         _isCoroutineRunning = false;
+        if (destroyAfterFadeOut && !fadeIn) Destroy(gameObject);
+        
     }
 }

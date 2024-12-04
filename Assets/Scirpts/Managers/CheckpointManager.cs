@@ -15,6 +15,7 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
 
     [Header("Settings")]
     [SerializeField] public Vector2 playerSpawnPoint;
+    [SerializeField] public SceneTeleporter startTeleporter;
     [SerializeField] public Checkpoint activeCheckpoint;
     [SerializeField] private List<Checkpoint> checkpointList = new List<Checkpoint>();
 
@@ -46,7 +47,13 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         playerSpawnPoint = newSpawnPoint;
         Debug.Log("Set spawn point to: " + playerSpawnPoint);
     }
-    
+
+    public void PlayStartTeleporterAnimation()
+    {
+        if (!startTeleporter) return;
+        
+        VFXManager.Instance?.PlayAnimationTrigger(startTeleporter.animator, "In");
+    }
      
     [Button] private void AddCheckpoint() 
     {
@@ -96,7 +103,7 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         if (activeCheckpoint == checkpoint) DeactivateLastCheckpoint();
     }
 
-    public void DeactivateLastCheckpoint() 
+    private void DeactivateLastCheckpoint() 
     {
         if (!activeCheckpoint) return;
         activeCheckpoint.DeactivateCheckpoint();

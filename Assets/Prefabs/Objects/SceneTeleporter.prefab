@@ -24214,6 +24214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 865939872225815038}
   - component: {fileID: 7433319475137850595}
+  - component: {fileID: 3965280894130747936}
   - component: {fileID: 5675501794804825328}
   - component: {fileID: 6815104843284206713}
   - component: {fileID: 4974211650589412614}
@@ -24298,6 +24299,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &3965280894130747936
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4768939878819942212}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4684c20e5232f5b4d96216ccd1db7b27, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!61 &5675501794804825328
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -24373,6 +24396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableRotation: 1
+  resetRotationOnDisable: 0
   xRotation:
     continuousRotation: 0
     reverseDirection: 0
@@ -24408,6 +24432,7 @@ MonoBehaviour:
   sceneToLoad:
     m_SceneAsset: {fileID: 0}
     m_SceneName: Level1
+  animator: {fileID: 3965280894130747936}
 --- !u!1 &4882779443881044937
 GameObject:
   m_ObjectHideFlags: 0

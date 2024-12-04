@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,9 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI fpsText;
     
     [Tab("UI Gameplay")] // ----------------------------------------------------------------------
+    [Header("Level Title")]
+    [SerializeField] private  TMP_Text levelTitleText;
+    
     [Header("Time")]
     [SerializeField] private TMP_Text[] timerTexts;
     [SerializeField] private  Color timerWarningColor = Color.red;
@@ -164,6 +168,21 @@ public class UIManager : MonoBehaviour
 
         }
 
+    }
+
+    public void StartLevelTitleEffect(float duration, string title) {
+        if (!levelTitleText) return;
+        StartCoroutine(LevelTitleEffect(duration, title));
+    }
+    
+    private IEnumerator LevelTitleEffect(float duration, string title) {
+        
+        if (!levelTitleText) yield break;
+        levelTitleText.CrossFadeAlpha(0, 0, false);
+        levelTitleText.text = title;
+        levelTitleText.CrossFadeAlpha(1, 1, false);
+        yield return new WaitForSeconds(1);
+        levelTitleText.CrossFadeAlpha(0, duration, false);
     }
     
     

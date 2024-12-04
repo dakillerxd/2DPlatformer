@@ -4,7 +4,8 @@ using TMPro;
 using System.Text;
 using System.Collections;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public enum PlayerState {
     Controllable,
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] public int maxHealth = 2;
     [SerializeField] private bool canTakeFallDamage;
     [ShowIf("canTakeFallDamage")][SerializeField] private int maxFallDamage = 1;[EndIf]
+    [SerializeField] [Range(0f, 5f)] private float deathTime;
     private int _currentHealth;
     private int _deaths;
     private float _invincibilityTime;
@@ -142,11 +144,12 @@ public class PlayerController : MonoBehaviour {
     [Tab("References")] // ----------------------------------------------------------------------
     [Header("Components")]
     [SerializeField] public Rigidbody2D rigidBody;
-    [SerializeField] public Collider2D collBody;
-    [SerializeField] public Collider2D collFeet;
+    [SerializeField] private Collider2D collBody;
+    [SerializeField] private Collider2D collFeet;
     [SerializeField] public Animator animator;
-    [SerializeField]  private GameObject normalEye;
-    [SerializeField]  private GameObject googlyEye;
+    [SerializeField] private ShadowCaster2D shadowCaster2D;
+    [SerializeField] private GameObject normalEye;
+    [SerializeField] private GameObject googlyEye;
     [SerializeField] private SpriteRenderer[] spriteRenderers;
 
 
@@ -163,6 +166,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem bleedVfx;
     [SerializeField] private ParticleSystem wallSlideVfx;
     [SerializeField] private ParticleSystem healVfx;
+    [SerializeField] private ParticleSystem landVfx;
     
     [Header("Colors")]
     [SerializeField] private Color hurtColor = Color.red;
@@ -222,9 +226,10 @@ public class PlayerController : MonoBehaviour {
     private void Start()
     {
         isFacingRight = true;
-        if (lookRightOnStart) {FlipPlayer("Right"); } else { FlipPlayer("Left"); }
-        CheckpointManager.Instance.SetSpawnPoint(transform.position);
+        FlipPlayer(lookRightOnStart ? "Right" : "Left");
+        CheckpointManager.Instance?.SetSpawnPoint(transform.position);
         UIManager.Instance?.UpdateAbilitiesUI();
+        UIManager.Instance?.StartLevelTitleEffect(1, SceneManager.GetActiveScene().name);
         ToggleGooglyEye();
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
@@ -275,7 +280,6 @@ public class PlayerController : MonoBehaviour {
         isMoving = Mathf.Abs(_moveSpeed) > movementThreshold;
         
         
-        
         // Handle run
         isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
         if (isRunning) { wasRunning = true; }
@@ -285,18 +289,18 @@ public class PlayerController : MonoBehaviour {
         if (isRunning != _wasLastRunningState) {
             if (isRunning) { 
                 VFXManager.Instance?.ToggleMotionBlur(true);
-                PlayAnimation("Run");
-                PlayVfxEffect(peakMoveSpeedVfx, false);
-                PlayVfxEffect(groundRunVfx, false);
+                PlayAnimationTrigger("Run");
+                VFXManager.Instance?.PlayVfxEffect(peakMoveSpeedVfx, false);
+                VFXManager.Instance?.PlayVfxEffect(groundRunVfx, false);
             } else if (wasRunning) {
                 VFXManager.Instance?.ToggleMotionBlur(true);
-                StopVfxEffect(groundRunVfx, false);
-                StopVfxEffect(peakMoveSpeedVfx, false);
+                VFXManager.Instance?.StopVfxEffect(groundRunVfx, false);
+                VFXManager.Instance?.StopVfxEffect(peakMoveSpeedVfx, false);
             } else {
                 VFXManager.Instance?.ToggleMotionBlur(false);
-                StopVfxEffect(groundRunVfx, false);
-                StopVfxEffect(peakMoveSpeedVfx, false);
-                PlayAnimation("StopRunning");
+                VFXManager.Instance?.StopVfxEffect(groundRunVfx, false);
+                VFXManager.Instance?.StopVfxEffect(peakMoveSpeedVfx, false);
+                PlayAnimationTrigger("StopRunning");
             }
             
             _wasLastRunningState = isRunning;
@@ -370,7 +374,7 @@ public class PlayerController : MonoBehaviour {
 
         if (!_dropDownInput) return;
         rigidBody.linearVelocityY = jumpForce/3;
-        PlayAnimation("DropDown");
+        PlayAnimationTrigger("DropDown");
         _softObject.StartDropDownCooldown();
         _softObject = null;
         
@@ -463,7 +467,7 @@ public class PlayerController : MonoBehaviour {
                 if (_canCoyoteJump && !isGrounded) { _logText = $"Coyote Jumped: {_coyoteJumpTime}";}
                 // Jump
                 ExecuteJump(0, "None");
-                PlayAnimation("Jump");
+                PlayAnimationTrigger("Jump");
                 SoundManager.Instance?.PlaySoundFX("Player Jump");
                 
                 // Reset coyote state
@@ -474,16 +478,16 @@ public class PlayerController : MonoBehaviour {
                 
                 // Jump
                 ExecuteJump(1, jumpDirection);
-                PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimation("AirJump");
+                VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
+                PlayAnimationTrigger("AirJump");
                 SoundManager.Instance?.PlaySoundFX("Player Air Jump");
                 
             } else if (!isGrounded && wallJumpAbility && !(_isTouchingWallOnLeft || _isTouchingWallOnRight) && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump when wall jump ability
                 
                 // Jump
                 ExecuteJump(1, jumpDirection);
-                PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimation("AirJump");
+                VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
+                PlayAnimationTrigger("AirJump");
                 SoundManager.Instance?.PlaySoundFX("Player Air Jump");
             }
         }
@@ -492,7 +496,7 @@ public class PlayerController : MonoBehaviour {
     
     private void ExecuteJump(int jumpCost, string side) {
         
-        StopVfxEffect(peakFallSpeedVfx, true);
+        VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
         
         // Jump
         if (side == "Right") {
@@ -559,10 +563,10 @@ public class PlayerController : MonoBehaviour {
             int dashDirection = isFacingRight ? 1 : -1;
 
             // Play effects
-            PlayVfxEffect(dashVfx, false);
-            StopVfxEffect(wallSlideVfx, true);
-            StopVfxEffect(peakFallSpeedVfx, true);
-            PlayAnimation("Dash");
+            VFXManager.Instance?.PlayVfxEffect(dashVfx, false);
+            VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
+            VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
+            PlayAnimationTrigger("Dash");
             SoundManager.Instance?.PlaySoundFX("Player Dash");
 
             // Dash
@@ -614,8 +618,8 @@ public class PlayerController : MonoBehaviour {
         isWallSliding = !isGrounded && (_isTouchingWallOnLeft || _isTouchingWallOnRight) && rigidBody.linearVelocity.y < 0;
 
         // Play wall slide effect
-        if (isWallSliding) { PlayVfxEffect(wallSlideVfx, false);}
-        else { StopVfxEffect(wallSlideVfx, false); }
+        if (isWallSliding) { VFXManager.Instance?.PlayVfxEffect(wallSlideVfx, false);}
+        else { VFXManager.Instance?.StopVfxEffect(wallSlideVfx, false); }
         
         
         
@@ -688,7 +692,7 @@ public class PlayerController : MonoBehaviour {
     private void ExecuteWallJump(string side) {
         
         // Effects
-        StopVfxEffect(wallSlideVfx, true);
+        VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
         SoundManager.Instance?.PlaySoundFX("Player Jump");
 
         // Jump
@@ -723,7 +727,7 @@ public class PlayerController : MonoBehaviour {
           {
               // On ground
               HandleGroundedGravity();
-              StopVfxEffect(peakFallSpeedVfx, true);
+              VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
           }
     }
     private void HandleAirGravity() {
@@ -743,7 +747,7 @@ public class PlayerController : MonoBehaviour {
         
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
         if (isFastFalling) {
-            CameraController.Instance.ShakeCamera(0.1f, 0.5f * fallSpeed/fastFallBopDiminisher, 1f, 1f);
+            CameraController.Instance?.ShakeCamera(0.1f, 0.5f, 1f, 1f);
             VFXManager.Instance?.ToggleMotionBlur(true);
         }else {
             VFXManager.Instance?.ToggleMotionBlur(false);
@@ -751,7 +755,7 @@ public class PlayerController : MonoBehaviour {
         
         
         atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;
-        if (atMaxFallSpeed) { PlayVfxEffect(peakFallSpeedVfx, false); }
+        if (atMaxFallSpeed) { VFXManager.Instance?.PlayVfxEffect(peakFallSpeedVfx, false); }
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }
@@ -762,16 +766,19 @@ public class PlayerController : MonoBehaviour {
         
         if (isFalling && isGrounded && !isDashing) { // Check if landed
 
-            // PlayAnimation("Land");
-            SoundManager.Instance.PlaySoundFX("Player Land");
+            
+            SoundManager.Instance?.PlaySoundFX("Player Land");
             
             if (isFastFalling) {
-                CameraController.Instance.ShakeCamera(0.2f, 1 * fallSpeed/fastFallBopDiminisher, 1, 1);
+                PlayAnimationTrigger("Land");
+                CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
+                VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
+                VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
             }
             
             if (atMaxFallSpeed) { // Apply fall damage
-                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
                 if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
+                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
             }
             
             atMaxFallSpeed = false;
@@ -851,7 +858,7 @@ public class PlayerController : MonoBehaviour {
         if (collision.contactCount == 0) return;
 
 
-        if (collision.gameObject.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb)) {
+        if (collision.gameObject.TryGetComponent(out Rigidbody2D rb)) {
 
             if (rb.bodyType != RigidbodyType2D.Static)
             {
@@ -862,7 +869,7 @@ public class PlayerController : MonoBehaviour {
 
          
         
-        if (collision.gameObject.TryGetComponent<SoftObject>(out SoftObject so)) {
+        if (collision.gameObject.TryGetComponent(out SoftObject so)) {
             _softObject = so;
         }
         
@@ -899,7 +906,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnCollisionExit2D(Collision2D other) {
 
-        if (other.gameObject.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+        if (other.gameObject.TryGetComponent(out Rigidbody2D rb))
         {
             if (rb == _movingRigidbody) {
                 _onGroundObject = false;
@@ -907,7 +914,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
         
-        if (other.gameObject.TryGetComponent<SoftObject>(out SoftObject so))
+        if (other.gameObject.TryGetComponent(out SoftObject so))
         {
             if (_softObject  == so) {
                 _softObject = null;
@@ -931,13 +938,19 @@ public class PlayerController : MonoBehaviour {
     [Button] private void RespawnFromSpawnPoint() {
 
         _deaths = 0;
-        Respawn(CheckpointManager.Instance.playerSpawnPoint);
+        if (CheckpointManager.Instance.startTeleporter) {
+            Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
+            CheckpointManager.Instance.PlayStartTeleporterAnimation(); 
+        } else {
+            Respawn(CheckpointManager.Instance.playerSpawnPoint);
+        }
+        
     }
     private void Respawn(Vector2 position) {
         
         SetPlayerState(PlayerState.Frozen);
         Teleport(position, false);
-        PlayAnimation("TeleportOut");
+        PlayAnimationTrigger("TeleportOut");
         onPlayerDeath.Invoke();
         
     }
@@ -945,11 +958,9 @@ public class PlayerController : MonoBehaviour {
         
         CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
         transform.position = position;
-        VFXManager.Instance?.SpawnParticleEffect(spawnVfx, transform, spawnVfx.transform.rotation);
-        foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-        {
-            spriteRenderer.color = _defaultColor;
-        }
+        VFXManager.Instance?.SpawnParticleEffect(spawnVfx, transform.position, spawnVfx.transform.rotation);
+        shadowCaster2D.castsShadows = true;
+        SetSpriteColor(_defaultColor);
 
         if (!keepMomentum)
         {
@@ -957,32 +968,41 @@ public class PlayerController : MonoBehaviour {
             isDashing = false;
             wasRunning = false;
             isWallSliding = false;
-            StopVfxEffect(jumpVfx, true);
-            StopVfxEffect(dashVfx, true);
-            StopVfxEffect(wallSlideVfx, true);
-            StopVfxEffect(bleedVfx, true);
-            StopVfxEffect(healVfx, true);
-            StopVfxEffect(hurtVfx, true);
-            StopVfxEffect(deathVfx, true);
+            VFXManager.Instance?.StopVfxEffect(jumpVfx, true);
+            VFXManager.Instance?.StopVfxEffect(dashVfx, true);
+            VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
+            VFXManager.Instance?.StopVfxEffect(bleedVfx, true);
+            VFXManager.Instance?.StopVfxEffect(healVfx, true);
+            VFXManager.Instance?.StopVfxEffect(hurtVfx, true);
+            VFXManager.Instance?.StopVfxEffect(deathVfx, true);
         }
     }
 
-    private void CheckIfDead(string cause = "") {
-
-        if (_currentHealth <= 0) { // Dead
-
-            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-            {
-                spriteRenderer.color = deadColor;
-            }
-            SetPlayerState(PlayerState.Frozen);
-            PlayAnimation("Death");
-            SpawnVfxEffect(deathVfx);
-            SoundManager.Instance?.PlaySoundFX("Player Death");
-            _logText = "Death by: " + cause;
-        }
+    private void CheckIfDead(string cause = "")
+    {
+        if (_currentHealth > 0) return;  // Make sure the player is dead
+        
+        // Set dead state
+        SetPlayerState(PlayerState.Frozen);
+        shadowCaster2D.castsShadows = false;
+        // SetAnimationBool("Death", true);
+        SetSpriteColor(deadColor);
+        VFXManager.Instance?.StopVfxEffect(bleedVfx,true);
+        VFXManager.Instance?.SpawnParticleEffect(deathVfx, transform.position, Quaternion.identity);
+        SoundManager.Instance?.PlaySoundFX("Player Death");
+        StartCoroutine(SetDeadStateFor(deathTime));
+        
+        _logText = "Death by: " + cause;
     }
-    
+
+    private IEnumerator SetDeadStateFor(float duration = 0) {
+
+        yield return new WaitForSeconds(duration);
+        RespawnFromCheckpoint();
+        
+    }
+
+
     public void DamageHealth(int damage, bool setInvincible, string cause = "") {
         
         if (damage <= 0) return;
@@ -992,10 +1012,10 @@ public class PlayerController : MonoBehaviour {
             CameraController.Instance.ShakeCamera(0.2f, 4,3,3);
             TurnStunLocked();
             _currentHealth -= damage;
-            SpawnVfxEffect(hurtVfx);
-            PlayAnimation("Hurt");
+            VFXManager.Instance?.SpawnParticleEffect(hurtVfx, transform.position, Quaternion.identity);
+            PlayAnimationTrigger("Hurt");
             SoundManager.Instance.PlaySoundFX("Player Hurt");
-            if (_currentHealth == 1 && _currentHealth < maxHealth) { PlayVfxEffect(bleedVfx, false); }
+            if (_currentHealth == 1 && _currentHealth < maxHealth) { VFXManager.Instance?.PlayVfxEffect(bleedVfx, false); }
             _logText = "Damaged by: " + cause;
         } 
         CheckIfDead(cause);
@@ -1004,8 +1024,8 @@ public class PlayerController : MonoBehaviour {
 
     public void HealToFullHealth() {
         if (_currentHealth == maxHealth) return;
-        StopVfxEffect(bleedVfx, true);
-        SpawnVfxEffect(healVfx);
+        VFXManager.Instance?.StopVfxEffect(bleedVfx, true);
+        VFXManager.Instance?.SpawnParticleEffect(healVfx, transform.position, Quaternion.identity);
         _currentHealth = maxHealth;
     }
     
@@ -1015,20 +1035,17 @@ public class PlayerController : MonoBehaviour {
     }
     private void TurnVulnerable() {
 
+        if (_currentHealth <= 0) return; // don't set the player back to normal if he died
+        
         isInvincible = false;
         isDashing = false;
-        
-        foreach (SpriteRenderer sr in spriteRenderers) {
-            sr.color = _defaultColor;
-        }
+        SetSpriteColor(_defaultColor);
     }
     private IEnumerator Invisible(float invincibilityDuration) {
         
         isInvincible = true;
         _invincibilityTime = invincibilityDuration;
-        foreach (SpriteRenderer sr in spriteRenderers) {
-            sr.color = invincibilityColor;
-        }
+        SetSpriteColor(invincibilityColor);
 
         while (isInvincible && _invincibilityTime > 0) {
             _invincibilityTime -= Time.deltaTime;
@@ -1142,8 +1159,8 @@ public class PlayerController : MonoBehaviour {
     
         if (isFacingRight && side == "Right" || !isFacingRight && side == "Left") return; // Only flip the player if he is not already facing the wanted direction
 
-        StopVfxEffect(groundRunVfx, true);
-        StopVfxEffect(peakMoveSpeedVfx, true);
+        VFXManager.Instance?.StopVfxEffect(groundRunVfx, true);
+        VFXManager.Instance?.StopVfxEffect(peakMoveSpeedVfx, true);
         wasRunning = false;
         
         if (side == "Left") {
@@ -1166,12 +1183,12 @@ public class PlayerController : MonoBehaviour {
     }
     public void SetPlayerState(PlayerState state) {
         
-        StopVfxEffect(groundRunVfx, true);
-        StopVfxEffect(peakMoveSpeedVfx, true);
-        StopVfxEffect(jumpVfx, true);
-        StopVfxEffect(dashVfx, true);
-        StopVfxEffect(wallSlideVfx, true);
-        StopVfxEffect(peakFallSpeedVfx, true);
+        VFXManager.Instance?.StopVfxEffect(groundRunVfx, true);
+        VFXManager.Instance?.StopVfxEffect(peakMoveSpeedVfx, true);
+        VFXManager.Instance?.StopVfxEffect(jumpVfx, true);
+        VFXManager.Instance?.StopVfxEffect(dashVfx, true);
+        VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
+        VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
         _isTouchingWallOnLeft = false;
         _isTouchingWallOnRight = false;
         _isTouchingGround = false;
@@ -1204,7 +1221,8 @@ public class PlayerController : MonoBehaviour {
                 _stunLockTime = 0f;
                 HealToFullHealth();
                 SoundManager.Instance?.PlaySoundFX("Player Spawn");
-                CameraController.Instance.StopCameraShake();
+                CameraController.Instance?.StopCameraShake();
+                // SetAnimationBool("Death", false);
                 break;
             case PlayerState.Frozen:
                 rigidBody.simulated = false;
@@ -1234,7 +1252,7 @@ public class PlayerController : MonoBehaviour {
         
         // SetPlayerState(PlayerState.Frozen);
         // PlayAnimation("ReceiveAbility");
-        SpawnVfxEffect(healVfx);
+        VFXManager.Instance?.SpawnParticleEffect(healVfx, transform.position, Quaternion.identity);
         SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
         
     }
@@ -1253,38 +1271,29 @@ public class PlayerController : MonoBehaviour {
         }
     }
     
-    #endregion Other functions
     
-    
-    #region Vfx/Animations functions //------------------------------------
-    
-    private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay) {
+    private void SetSpriteColor(Color color) {
         
-        if (!effect) return;
-        if (forcePlay) {effect.Play();} else { if (!effect.isPlaying) { effect.Play(); } }
-    }
-    private void StopVfxEffect(ParticleSystem effect, bool clear) {
-        if (!effect) return;
-        
-        if (effect.isPlaying) { 
-            if (clear) { effect.Clear(); } 
-            effect.Stop(); 
+        foreach (SpriteRenderer sr in spriteRenderers) {
+            sr.color = color;
         }
     }
     
-    private void SpawnVfxEffect(ParticleSystem effect) {
-        if (!effect) return;
-        Instantiate(effect, transform.position, Quaternion.identity);
-    }
-    public void PlayAnimation(string animationName) {
+    public void PlayAnimationTrigger(string trigger) {
         
         if (!animator) return;
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName(animationName)) return;
-        animator.SetTrigger(animationName);
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName(trigger)) return;
+        animator.SetTrigger(trigger);
     }
     
+    public void SetAnimationBool(string boolName, bool state) {
+        
+        if (!animator) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName(boolName)) return;
+        animator.SetBool(boolName, state);
+    }
     
-    #endregion Sfx/Vfx functions
+    #endregion Other functions
     
     
     #region Debugging functions //------------------------------------

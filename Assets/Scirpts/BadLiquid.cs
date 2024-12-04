@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class BadLiquid : MonoBehaviour
 {
-    
     private bool _triggered;
     
    private void OnTriggerEnter2D(Collider2D other)

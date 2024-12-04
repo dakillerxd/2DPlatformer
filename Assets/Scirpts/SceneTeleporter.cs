@@ -10,7 +10,15 @@ public class SceneTeleporter : MonoBehaviour
     [SerializeField] private bool activated = false;
     [SerializeField] private bool goToNextLevel = true;
     [SerializeField] private SceneField sceneToLoad;
+    
+    [Header("References")]
+    [SerializeField] public Animator animator;
 
+    
+    private void Start()
+    {
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "In");
+    }
     
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -33,11 +41,12 @@ public class SceneTeleporter : MonoBehaviour
     
     private IEnumerator PlayAnimationAndTeleport(Transform objectTransform) {
         activated = true;
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "Out");
         SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
         CameraController.Instance?.ShakeCamera(2f, 2f,2,2);
-        PlayerController.Instance.PlayAnimation("TeleportIn");
+        PlayerController.Instance.PlayAnimationTrigger("TeleportIn");
         PlayerController.Instance.SetPlayerState(PlayerState.Frozen);
         
         // Wait until the animation enters the state

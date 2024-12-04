@@ -89,8 +89,10 @@ public class CameraController : MonoBehaviour
         _cameraHeight = _camera.orthographicSize * 2;
         _cameraWidth = _cameraHeight * _camera.aspect;
         
-        PlayerController.Instance?.TryGetComponent<PlayerController>(out _player);
-        if (_player) { SetTarget(_player.transform); }
+        if (!PlayerController.Instance) return;
+        _player = PlayerController.Instance;
+        SetTarget(_player.transform);
+
     }
     
     private void LateUpdate() {

@@ -503,6 +503,7 @@ MonoBehaviour:
   maxHealth: 2
   canTakeFallDamage: 0
   maxFallDamage: 1
+  deathTime: 1
   lookRightOnStart: 1
   maxMoveSpeed: 6
   maxAirMoveSpeed: 5
@@ -525,7 +526,7 @@ MonoBehaviour:
   fallMultiplier: 3
   maxFallSpeed: 15
   fastFallSpeed: 12
-  fastFallBopDiminisher: 6
+  fastFallBopDiminisher: 11
   fallSpeed: 0
   groundLayer:
     serializedVersion: 2
@@ -565,6 +566,7 @@ MonoBehaviour:
   collBody: {fileID: 6793365586128216939}
   collFeet: {fileID: 8767898529786398378}
   animator: {fileID: 631767106991630361}
+  shadowCaster2D: {fileID: 7882390600563638155}
   normalEye: {fileID: 4819790430579151037}
   googlyEye: {fileID: 136033198686825285}
   spriteRenderers:
@@ -584,6 +586,7 @@ MonoBehaviour:
   bleedVfx: {fileID: 3183420118479420180}
   wallSlideVfx: {fileID: 7742417552954125015}
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
+  landVfx: {fileID: 5060159489429807464, guid: df6e33d8b8e298f4b83972fbf598075d, type: 3}
   hurtColor: {r: 1, g: 0, b: 0, a: 1}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
   deadColor: {r: 0, g: 0, b: 0, a: 0}

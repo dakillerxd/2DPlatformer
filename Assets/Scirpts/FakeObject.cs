@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Events;
 
 
 public class FakeObject : MonoBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private bool destroyOnTrigger = true;
+    [SerializeField] private UnityEvent[] eventsAfterTrigger;
     
     [Header("Colors")]
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
@@ -17,7 +19,10 @@ public class FakeObject : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        
+        foreach (var e in eventsAfterTrigger)
+        {
+            e.Invoke();
+        }
         if (destroyOnTrigger)
         {
             Destroy(gameObject);

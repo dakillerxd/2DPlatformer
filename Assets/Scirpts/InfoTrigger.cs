@@ -8,9 +8,9 @@ public class InfoTrigger : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool hideTriggerOnStart = true;
     [SerializeField] private bool useDelay; 
-    [SerializeField] [Min(0f)] private float fadeInDelay;
+    [EnableIf(nameof(useDelay))][SerializeField] [Min(0f)] private float fadeInDelay = 1;[EndIf]
     [SerializeField] [Min(0f)] private float fadeInTime = 2f;
-    [SerializeField] [Min(0f)] private float fadeOutTime = 3f;
+    [SerializeField] [Min(0f)] private float fadeOutTime = 2f;
     [SerializeField] private bool fadeOutOnExit = true;
     [EnableIf(nameof(fadeOutOnExit))]
     [SerializeField] private bool destroyAfterFadeOut;
@@ -22,6 +22,7 @@ public class InfoTrigger : MonoBehaviour
     private bool _isFirstEntry = true;
     private bool _isCoroutineRunning;
     private bool _isPlayerInTrigger;
+    private Collider2D _triggerCollider;
 
     [Header("References")]
     [SerializeField] private SpriteRenderer triggerSprite;
@@ -34,6 +35,7 @@ public class InfoTrigger : MonoBehaviour
         infoText.color = _invisibleColor;
         _isCoroutineRunning = false;
         _isPlayerInTrigger = false;
+        _triggerCollider = GetComponent<Collider2D>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -72,38 +74,16 @@ public class InfoTrigger : MonoBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
+        
+        _isPlayerInTrigger = false;
+        if (!fadeOutOnExit) return;
 
-        StartCoroutine(CheckPlayerExit());
-    }
-
-    private IEnumerator CheckPlayerExit()
-    {
-        yield return new WaitForSeconds(0.1f);
-
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, GetComponent<Collider2D>().bounds.size, 0);
-        bool playerStillInside = false;
-
-        foreach (Collider2D col in colliders)
+        if (_fadeCoroutine != null)
         {
-            if (col.CompareTag("Player"))
-            {
-                playerStillInside = true;
-                break;
-            }
+            StopCoroutine(_fadeCoroutine);
+            _fadeCoroutine = null;
         }
-
-        if (!playerStillInside)
-        {
-            _isPlayerInTrigger = false;
-            if (!fadeOutOnExit) yield break;
-            
-            if (_fadeCoroutine != null)
-            {
-                StopCoroutine(_fadeCoroutine);
-                _fadeCoroutine = null;
-            }
-            _fadeCoroutine = StartCoroutine(FadeText(false, fadeOutTime));
-        }
+        _fadeCoroutine = StartCoroutine(FadeText(false, fadeOutTime));
     }
 
     private IEnumerator StartFadeWithDelay(float delay)
@@ -131,6 +111,5 @@ public class InfoTrigger : MonoBehaviour
         _fadeCoroutine = null;
         _isCoroutineRunning = false;
         if (destroyAfterFadeOut && !fadeIn) Destroy(gameObject);
-        
     }
 }

@@ -36,14 +36,17 @@ public class GameManager : MonoBehaviour
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
     public bool debugMode;
-    public bool googlyEyesMode;
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
     
     
     [Tab("Collectibles")] // ----------------------------------------------------------------------
-    [SerializeField] public Collectible[] collectibles;
+    [Header("Unlocks")]
+    public bool googlyEyes;
+    public bool propellerHat;
+    [Space(10)]
+    public Collectible[] collectibles;
     public bool googlyEyesModeReceived {get ; private set;}
     public bool bonusLevel1Received {get ; private set;}
     public bool bonusLevel2Received {get ; private set;}
@@ -188,7 +191,7 @@ public class GameManager : MonoBehaviour
     
     public void ToggleGooglyEyeMode(bool state) {
         
-        googlyEyesMode = state;
+        googlyEyes = state;
         // VFXManager.Instance?.ToggleChromaticAberration(state);
         VFXManager.Instance?.ToggleLensDistortion(state);
         Debug.Log("Googly Eyes Mode: " + state);
@@ -260,7 +263,7 @@ public class GameManager : MonoBehaviour
             SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
         }
         
-        googlyEyesMode = false;
+        googlyEyes = false;
         LoadCollectibles();
     }
     

@@ -133,7 +133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6962597204337529161, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: sceneToLoad.m_SceneName
-      value: TestLevel
+      value: LevelTest
       objectReference: {fileID: 0}
     - target: {fileID: -6962597204337529161, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: sceneToLoad.m_SceneAsset
@@ -153,11 +153,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 865939872225815038, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.75
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 865939872225815038, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.125
+      value: -1.25
       objectReference: {fileID: 0}
     - target: {fileID: 865939872225815038, guid: 8d30b2ae5bc93054d933c1d4227ad6f2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -431,7 +431,28 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3717269721487764816, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
   m_PrefabInstance: {fileID: 352684336}
   m_PrefabAsset: {fileID: 0}
---- !u!43 &751968609
+--- !u!1 &1282285059 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4578070229102411650, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
+  m_PrefabInstance: {fileID: 2691844950602736859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1282285062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1282285059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212b246944a941848abeb93605e9c293, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverSpeed: 1
+  hoverAmount: 0.5
+  hoverDirection: {x: 0, y: 1, z: 0}
+--- !u!43 &1422223275
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -596,27 +617,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1282285059 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4578070229102411650, guid: 86d6ff486029a4947be61aca8711c359, type: 3}
-  m_PrefabInstance: {fileID: 2691844950602736859}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1282285062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1282285059}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 212b246944a941848abeb93605e9c293, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableHover: 1
-  hoverSpeed: 1
-  hoverAmount: 0.5
-  hoverDirection: {x: 0, y: 1, z: 0}
 --- !u!4 &1425164211 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 114524918611777055, guid: 6a2bb8276bee93e4da3a8c4337f439c8, type: 3}

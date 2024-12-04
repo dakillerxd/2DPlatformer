@@ -11,9 +11,8 @@ GameObject:
   - component: {fileID: 4909081437411791541}
   - component: {fileID: 6016309816526566280}
   - component: {fileID: 4638233594414482213}
-  - component: {fileID: 1605662221420038842}
   m_Layer: 0
-  m_Name: Trigger
+  m_Name: TriggerBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -135,23 +134,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &1605662221420038842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5172606775380563759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aa8ab3cae47c9b47833cd5735e9d351, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hideTriggerOnStart: 1
-  fadeTime: 2
-  fadeOutOnExit: 1
-  triggerSprite: {fileID: 6016309816526566280}
-  infoText: {fileID: 6413980024100575106}
 --- !u!1 &6642515182844429727
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,6 +143,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9145534432276338600}
+  - component: {fileID: 1940515258778238006}
+  - component: {fileID: 1570243177763866406}
   m_Layer: 0
   m_Name: InfoTrigger
   m_TagString: Untagged
@@ -185,6 +169,54 @@ Transform:
   - {fileID: 6395240413998101540}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1940515258778238006
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6642515182844429727}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &1570243177763866406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6642515182844429727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa8ab3cae47c9b47833cd5735e9d351, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideTriggerOnStart: 1
+  useDelay: 0
+  fadeInDelay: 1
+  fadeInTime: 2
+  fadeOutTime: 2
+  fadeOutOnExit: 1
+  destroyAfterFadeOut: 0
+  triggerSprite: {fileID: 6016309816526566280}
+  infoText: {fileID: 6413980024100575106}
 --- !u!1001 &7734387380366596468
 PrefabInstance:
   m_ObjectHideFlags: 0

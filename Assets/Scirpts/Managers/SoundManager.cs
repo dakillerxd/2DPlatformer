@@ -152,7 +152,7 @@ public class SoundManager : MonoBehaviour
 
         int rand;
         AudioClip[] clipsType;
-        if (GameManager.Instance.googlyEyesMode && soundFx.googlyEyesModeClips.Length > 0) {
+        if (GameManager.Instance.googlyEyes && soundFx.googlyEyesModeClips.Length > 0) {
             rand = Random.Range(0, soundFx.googlyEyesModeClips.Length);
             clipsType = soundFx.googlyEyesModeClips;
         } else {

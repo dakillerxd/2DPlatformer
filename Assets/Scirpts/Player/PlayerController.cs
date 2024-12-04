@@ -148,6 +148,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Collider2D collFeet;
     [SerializeField] public Animator animator;
     [SerializeField] private ShadowCaster2D shadowCaster2D;
+    [SerializeField] private GameObject propellerHat;
     [SerializeField] private GameObject normalEye;
     [SerializeField] private GameObject googlyEye;
     [SerializeField] private SpriteRenderer[] spriteRenderers;
@@ -229,8 +230,8 @@ public class PlayerController : MonoBehaviour {
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
         CheckpointManager.Instance?.SetSpawnPoint(transform.position);
         UIManager.Instance?.UpdateAbilitiesUI();
-        UIManager.Instance?.StartLevelTitleEffect(1, SceneManager.GetActiveScene().name);
-        ToggleGooglyEye();
+        UIManager.Instance?.StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+        ToggleCosmetics();
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         RespawnFromSpawnPoint();
@@ -1225,7 +1226,7 @@ public class PlayerController : MonoBehaviour {
                 // SetAnimationBool("Death", false);
                 break;
             case PlayerState.Frozen:
-                rigidBody.simulated = false;
+                rigidBody.simulated = true;
                 rigidBody.linearVelocity = Vector2.zero;
                 isTeleporting = true;
                 break;
@@ -1257,18 +1258,12 @@ public class PlayerController : MonoBehaviour {
         
     }
 
-    private void ToggleGooglyEye()
+    private void ToggleCosmetics()
     {
-        if (GameManager.Instance.googlyEyesMode)
-        {
-            normalEye.SetActive(false);
-            googlyEye.SetActive(true);
-        }
-        else
-        {
-            normalEye.SetActive(true);
-            googlyEye.SetActive(false);
-        }
+        normalEye.SetActive(!GameManager.Instance.googlyEyes);
+        googlyEye.SetActive(GameManager.Instance.googlyEyes);
+        propellerHat.SetActive(GameManager.Instance.propellerHat);
+        
     }
     
     

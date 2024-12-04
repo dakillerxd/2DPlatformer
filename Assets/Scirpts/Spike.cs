@@ -8,10 +8,9 @@ public class Spike : MonoBehaviour
     public int damage = 1;
     private bool _triggered;
 
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!collision.gameObject.CompareTag("Player")) return;
+        if (!collision.gameObject.CompareTag("Player") || _triggered) return;
         _triggered = true;
         Vector2 spikeNormal = collision.GetContact(0).normal;
         var player = collision.gameObject.GetComponent<PlayerController>();
@@ -22,7 +21,7 @@ public class Spike : MonoBehaviour
     
     private IEnumerator ResetTrigger()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
         _triggered = false;
     }
 }

@@ -234,7 +234,11 @@ public class PlayerController : MonoBehaviour {
         ToggleCosmetics();
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
-        RespawnFromSpawnPoint();
+
+        if (!Application.isEditor)
+        {
+            RespawnFromSpawnPoint();
+        }
     }
     
     private void Update() {

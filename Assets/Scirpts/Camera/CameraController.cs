@@ -597,7 +597,7 @@ private void HandleOffsetBoundaries()
     }
     
 #if UNITY_EDITOR
-    private void OnDrawGizmos() 
+    private void OnDrawGizmosSelected() 
     { 
         if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
         {

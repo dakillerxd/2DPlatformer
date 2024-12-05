@@ -760,9 +760,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 10
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1001 &280519055
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -899,9 +904,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 1
+  applyToParent: 0
   parallaxEffectX: 0.1
   parallaxEffectY: 0.1
   parallaxRange: 10
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1001 &357287595
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1055,9 +1065,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 20
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1001 &371474877
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1743,9 +1758,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 1
+  applyToParent: 0
   parallaxEffectX: 0.1
   parallaxEffectY: 0.1
   parallaxRange: 10
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1001 &621345770
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1847,9 +1867,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 20
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1 &645037584
 GameObject:
   m_ObjectHideFlags: 0
@@ -103484,7 +103509,7 @@ MonoBehaviour:
     rid: 3592690971401257127
   m_ShadowCastingSource: 2
   m_ShadowMesh:
-    m_Mesh: {fileID: 1562562681}
+    m_Mesh: {fileID: 1074138496}
     m_LocalBounds:
       m_Center: {x: 0.49998474, y: -7.25, z: 0}
       m_Extent: {x: 38.999985, y: 22.25, z: 0}
@@ -103901,6 +103926,171 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7099026344493478484, guid: e3c6d6173a53c5d4b853b8afcffb25bf, type: 3}
   m_PrefabInstance: {fileID: 1039117319}
   m_PrefabAsset: {fileID: 0}
+--- !u!43 &1074138496
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 11
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 0
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 0
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 0
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 0
+    _typelessdata: 
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  'm_MeshMetrics[0]': 1
+  'm_MeshMetrics[1]': 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!1001 &1099250805
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -104413,9 +104603,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 20
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1 &1319762670
 GameObject:
   m_ObjectHideFlags: 0
@@ -104873,9 +105068,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 20
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!224 &1468043401 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5506434680227851358, guid: 48e7102aada85fd4f9a1672b222aa4a8, type: 3}
@@ -104943,171 +105143,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4311682538473730760, guid: ae925a1eb08e0dc439b3896484865326, type: 3}
   m_PrefabInstance: {fileID: 1495296181}
   m_PrefabAsset: {fileID: 0}
---- !u!43 &1562562681
-Mesh:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 11
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 0
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 0
-    localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
-  m_Shapes:
-    vertices: []
-    shapes: []
-    channels: []
-    fullWeights: []
-  m_BindPose: []
-  m_BoneNameHashes: 
-  m_RootBoneNameHash: 0
-  m_BonesAABB: []
-  m_VariableBoneCountWeights:
-    m_Data: 
-  m_MeshCompression: 0
-  m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexFormat: 0
-  m_IndexBuffer: 
-  m_VertexData:
-    serializedVersion: 3
-    m_VertexCount: 0
-    m_Channels:
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 0
-    _typelessdata: 
-  m_CompressedMesh:
-    m_Vertices:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UV:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Normals:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Tangents:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Weights:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_NormalSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_TangentSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_FloatColors:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_BoneIndices:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Triangles:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UVInfo: 0
-  m_LocalAABB:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  m_MeshUsageFlags: 0
-  m_CookingOptions: 30
-  m_BakedConvexCollisionMesh: 
-  m_BakedTriangleCollisionMesh: 
-  'm_MeshMetrics[0]': 1
-  'm_MeshMetrics[1]': 1
-  m_MeshOptimizationFlags: 1
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1001 &1600898591
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -105834,10 +105869,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4372389166945639085, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6282327043550573817, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -107602,9 +107633,14 @@ MonoBehaviour:
     m_LayerID: 438391897
   followCamera: 0
   useParallaxEffect: 0
+  applyToParent: 0
   parallaxEffectX: 0
   parallaxEffectY: 0
   parallaxRange: 10
+  useHorizontalLimit: 0
+  maxHorizontalOffset: 5
+  useVerticalLimit: 0
+  maxVerticalOffset: 5
 --- !u!1001 &2031492146
 PrefabInstance:
   m_ObjectHideFlags: 0

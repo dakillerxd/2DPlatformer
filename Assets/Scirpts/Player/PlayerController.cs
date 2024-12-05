@@ -168,6 +168,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem wallSlideVfx;
     [SerializeField] private ParticleSystem healVfx;
     [SerializeField] private ParticleSystem landVfx;
+    [SerializeField] private ParticleSystem landMaxSpeedVfx;
     
     [Header("Colors")]
     [SerializeField] private Color hurtColor = Color.red;
@@ -484,7 +485,7 @@ public class PlayerController : MonoBehaviour {
                 // Jump
                 ExecuteJump(1, jumpDirection);
                 VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimationTrigger("AirJump");
+                PlayAnimationTrigger("Jump");
                 SoundManager.Instance?.PlaySoundFX("Player Air Jump");
                 
             } else if (!isGrounded && wallJumpAbility && !(_isTouchingWallOnLeft || _isTouchingWallOnRight) && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump when wall jump ability
@@ -492,7 +493,7 @@ public class PlayerController : MonoBehaviour {
                 // Jump
                 ExecuteJump(1, jumpDirection);
                 VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimationTrigger("AirJump");
+                PlayAnimationTrigger("Jump");
                 SoundManager.Instance?.PlaySoundFX("Player Air Jump");
             }
         }
@@ -537,8 +538,10 @@ public class PlayerController : MonoBehaviour {
         if (_jumpInputUp && !_isJumpCut) {  
             if (isJumping && rigidBody.linearVelocity.y > 0) {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
-                // SoundManager.Instance?.StopSoundFx("Player Jump");
+                PlayAnimationTrigger("Idle");
                 _isJumpCut = true;
+                Debug.Log("Jump Cut");
+                // SoundManager.Instance?.StopSoundFx("Player Jump");
             }
             _jumpInputHeld = false;
             _variableJumpHeldDuration = 0;
@@ -767,29 +770,46 @@ public class PlayerController : MonoBehaviour {
     }
     
     
-    private void HandleGroundedGravity() {
+    private void HandleGroundedGravity()
+    {
+        if (!isFalling || !isGrounded || isDashing) return; // Check if landed
         
-        if (isFalling && isGrounded && !isDashing) { // Check if landed
-
-            
-            SoundManager.Instance?.PlaySoundFX("Player Land");
-            
-            if (isFastFalling) {
-                PlayAnimationTrigger("Land");
-                CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
-                VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
-                VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            }
-            
-            if (atMaxFallSpeed) { // Apply fall damage
-                if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
-                rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
-            }
-            
-            atMaxFallSpeed = false;
-            isFastFalling = false;
-            isFalling = false;
+        SoundManager.Instance?.PlaySoundFX("Player Land");
+        
+        
+        if (fallSpeed < -maxFallSpeed)
+        {
+            PlayAnimationTrigger("LandMaxFall");
+            // TurnStunLocked(0.1f);
+            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
+            VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
+            VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
+            //     if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
+            //     rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+            Debug.Log("Bop");
         }
+        else if (fallSpeed < -fastFallSpeed)
+        {
+            PlayAnimationTrigger("LandHighFall");
+            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
+            VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
+            VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
+        }
+        else if (fallSpeed < -9)
+        {
+            PlayAnimationTrigger("Land");
+            VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
+            VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
+        }
+        else if (fallSpeed < -6)
+        {
+            PlayAnimationTrigger("Land");
+        }
+        
+            
+        atMaxFallSpeed = false;
+        isFastFalling = false;
+        isFalling = false;
     }
     
     #endregion Gravity functions 
@@ -938,6 +958,7 @@ public class PlayerController : MonoBehaviour {
         _deaths += 1;
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
+            CheckpointManager.Instance.PlayCheckpointAnimation();
         } else { RespawnFromSpawnPoint();}
     }
     [Button] private void RespawnFromSpawnPoint() {
@@ -945,7 +966,7 @@ public class PlayerController : MonoBehaviour {
         _deaths = 0;
         if (CheckpointManager.Instance.startTeleporter) {
             Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
-            CheckpointManager.Instance.PlayStartTeleporterAnimation(); 
+            CheckpointManager.Instance.PlayTeleporterAnimation(); 
         } else {
             Respawn(CheckpointManager.Instance.playerSpawnPoint);
         }

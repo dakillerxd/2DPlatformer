@@ -17,7 +17,7 @@ public class SceneTeleporter : MonoBehaviour
 
     private void Start()
     {
-        VFXManager.Instance?.PlayAnimationTrigger(animator, "In");
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "Spawn");
     }
     
     private void OnTriggerEnter2D(Collider2D other)
@@ -53,7 +53,7 @@ public class SceneTeleporter : MonoBehaviour
         Vector2 originalVelocity = rb.linearVelocity;
 
         // Start effects
-        VFXManager.Instance?.PlayAnimationTrigger(animator, "Out");
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "Teleport");
         SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));

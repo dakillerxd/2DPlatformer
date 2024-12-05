@@ -48,11 +48,18 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         Debug.Log("Set spawn point to: " + playerSpawnPoint);
     }
 
-    public void PlayStartTeleporterAnimation()
+    public void PlayTeleporterAnimation()
     {
         if (!startTeleporter) return;
         
-        VFXManager.Instance?.PlayAnimationTrigger(startTeleporter.animator, "In");
+        VFXManager.Instance?.PlayAnimationTrigger(startTeleporter.animator, "Spawn");
+    }
+
+    public void PlayCheckpointAnimation()
+    {
+        if (!activeCheckpoint) return;
+    
+        VFXManager.Instance?.PlayAnimationTrigger(activeCheckpoint.animator, "Spawn");
     }
      
     [Button] private void AddCheckpoint() 

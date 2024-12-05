@@ -15,6 +15,7 @@ public class Checkpoint : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private SpriteRenderer[] spriteRenderers;
+    [SerializeField] public Animator animator;
 
 
     private void Start() {

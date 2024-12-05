@@ -79,7 +79,18 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        SetupPauseScreen();
+        InitializeUI();
+
+
+    }
+    
+    private void InitializeUI()
+    {
+        
+        if (levelTitleText)
+        {
+            levelTitleText.CrossFadeAlpha(0, 0, false);
+        }
         
         if (timerTexts.Length > 0)
         {
@@ -88,6 +99,34 @@ public class UIManager : MonoBehaviour
                 timerOriginalColor = timerText.color;
             }
         }
+        
+        if (buttonResume != null)
+        {
+            buttonResume.onClick.RemoveAllListeners();
+            buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+        }
+
+        if (buttonOptions != null)
+        {
+            buttonOptions.onClick.RemoveAllListeners();
+            buttonOptions.onClick.AddListener(ShowPanelOptions);
+        }
+        
+        if (buttonMainMenu != null)
+        {
+            buttonMainMenu.onClick.RemoveAllListeners();
+            buttonMainMenu.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.None));
+            buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
+        }
+
+        if (buttonQuit != null)
+        {
+            buttonQuit.onClick.RemoveAllListeners();
+            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
+        }
+
+        ShowPanelMain();
+
     }
     
 
@@ -114,7 +153,8 @@ public class UIManager : MonoBehaviour
 
     }
 
-
+    
+    
 
 #region  Gameplay Screen
 
@@ -169,7 +209,7 @@ public class UIManager : MonoBehaviour
         }
 
     }
-
+    
     public void StartLevelTitleEffect(float duration, string title) {
         if (!levelTitleText) return;
         StartCoroutine(LevelTitleEffect(duration, title));
@@ -191,36 +231,8 @@ public class UIManager : MonoBehaviour
 
 #region Pause Screen
 
-    private void SetupPauseScreen()
-    {
-        if (buttonResume != null)
-        {
-            buttonResume.onClick.RemoveAllListeners();
-            buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-        }
 
-        if (buttonOptions != null)
-        {
-            buttonOptions.onClick.RemoveAllListeners();
-            buttonOptions.onClick.AddListener(() => ShowPanelOptions());
-        }
-        
-        if (buttonMainMenu != null)
-        {
-            buttonMainMenu.onClick.RemoveAllListeners();
-            buttonMainMenu.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.None));
-            buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
-        }
-
-        if (buttonQuit != null)
-        {
-            buttonQuit.onClick.RemoveAllListeners();
-            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
-        }
-
-        ShowPanelMain();
-
-    }
+    
     private void UpdatePauseScreenInfo()
     {
         if (pauseTimeText != null)

@@ -39,8 +39,7 @@ public class CameraTrigger : MonoBehaviour
     [Header("Zoom")]
     [SerializeField] public bool setCameraZoom;
     [EnableIf(nameof(setCameraZoom))]
-    [SerializeField] [Min(3f)] public float boundaryZoom = 4f;
-    public bool resetZoomOnExit = true; 
+    [SerializeField] public float zoomOffset = 0f;
     [EndIf]
     
     [Header("References")]
@@ -82,8 +81,9 @@ public class CameraTrigger : MonoBehaviour
         return new Vector4(boundaryMinX, boundaryMaxX, boundaryMinY, boundaryMaxY);
     }
 
-    #region Debug
-    #if UNITY_EDITOR
+#region Debug
+#if UNITY_EDITOR
+    
     private void OnValidate()
     {
         if (useColliderAsBoundary) MatchBoundaryToCollider();
@@ -146,61 +146,98 @@ public class CameraTrigger : MonoBehaviour
             alignment = TextAnchor.UpperCenter
         };
         
-        Debug.DrawLine(
+        // Draw boundary lines
+        Vector3[] points = {
             new Vector3(boundaryMinX, boundaryMinY, 0),
             new Vector3(boundaryMinX, boundaryMaxY, 0),
-            infoColor
-        );
-        Debug.DrawLine(
-            new Vector3(boundaryMaxX, boundaryMinY, 0),
             new Vector3(boundaryMaxX, boundaryMaxY, 0),
-            infoColor
-        );
-        Debug.DrawLine(
-            new Vector3(boundaryMinX, boundaryMinY, 0),
-            new Vector3(boundaryMaxX, boundaryMinY, 0),
-            infoColor
-        );
-        Debug.DrawLine(
-            new Vector3(boundaryMinX, boundaryMaxY, 0),
-            new Vector3(boundaryMaxX, boundaryMaxY, 0),
-            infoColor
-        );
+            new Vector3(boundaryMaxX, boundaryMinY, 0)
+        };
         
-        if (useColliderAsBoundary)
+        for (int i = 0; i < points.Length; i++)
         {
-            Handles.Label(
-                boxCollider2D.bounds.center + new Vector3(0, 1, 0),
-                "Camera Trigger",
-                style
-            );
+            Debug.DrawLine(points[i], points[(i + 1) % points.Length], infoColor);
         }
-        else
+        
+        // Draw base trigger name
+        DrawTriggerLabel(boxCollider2D.bounds.center + Vector3.up, "Camera Trigger", style);
+
+        // Draw boundary center and connection line if using custom boundaries
+        if (!useColliderAsBoundary && (boundaryMinX != 0 || boundaryMaxX != 0 || boundaryMinY != 0 || boundaryMaxY != 0))
         {
-            Handles.Label(
-                boxCollider2D.bounds.center + new Vector3(0, 2, 0),
-                "Camera Trigger",
-                style
-            );
-            
             Vector3 boundaryCenter = new Vector3(
                 (boundaryMaxX + boundaryMinX) / 2,
                 (boundaryMaxY + boundaryMinY) / 2,
                 0
             );
             Debug.DrawLine(boxCollider2D.bounds.center, boundaryCenter, infoColor);
-            
-            if (boundaryMinX != 0 || boundaryMaxX != 0 || boundaryMinY != 0 || boundaryMaxY != 0)
-            {
-                Handles.Label(
-                    boundaryCenter + new Vector3(0, 1, 0),
-                    "Camera Boundary",
-                    style
-                );
-                Gizmos.DrawSphere(boundaryCenter, 0.3f);
-            }
+            Gizmos.DrawSphere(boundaryCenter, 0.3f);
         }
     }
-    #endif
-    #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!boxCollider2D || Application.isPlaying) return;
+
+        GUIStyle style = new GUIStyle
+        {
+            normal = { textColor = Color.yellow },
+            fontSize = 10,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.UpperCenter
+        };
+
+        // Calculate base position for labels
+        Vector3 labelBasePosition = boxCollider2D.bounds.center + Vector3.down;
+        float labelSpacing = 0.5f;
+        int labelCount = 1; // Start at 1 since the trigger name is at 0
+
+        // Draw State information
+        if (setCameraStateOnEnter)
+        {
+            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount++), 
+                $"Enter State: {cameraStateOnEnter}", style);
+        }
+
+        if (setCameraStateOnExit)
+        {
+            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount++), 
+                $"Exit State: {cameraStateOnExit}", style);
+        }
+
+        // Draw Offset information
+        if (setCameraOffset)
+        {
+            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount++), 
+                $"Offset: ({offset.x:0.0}, {offset.y:0.0})", style);
+        }
+
+        // Draw Zoom information
+        if (setCameraZoom)
+        {
+            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount++), 
+                $"Zoom: {(zoomOffset >= 0 ? "+" : "")}{zoomOffset:0.0}", style);
+        }
+
+        // Draw Boundary information
+        if (limitCameraToBoundary)
+        {
+            string boundaryInfo = useColliderAsBoundary ? "Using Collider Bounds" : "Custom Bounds";
+            if (resetBoundaryOnExit)
+            {
+                boundaryInfo += " (Reset on Exit)";
+            }
+            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount), 
+                $"Boundary: {boundaryInfo}", style);
+        }
+    }
+
+    private void DrawTriggerLabel(Vector3 position, string text, GUIStyle style)
+    {
+        Handles.Label(position, text, style);
+    }
+    
+    
+#endif
+#endregion
 }

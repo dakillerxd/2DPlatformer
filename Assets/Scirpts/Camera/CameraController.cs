@@ -18,12 +18,8 @@ public class CameraController : MonoBehaviour
 {
     public static CameraController Instance { get; private set; }
     
-    [Header("Camera State")]
-    [SerializeField] private CameraState cameraState = CameraState.Free;
-    private float _cameraHeight;
-    private float _cameraWidth;
-
     [Header("Movement")] 
+    [SerializeField] private CameraState cameraState = CameraState.Free;
     [SerializeField] private float baseVerticalFollowDelay = 0.5f;
     [SerializeField] private float baseHorizontalFollowDelay = 0.5f;
     private float _currentVelocityX;
@@ -32,9 +28,6 @@ public class CameraController : MonoBehaviour
     private const float SmoothTime = 0.2f;
 
     [Header("Offset")] 
-    [SerializeField] private float baseHorizontalOffset = 1f;
-    [SerializeField] private float baseVerticalOffset = 1.5f;
-    [Space(10)]
     [SerializeField] private bool useTargetOffsetBoundaries = true;
     [EnableIf("useTargetOffsetBoundaries")]
     [SerializeField] private float minHorizontalOffset = -4;
@@ -42,20 +35,18 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float minVerticalOffset = -3;
     [SerializeField] private float maxVerticalOffset = 3;
     [EndIf]
-    [Space(10)]
-    [SerializeField] [Min(1f)] private float verticalMoveDiminisher;
-    [SerializeField] [Min(1f)] private float horizontalMoveDiminisher;
     private Vector3 _targetPosition;
-    private Vector3 _targetStateOffset;
+    private Vector3 _targetTriggerOffset;
+    private Vector3 _targetDynamicOffset;
     
     [Header("Zoom")]
     [SerializeField] private float defaultZoom = 4;
     [SerializeField] private float minZoom = 2f;
     [SerializeField] private float maxZoom = 6f;
     [SerializeField] private float zoomSpeed = 0.5f;
-    private float _targetZoom;
     private float _zoomVelocity;
     private float _triggerZoomOffset;
+    private float _targetDynamicZoom;
 
     [Header("Boundaries")]
     private float _minXBoundary;
@@ -69,11 +60,12 @@ public class CameraController : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private CameraTrigger triggerPrefab;
-    private float _lastStateChangeTime;
     public Transform target;
-    private Camera _camera;
-    private PlayerController _player;
     private List<CameraTrigger> _activeTriggers = new List<CameraTrigger>();
+    private float _lastStateChangeTime;
+    private Camera _camera;
+    private float _cameraHeight;
+    private float _cameraWidth;
 
     private void Awake() {
         if (Instance != null && Instance != this) {
@@ -85,15 +77,13 @@ public class CameraController : MonoBehaviour
     
     private void Start() {
         _camera = GetComponent<Camera>();
-        _targetZoom = defaultZoom;
         _camera.orthographicSize = defaultZoom;
         _cameraHeight = _camera.orthographicSize * 2;
         _cameraWidth = _cameraHeight * _camera.aspect;
         _triggerZoomOffset = 0f;
-        
-        if (!PlayerController.Instance) return;
-        _player = PlayerController.Instance;
-        SetTarget(_player.transform);
+        _targetTriggerOffset = Vector3.zero;
+        _targetDynamicZoom = 0f;
+        _targetDynamicOffset = Vector3.zero;
     }
     
     private void LateUpdate() {
@@ -102,8 +92,7 @@ public class CameraController : MonoBehaviour
         HandleZoom();
         HandleOffsetBoundaries();
     }
-
-
+    
 
 #region Triggers
 
@@ -135,9 +124,8 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            _targetStateOffset = Vector3.zero;
+            _targetTriggerOffset = Vector3.zero;
             _triggerZoomOffset = 0f;
-            _targetZoom = defaultZoom;
                 
             if (trigger.limitCameraToBoundary && trigger.resetBoundaryOnExit)
             {
@@ -149,7 +137,7 @@ public class CameraController : MonoBehaviour
     private void HandleActiveTriggers()
     {
         // Reset offset and zoom at the start
-        _targetStateOffset = Vector3.zero;
+        _targetTriggerOffset = Vector3.zero;
         _triggerZoomOffset = 0f;
 
         if (_activeTriggers.Count == 0) return;
@@ -177,7 +165,7 @@ public class CameraController : MonoBehaviour
         {
             if (trigger.setCameraOffset)
             {
-                _targetStateOffset += trigger.offset;
+                _targetTriggerOffset += trigger.offset;
             }
         }
 
@@ -213,16 +201,17 @@ public class CameraController : MonoBehaviour
     #endif
 
 #endregion
-    
 
-    
 #region States
+
     public void SetCameraState(CameraState newState) {
         cameraState = newState;
     }
+    
 #endregion
     
 #region Target
+
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
@@ -230,10 +219,9 @@ public class CameraController : MonoBehaviour
 
     private void FollowTarget() {
         if (!target) return;
-
-        Vector3 dynamicOffset = CalculateTargetOffset();
+        
         _targetPosition = CalculateTargetPosition();
-        Vector3 targetPos = _targetPosition + dynamicOffset + _shakeOffset;
+        Vector3 targetPos = _targetPosition + _targetDynamicOffset + _shakeOffset;
         float smoothedX = transform.position.x;
         float smoothedY = transform.position.y;
 
@@ -242,29 +230,29 @@ public class CameraController : MonoBehaviour
             case CameraState.Locked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
                     Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
                 break;
 
             case CameraState.VerticalLocked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
-                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 break;
 
             case CameraState.HorizontalLocked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
-                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 break;
 
             case CameraState.Free:
             default:
-                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetStateOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetStateOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 break;
         }
         
@@ -357,85 +345,54 @@ public class CameraController : MonoBehaviour
         
         transform.position = position;
     }
-
-    private Vector3 CalculateTargetOffset() {
-        Vector3 offset = Vector3.zero;
-        if (!target.CompareTag("Player")) return offset;
-        if (_player.currentPlayerState == PlayerState.Frozen) return offset;
-        
-        // Horizontal Offset
-        if (_player.isFastFalling) offset.x = 0;
-        else if (_player.wasRunning) {
-            offset.x = _player.isFacingRight
-                ? baseHorizontalOffset + _player.rigidBody.linearVelocityX
-                : -baseHorizontalOffset + _player.rigidBody.linearVelocityX;
-        } else {
-            offset.x = _player.isFacingRight
-                ? baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher
-                : -baseHorizontalOffset + _player.rigidBody.linearVelocityX / horizontalMoveDiminisher;
-        }
-        
-        // Vertical Offset
-        if (_player.isGrounded || _player.isJumping) {
-            offset.y = baseVerticalOffset;
-        } else if (_player.isFastFalling || _player.isWallSliding) {
-            offset.y = -baseVerticalOffset + _player.rigidBody.linearVelocityY / verticalMoveDiminisher;
-        } else if (_player.isFalling) {
-            offset.y = -baseVerticalOffset;
-        }
-        
-        return offset;
-    }
-#endregion
-
-#region Zoom functions
-private void HandleZoom() {
-    if (!target) return;
-    float dynamicZoomOffset = CalculateTargetZoomOffset();
-    _targetZoom = defaultZoom + _triggerZoomOffset;
-    _targetZoom = Mathf.Clamp(_targetZoom, minZoom, maxZoom);
-        
-    float finalZoom = _targetZoom + dynamicZoomOffset;
-    finalZoom = Mathf.Clamp(finalZoom, minZoom, maxZoom);
-        
-    _camera.orthographicSize = Mathf.SmoothDamp(
-        _camera.orthographicSize, 
-        finalZoom, 
-        ref _zoomVelocity, 
-        zoomSpeed, 
-        Mathf.Infinity, 
-        Time.deltaTime
-    );
-}
     
-    private float CalculateTargetZoomOffset()
+    public void SetDynamicOffset(Vector3 offset)
     {
-        float offset = 0;
-        if (!_player) return 0;
-        
-        if (_player.wasRunning)
-        {
-            offset += 2;
-        }
-        else if (_player.isTeleporting)
-        { 
-            offset -= 2;
-        }
-
-        return offset;
+        _targetDynamicOffset = offset;
     }
+
+
 #endregion
 
-#region Boundaries functions
+#region Zoom
+
+    private void HandleZoom() 
+    {
+        if (!target) return;
+        
+        float finalZoom = defaultZoom + _triggerZoomOffset + _targetDynamicZoom;
+        finalZoom = Mathf.Clamp(finalZoom, minZoom, maxZoom);
+            
+        _camera.orthographicSize = Mathf.SmoothDamp(
+            _camera.orthographicSize, 
+            finalZoom, 
+            ref _zoomVelocity, 
+            zoomSpeed, 
+            Mathf.Infinity, 
+            Time.deltaTime
+        );
+    }
+    
+    public void SetDynamicZoom(float zoomOffset)
+    {
+        _targetDynamicZoom = zoomOffset;
+    }
+
+#endregion
+
+#region Boundaries
+
     private void ResetTriggerBoundaries() {
         _minXBoundary = 0;
         _maxXBoundary = 0;
         _minYBoundary = 0;
         _maxYBoundary = 0;
     }
+    
 #endregion
     
-#region Shake functions
+#region Shake
+
     private IEnumerator Shake(float duration, float magnitude, float xShakeRange, float yShakeRange)
     {
         _isShaking = true;
@@ -467,7 +424,8 @@ private void HandleZoom() {
     }
 #endregion
     
-#region Debugging functions
+#region Debugging
+
     private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject) {
         _debugStringBuilder.Clear();
@@ -480,22 +438,21 @@ private void HandleZoom() {
         _debugStringBuilder.AppendFormat("Position: ({0:0.0}, {1:0.0})\n", transform.position.x, transform.position.y);
         
         // Offset Info
-        Vector2 targetOffset = target ? CalculateTargetOffset() : Vector2.zero;
+        Vector2 targetOffset = target ? _targetDynamicOffset : Vector2.zero;
         _debugStringBuilder.AppendFormat("Offset: ({0:0.0}, {1:0.0}) (Target: ({2:0.0}, {3:0.0}), Triggers: ({4:0.0}, {5:0.0}))\n",
-            targetOffset.x + _targetStateOffset.x,
-            targetOffset.y + _targetStateOffset.y,
+            targetOffset.x + _targetTriggerOffset.x,
+            targetOffset.y + _targetTriggerOffset.y,
             targetOffset.x,
             targetOffset.y,
-            _targetStateOffset.x,
-            _targetStateOffset.y);
+            _targetTriggerOffset.x,
+            _targetTriggerOffset.y);
         
         
         // Zoom Info 
-        float dynamicZoomOffset = CalculateTargetZoomOffset();
         _debugStringBuilder.AppendFormat("Zoom: {0:0.0} (Base: {1:0.0}, Target: {2:0.0}, Trigger: {3:0.0})\n", 
             _camera.orthographicSize, 
             defaultZoom,
-            dynamicZoomOffset,
+            _targetDynamicZoom,
             _triggerZoomOffset);
 
         // Boundaries
@@ -633,4 +590,6 @@ private void HandleZoom() {
     }
 #endif
 #endregion
+
+
 }

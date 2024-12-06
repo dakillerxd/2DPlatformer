@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour {
 
     [Tab("Player Settings")] // ----------------------------------------------------------------------
     public PlayerState currentPlayerState = PlayerState.Controllable;
-    private string _logText;
     
     [Header("Health")]
     [SerializeField] public int maxHealth = 2;
@@ -171,19 +170,20 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem landMaxSpeedVfx;
     
     [Header("Colors")]
-    [SerializeField] private Color hurtColor = Color.red;
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
     [SerializeField] private Color deadColor = Color.clear;
     private readonly Color _defaultColor = Color.white;
     
-    
+    [Header("Events")]
+    public UnityEvent onPlayerDeath = new UnityEvent();
+
+
     [Header("States")] 
-    public bool isMoving { get; private set; }
+    public bool isMoving;
     public bool isJumping { get; private set; }
     public bool isFacingRight { get; private set; }
     public bool isStunLocked { get; private set; }
     public bool isInvincible { get; private set; }
-    public bool isTeleporting { get; private set; }
     public bool wasRunning { get; private set; }
     public bool isRunning { get; private set; }
     public bool isGrounded { get; private set; }
@@ -208,11 +208,22 @@ public class PlayerController : MonoBehaviour {
     private bool _runInput;
     private bool _dropDownInput;
     
+    [Header("Other")] 
+    private string _logText;
     
     
-    [Tab("Events")] // ----------------------------------------------------------------------
-    public UnityEvent onPlayerDeath = new UnityEvent();
-
+    
+    [Tab("Camera")] // ----------------------------------------------------------------------
+    [Header("Offset")]
+    [SerializeField] private float baseHorizontalOffset = 1f;
+    [SerializeField] private float baseVerticalOffset = 1.5f;
+    [SerializeField] private float horizontalMoveDiminisher = 1f;
+    [SerializeField] private float verticalMoveDiminisher = 1f;
+    
+    [Header("Zoom")]
+    [SerializeField] private float runningZoomOffset = 2f;
+    [SerializeField] private float teleportZoomOffset = -2f;
+    [EndTab]
     
     
     private void Awake() {
@@ -227,6 +238,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Start()
     {
+        
         isFacingRight = true;
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
         CheckpointManager.Instance?.SetSpawnPoint(transform.position);
@@ -253,6 +265,7 @@ public class PlayerController : MonoBehaviour {
         WallSlideTimer();
     }
     
+    
     private void FixedUpdate() {
         if (!CanPlay()) { return; }
         CollisionChecks();
@@ -265,6 +278,12 @@ public class PlayerController : MonoBehaviour {
         HandleWallJump();
         HandleDashing();
     }
+    
+    private void LateUpdate()
+    {
+        UpdateCameraPosition();
+    }
+
     
     
     #region Movement functions //------------------------------------
@@ -534,13 +553,12 @@ public class PlayerController : MonoBehaviour {
             _variableJumpHeldDuration += Time.deltaTime;
         }
         
-        // Only Cut jump height if button is released early in upward motion
-        if (_jumpInputUp && !_isJumpCut) {  
+        
+        if (_jumpInputUp && !_isJumpCut) {   // Only Cut jump height if button is released early in upward motion
             if (isJumping && rigidBody.linearVelocity.y > 0) {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
                 PlayAnimationTrigger("Idle");
                 _isJumpCut = true;
-                Debug.Log("Jump Cut");
                 // SoundManager.Instance?.StopSoundFx("Player Jump");
             }
             _jumpInputHeld = false;
@@ -784,9 +802,8 @@ public class PlayerController : MonoBehaviour {
             CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            //     if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
+            if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
             //     rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
-            Debug.Log("Bop");
         }
         else if (fallSpeed < -fastFallSpeed)
         {
@@ -1234,7 +1251,6 @@ public class PlayerController : MonoBehaviour {
                 fallSpeed = 0;
                 _moveSpeed = 0;
                 wasRunning = false;
-                isTeleporting = false;
                 isDashing = false;
                 isWallSliding = false;
                 isInvincible = false;
@@ -1253,7 +1269,6 @@ public class PlayerController : MonoBehaviour {
             case PlayerState.Frozen:
                 rigidBody.simulated = true;
                 rigidBody.linearVelocity = Vector2.zero;
-                isTeleporting = true;
                 break;
         }
     }
@@ -1314,6 +1329,58 @@ public class PlayerController : MonoBehaviour {
     }
     
     #endregion Other functions
+
+    #region Camera functions //------------------------------------
+
+    
+    private void UpdateCameraPosition()
+    {
+        if (!CameraController.Instance) return;
+    
+        if (currentPlayerState == PlayerState.Frozen)
+        {
+            CameraController.Instance.SetDynamicOffset(Vector3.zero);
+            CameraController.Instance.SetDynamicZoom(teleportZoomOffset);
+            return;
+        }
+    
+        Vector3 offset = Vector3.zero;
+
+        // Horizontal Offset
+        if (isFastFalling) {
+            offset.x = 0;
+        } else if (wasRunning) {
+            offset.x = isFacingRight
+                ? baseHorizontalOffset + rigidBody.linearVelocityX
+                : -baseHorizontalOffset + rigidBody.linearVelocityX;
+        } else {
+            offset.x = isFacingRight
+                ? baseHorizontalOffset + rigidBody.linearVelocityX / horizontalMoveDiminisher
+                : -baseHorizontalOffset + rigidBody.linearVelocityX / horizontalMoveDiminisher;
+        }
+
+        // Vertical Offset
+        if (isGrounded || isJumping) {
+            offset.y = baseVerticalOffset;
+        } else if (isFastFalling || isWallSliding) {
+            offset.y = -baseVerticalOffset + rigidBody.linearVelocityY / verticalMoveDiminisher;
+        } else if (isFalling) {
+            offset.y = -baseVerticalOffset;
+        }
+
+        // Zoom
+        float zoomOffset = 0;
+        if (wasRunning) {
+            zoomOffset += runningZoomOffset;
+        }
+
+        // Update Camera
+        CameraController.Instance.SetDynamicOffset(offset);
+        CameraController.Instance.SetDynamicZoom(zoomOffset);
+    }
+
+    #endregion
+    
     
     
     #region Debugging functions //------------------------------------

@@ -1,57 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1904969132745315495
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1328080476843783271}
-  - component: {fileID: 6599675306297937152}
-  m_Layer: 0
-  m_Name: Layer1_Walls
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1328080476843783271
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1904969132745315495}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3282455991741977539}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6599675306297937152
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1904969132745315495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orderInLayer: -15
-  sortingLayer:
-    m_LayerName: Background
-    m_LayerID: 438391897
-  followCamera: 0
-  parallaxEffectX: 0
-  parallaxEffectY: 0
-  parallaxRange: 5
 --- !u!1 &2694273594734351583
 GameObject:
   m_ObjectHideFlags: 0
@@ -82,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2017107155021506510}
-  - {fileID: 1328080476843783271}
+  - {fileID: 4851826421313457145}
   - {fileID: 1254467266685977639}
   - {fileID: 3341069836360536612}
   - {fileID: 8006558434120702669}
@@ -98,7 +46,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8006558434120702669}
-  - component: {fileID: 867505069114136650}
+  - component: {fileID: 6826990700276019167}
   m_Layer: 0
   m_Name: Layer4_ParalaxObjects
   m_TagString: Untagged
@@ -121,7 +69,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3282455991741977539}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &867505069114136650
+--- !u!114 &6826990700276019167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,17 +78,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 3950283706052020224}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundType: 2
+  useCustomLayer: 1
   orderInLayer: -18
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  followCamera: 0
-  parallaxEffectX: 0.4
-  parallaxEffectY: 0.4
-  parallaxRange: 20
+  maxHorizontalParallax: 0.2
+  maxVerticalParallax: 0.2
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &4578070229102411650
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3341069836360536612}
-  - component: {fileID: 391148073143140505}
+  - component: {fileID: 5114707441453573547}
   m_Layer: 0
   m_Name: Layer3_ParalaxObjects
   m_TagString: Untagged
@@ -173,7 +125,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3282455991741977539}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &391148073143140505
+--- !u!114 &5114707441453573547
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,17 +134,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4578070229102411650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundType: 2
+  useCustomLayer: 1
   orderInLayer: -17
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  followCamera: 0
-  parallaxEffectX: 0.35
-  parallaxEffectY: 0.35
-  parallaxRange: 20
+  maxHorizontalParallax: 0.5
+  maxVerticalParallax: 0.2
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6061294750296568520
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,7 +158,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2017107155021506510}
-  - component: {fileID: 2023627087917036773}
+  - component: {fileID: 2133224461923247944}
   m_Layer: 0
   m_Name: Layer0_Foreground
   m_TagString: Untagged
@@ -225,7 +181,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3282455991741977539}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2023627087917036773
+--- !u!114 &2133224461923247944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -234,17 +190,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 6061294750296568520}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundType: 2
+  useCustomLayer: 1
   orderInLayer: 20
   sortingLayer:
     m_LayerName: Foreground
     m_LayerID: 776302797
-  followCamera: 0
-  parallaxEffectX: 0
-  parallaxEffectY: 0
-  parallaxRange: 20
+  maxHorizontalParallax: 0.9
+  maxVerticalParallax: 0.9
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6176657177239963657
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,7 +214,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1254467266685977639}
-  - component: {fileID: 5717007796120681647}
+  - component: {fileID: 3409859929922699532}
   m_Layer: 0
   m_Name: Layer2_ParalaxObjects
   m_TagString: Untagged
@@ -277,7 +237,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3282455991741977539}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5717007796120681647
+--- !u!114 &3409859929922699532
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -286,17 +246,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 6176657177239963657}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundType: 2
+  useCustomLayer: 1
   orderInLayer: -16
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  followCamera: 0
-  parallaxEffectX: 0.3
-  parallaxEffectY: 0.3
-  parallaxRange: 20
+  maxHorizontalParallax: 0.8
+  maxVerticalParallax: 0.2
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &7505008654064531884
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +270,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5580011918406320416}
-  - component: {fileID: 6797311345467741720}
+  - component: {fileID: 5421136166707445525}
   m_Layer: 0
   m_Name: Layer5_Background
   m_TagString: Untagged
@@ -329,7 +293,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3282455991741977539}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6797311345467741720
+--- !u!114 &5421136166707445525
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,14 +302,74 @@ MonoBehaviour:
   m_GameObject: {fileID: 7505008654064531884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundType: 0
+  useCustomLayer: 1
   orderInLayer: -20
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  followCamera: 0
-  parallaxEffectX: 0
-  parallaxEffectY: 0
-  parallaxRange: 20
+  maxHorizontalParallax: 0
+  maxVerticalParallax: 0
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
+--- !u!1 &8845714418037494450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4851826421313457145}
+  - component: {fileID: 8847227704891674577}
+  m_Layer: 0
+  m_Name: Layer1_Wall
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4851826421313457145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8845714418037494450}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3282455991741977539}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8847227704891674577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8845714418037494450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundType: 0
+  useCustomLayer: 1
+  orderInLayer: -15
+  sortingLayer:
+    m_LayerName: Background
+    m_LayerID: 438391897
+  maxHorizontalParallax: 0
+  maxVerticalParallax: 0
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 0
+  cameraOffset: {x: 0, y: 0, z: 0}

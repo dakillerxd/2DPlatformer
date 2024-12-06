@@ -219,7 +219,6 @@ public class GameManager : MonoBehaviour
                 return collectible.collected;
             }
         }
-        Debug.LogError("Collectible not found");
         return false;
     }
 

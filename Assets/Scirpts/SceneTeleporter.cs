@@ -48,7 +48,7 @@ public class SceneTeleporter : MonoBehaviour
         }
 
         // Store original settings
-        bool wasKinematic = rb.isKinematic;
+        RigidbodyType2D oRigidbodyType = rb.bodyType;
         RigidbodyConstraints2D originalConstraints = rb.constraints;
         Vector2 originalVelocity = rb.linearVelocity;
 
@@ -81,7 +81,7 @@ public class SceneTeleporter : MonoBehaviour
         }
 
         // Freeze position at the end
-        rb.isKinematic = true;
+        rb.bodyType = RigidbodyType2D.Kinematic;;
         rb.linearVelocity = Vector2.zero;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
@@ -98,7 +98,7 @@ public class SceneTeleporter : MonoBehaviour
         }
 
         // Restore original settings (though not strictly necessary since we're changing scenes)
-        rb.isKinematic = wasKinematic;
+        rb.bodyType = oRigidbodyType;
         rb.constraints = originalConstraints;
         rb.linearVelocity = originalVelocity;
     }

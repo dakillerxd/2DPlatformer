@@ -3,9 +3,11 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public enum PlayerState {
     Controllable,
@@ -79,15 +81,17 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] [Range(0, 3f)] private float wallCheckDistance = 0.02f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckHorizontalDistance = 0.5f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 2f;
+    [SerializeField] [Range(0, 3f)] private float groundCheckVerticalDistance = 2f;
     private bool _isTouchingGround;
     private bool _isTouchingPlatform;
     private bool _isTouchingWall;
     private bool _isTouchingWallOnRight;
     private bool _isTouchingWallOnLeft;
     private bool _onGroundObject;
+    private bool _isGroundBelow;
+    private SoftObject _softObject;
     private Rigidbody2D _movingRigidbody;
     private float _movingRigidbodyLastVelocityX;
-    private SoftObject _softObject;
 
     
     [Header("Climb Steps")]
@@ -222,7 +226,7 @@ public class PlayerController : MonoBehaviour {
     
     [Header("Zoom")]
     [SerializeField] private float runningZoomOffset = 2f;
-    [SerializeField] private float teleportZoomOffset = -2f;
+    [SerializeField] private float frozenZoomOffset = -2f;
     [EndTab]
     
     
@@ -873,6 +877,13 @@ public class PlayerController : MonoBehaviour {
             RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
             Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
             ledgeOnLeft = !hitLeft;
+            
+        } else { // if the player is in the air check there is ground below him
+            
+            // Check collision with ground
+            RaycastHit2D hit = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, groundCheckVerticalDistance, combinedGroundMask );
+            Debug.DrawRay(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (groundCheckVerticalDistance), Color.red);
+            _isGroundBelow = hit;
         }
         
         // Check if on platform
@@ -1340,7 +1351,7 @@ public class PlayerController : MonoBehaviour {
         if (currentPlayerState == PlayerState.Frozen)
         {
             CameraController.Instance.SetDynamicOffset(Vector3.zero);
-            CameraController.Instance.SetDynamicZoom(teleportZoomOffset);
+            CameraController.Instance.SetDynamicZoom(frozenZoomOffset);
             return;
         }
     
@@ -1360,12 +1371,12 @@ public class PlayerController : MonoBehaviour {
         }
 
         // Vertical Offset
-        if (isGrounded || isJumping) {
+        if (isGrounded || isJumping || _isGroundBelow) {
             offset.y = baseVerticalOffset;
         } else if (isFastFalling || isWallSliding) {
             offset.y = -baseVerticalOffset + rigidBody.linearVelocityY / verticalMoveDiminisher;
         } else if (isFalling) {
-            offset.y = -baseVerticalOffset;
+            offset.y = -baseVerticalOffset + rigidBody.linearVelocityY / verticalMoveDiminisher;
         }
 
         // Zoom
@@ -1385,52 +1396,103 @@ public class PlayerController : MonoBehaviour {
     
     #region Debugging functions //------------------------------------
 
-    private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
-    public void UpdateDebugText(TextMeshProUGUI textObject) {
+        private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
+        public void UpdateDebugText(TextMeshProUGUI textObject) {
+            _debugStringBuilder.Clear();
+            
+            // Core Stats Section
+            AppendHeader("Player");
+            AppendStat("HP", $"{_currentHealth}/{maxHealth}");
+            AppendStat("Deaths", _deaths.ToString());
+            AppendStat("Velocity", $"X: {rigidBody.linearVelocityX:F1} Y: {rigidBody.linearVelocityY:F1}");
+            AppendStat("Speed", $"Move: {_moveSpeed:F1} Fall: {fallSpeed:F1}");
+            if (doubleJumpAbility) {
+                AppendStat("Air Jumps", $"{_remainingAirJumps}/{maxAirJumps}");
+            }
+            if (dashAbility) {
+                AppendStat("Dashes", $"{_remainingDashes}/{maxDashes}");
+                AppendStat("Dash CD", $"{_dashCooldownTimer:F1}s/{dashCooldownDuration:F1}s");
+            }
 
-                _debugStringBuilder.Clear();
-                
-                _debugStringBuilder.AppendFormat("Player:\n");
-                _debugStringBuilder.AppendFormat("Health: {0} / {1}\n", _currentHealth, maxHealth);
-                _debugStringBuilder.AppendFormat("Deaths: {0}\n\n", _deaths);
-                if (doubleJumpAbility) _debugStringBuilder.AppendFormat("Jumps: {0} / {1}\n", _remainingAirJumps, maxAirJumps);
-                if (dashAbility) _debugStringBuilder.AppendFormat("Dashes: {0} / {1} ({2:0.0} / {3:0.0})\n", _remainingDashes, maxDashes, _dashCooldownTimer, dashCooldownDuration);
-                _debugStringBuilder.AppendFormat("Velocity: ({0:0.0},{1:0.0})\n", rigidBody.linearVelocityX, rigidBody.linearVelocityY);
-                _debugStringBuilder.AppendFormat("Move Speed: ({0:0.0},{1:0.0})\n", _moveSpeed, fallSpeed);
+            
+            // Movement State Section
+            AppendHeader("Movement");
+            AppendStatGroup(new Dictionary<string, bool> {
+                { "Running", isRunning },
+                { "Was Running", wasRunning },
+                { "Jumping", isJumping },
+                { "Wall Sliding", isWallSliding },
+                { "Fast Dropping", isFastDropping },
+                { "Fast Falling", isFastFalling },
+                { "Max Fall Speed", atMaxFallSpeed }
+            });
+            
+            // Player State Section
+            AppendHeader("Status");
+            AppendStatGroup(new Dictionary<string, (bool state, float? timer)> {
+                { "Facing Right", (isFacingRight, null) },
+                { "Invincible", (isInvincible, _invincibilityTime) },
+                { "Stun Locked", (isStunLocked, _stunLockTime) },
+                { "Coyote Jump", (_canCoyoteJump, _coyoteJumpTime) }
+            });
+            
+            // Collision State Section
+            AppendHeader("Collisions");
+            AppendStatGroup(new Dictionary<string, bool> {
+                { "Grounded", isGrounded },
+                { "On Platform", isOnPlatform },
+                { "Wall Right", _isTouchingWallOnRight },
+                { "Wall Left", _isTouchingWallOnLeft },
+                { "Ledge Right", ledgeOnRight },
+                { "Ledge Left", ledgeOnLeft }
+            });
+            
+            // Ground Object Info
+            if (_movingRigidbody != null) {
+                AppendStat("Ground Object", $"Vel: {_movingRigidbody.linearVelocityX:F1} Last: {_movingRigidbodyLastVelocityX:F1}");
+            }
+            if (_softObject != null) {
+                AppendStat("Soft Object", "Active");
+            }
+            
+            // Log Section
+            if (!string.IsNullOrEmpty(_logText)) {
+                AppendHeader("Log");
+                _debugStringBuilder.AppendLine(_logText);
+            }
+            
+            textObject.text = _debugStringBuilder.ToString();
+        }
 
-                _debugStringBuilder.AppendFormat("\nStates:\n");
-                _debugStringBuilder.AppendFormat("Facing Right: {0}\n", isFacingRight);
-                _debugStringBuilder.AppendFormat("Invincible: {0} ({1:0.0})\n", isInvincible, _invincibilityTime);
-                _debugStringBuilder.AppendFormat("Stun Locked: {0} ({1:0.0})\n", isStunLocked, _stunLockTime);
-                _debugStringBuilder.AppendFormat("Jumping: {0}\n", isJumping);
-                _debugStringBuilder.AppendFormat("Running: {0}, {1}\n", isRunning, wasRunning);
-                if (dashAbility) _debugStringBuilder.AppendFormat("Dashing: {0}\n", isDashing);
-                if (wallSlideAbility) _debugStringBuilder.AppendFormat("Wall Sliding: {0}\n", isWallSliding);
-                if (canFastDrop) _debugStringBuilder.AppendFormat("Fast Dropping: {0}\n", isFastDropping);
-                _debugStringBuilder.AppendFormat("Coyote Jumping: {0} ({1:0.0} / {2:0.0})\n",_canCoyoteJump, _coyoteJumpTime,coyoteJumpBuffer);
-                _debugStringBuilder.AppendFormat("Fast Falling: {0}\n", isFastFalling);
-                _debugStringBuilder.AppendFormat("At Max Fall Speed: {0}\n", atMaxFallSpeed);
+        private void AppendHeader(string header) {
+            _debugStringBuilder.AppendLine($"\n<color=#00FF00>{header}</color>");
+            // _debugStringBuilder.AppendLine("---------------");
+        }
 
-                _debugStringBuilder.AppendFormat("\nCollisions:\n");
-                _debugStringBuilder.AppendFormat("Grounded: {0}\n", isGrounded);
-                _debugStringBuilder.AppendFormat("On Platform: {0}\n", isOnPlatform);
-                _debugStringBuilder.AppendFormat("Touching Wall on Right: {0}, Left: {1}\n", _isTouchingWallOnRight, _isTouchingWallOnLeft);
-                _debugStringBuilder.AppendFormat("Ledge on Right: {0}, Left: {1}\n", ledgeOnRight, ledgeOnLeft);
-                _debugStringBuilder.AppendFormat("Ground Object: {0} {1:0.0} {2:0.0}\n", _movingRigidbody, _movingRigidbody?.linearVelocityX, _movingRigidbodyLastVelocityX);
-                _debugStringBuilder.AppendFormat("Soft Object: {0}\n", _softObject);
+        private void AppendStat(string label, string value) {
+            _debugStringBuilder.AppendLine($"{label}: {value}");
+        }
 
-                _debugStringBuilder.AppendFormat("\nInputs:\n");
-                _debugStringBuilder.AppendFormat($"H/V: {_horizontalInput:F2} / {_verticalInput:F2}\n");
-                // _debugStringBuilder.AppendFormat("Run: {0}\n", _runInput);
-                // _debugStringBuilder.AppendFormat("Jump: {0}  ({1:0.0} / {2:0.0})\n", InputManager.JumpWasPressed, _variableJumpHeldDuration, variableJumpMaxHoldDuration);
-                // _debugStringBuilder.AppendFormat("Dash: {0}\n", InputManager.DashWasPressed);
-                // _debugStringBuilder.AppendFormat("Drop Down: {0}\n", _dropDownInput);
-                
-                _debugStringBuilder.AppendFormat("\n{0}\n", _logText);
+        private void AppendStatGroup(Dictionary<string, bool> states) {
+            foreach (var (label, state) in states) {
+                if (state) {
+                    _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}");
+                } else {
+                    _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}");
+                }
+            }
+        }
 
-                textObject.text = _debugStringBuilder.ToString();
-    }
-    
+        private void AppendStatGroup(Dictionary<string, (bool state, float? timer)> states) {
+            foreach (var (label, info) in states) {
+                string timerText = info.timer.HasValue ? $" ({info.timer:F1}s)" : "";
+                if (info.state) {
+                    _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}{timerText}");
+                } else {
+                    _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}{timerText}");
+                }
+            }
+        }
     #endregion Debugging functions
     
 }

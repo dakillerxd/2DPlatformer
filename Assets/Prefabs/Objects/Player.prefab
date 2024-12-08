@@ -624,6 +624,7 @@ MonoBehaviour:
   wallCheckDistance: 0.02
   ledgeCheckHorizontalDistance: 0.5
   ledgeCheckVerticalDistance: 2
+  groundCheckVerticalDistance: 3
   autoClimbSteps: 0
   stepHeight: 0.12
   stepWidth: 0.1
@@ -676,12 +677,18 @@ MonoBehaviour:
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
   landVfx: {fileID: 5060159489429807464, guid: df6e33d8b8e298f4b83972fbf598075d, type: 3}
   landMaxSpeedVfx: {fileID: 2330993811950128915, guid: 12fc2adb50925694087370efed179643, type: 3}
-  hurtColor: {r: 1, g: 0, b: 0, a: 1}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
   deadColor: {r: 0, g: 0, b: 0, a: 0}
   onPlayerDeath:
     m_PersistentCalls:
       m_Calls: []
+  isMoving: 0
+  baseHorizontalOffset: 1
+  baseVerticalOffset: 1.5
+  horizontalMoveDiminisher: 1
+  verticalMoveDiminisher: 1
+  runningZoomOffset: 2
+  frozenZoomOffset: -2
 --- !u!1 &4153000382075459821
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,13 +4,26 @@ using CustomAttribute;
 using System.Collections;
 using VInspector;
 
+public enum TeleportType
+{
+    NextScene,
+    SelectedScene,
+    SameSceneLocation
+}
+
 public class SceneTeleporter : MonoBehaviour 
 {
     [Header("Settings")]
+    [SerializeField] private TeleportType teleportType = TeleportType.NextScene;
     [SerializeField] private bool activated = false;
-    [SerializeField] private bool goToNextLevel = true;
-    [SerializeField] private SceneField sceneToLoad;
     [SerializeField] [Min(0f)] private float pullDuration = 1.5f;
+    
+    [Header("Selected Scene Teleport")]
+    [SerializeField] private SceneField sceneToLoad;
+    
+    [Header("Same Scene Teleport")]
+    [SerializeField] private Transform destinationPoint;
+    [SerializeField] [Min(0f)] private float sameSceneTeleportDelay = 0.5f;
     
     [Header("References")]
     [SerializeField] public Animator animator;
@@ -18,6 +31,16 @@ public class SceneTeleporter : MonoBehaviour
     private void Start()
     {
         VFXManager.Instance?.PlayAnimationTrigger(animator, "Spawn");
+        
+        // Validate settings
+        if (teleportType == TeleportType.SameSceneLocation && destinationPoint == null)
+        {
+            Debug.LogWarning("Destination point is not set for same scene teleportation!");
+        }
+        else if (teleportType == TeleportType.SelectedScene && sceneToLoad == null)
+        {
+            Debug.LogWarning("Scene to load is not set for selected scene teleportation!");
+        }
     }
     
     private void OnTriggerEnter2D(Collider2D other)
@@ -28,17 +51,38 @@ public class SceneTeleporter : MonoBehaviour
         StartCoroutine(PlayAnimationAndTeleport(parentTransform));
     }
 
-    private void GoToSelectedLevel() {
-        if (sceneToLoad != null) {
-            SceneManager.LoadScene(sceneToLoad.SceneName);
+    private void ExecuteTeleport() 
+    {
+        switch (teleportType)
+        {
+            case TeleportType.NextScene:
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                break;
+                
+            case TeleportType.SelectedScene:
+                if (sceneToLoad != null) {
+                    SceneManager.LoadScene(sceneToLoad.SceneName);
+                }
+                break;
+                
+            case TeleportType.SameSceneLocation:
+                if (destinationPoint != null) {
+                    PlayerController.Instance.transform.position = destinationPoint.position;
+                }
+                activated = false; // Reset activation for same-scene teleports
+                TeleportOut();
+                break;
         }
     }
-    
-    private void GoToNextLevel() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
+    private void TeleportOut()
+    {
+        StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
+        StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
     }
     
-    private IEnumerator PlayAnimationAndTeleport(Transform objectTransform) {
+    private IEnumerator PlayAnimationAndTeleport(Transform objectTransform) 
+    {
         activated = true;
         Rigidbody2D rb = objectTransform.GetComponentInChildren<Rigidbody2D>();
         
@@ -69,37 +113,26 @@ public class SceneTeleporter : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / pullDuration);
             float smoothT = Mathf.SmoothStep(0, 1, t);
-            
+                
             // Calculate new position
             Vector2 newPosition = Vector2.Lerp(startPos, targetPos, smoothT);
-            
+                
             // Move the rigidbody
             rb.linearVelocity = Vector2.zero;
             rb.MovePosition(newPosition);
-            
+                
             yield return null;
         }
-
-        // Freeze position at the end
-        rb.bodyType = RigidbodyType2D.Kinematic;;
-        rb.linearVelocity = Vector2.zero;
-        rb.constraints = RigidbodyConstraints2D.FreezeAll;
-
+            
         // Wait a moment at the end
         yield return new WaitForSeconds(0.2f);
         
-        if (goToNextLevel)
+        if (teleportType == TeleportType.SameSceneLocation)
         {
-            GoToNextLevel();
+            yield return new WaitForSeconds(sameSceneTeleportDelay);
         }
-        else
-        {
-            GoToSelectedLevel();
-        }
-
-        // Restore original settings (though not strictly necessary since we're changing scenes)
-        rb.bodyType = oRigidbodyType;
-        rb.constraints = originalConstraints;
-        rb.linearVelocity = originalVelocity;
+        
+        
+        ExecuteTeleport();
     }
 }

@@ -230,8 +230,9 @@ public class CameraController : MonoBehaviour
             case CameraState.Locked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
                     Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    Vector3 fixedPosWithOffset = cameraPos.position + _targetTriggerOffset;
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, fixedPosWithOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, fixedPosWithOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
                 break;
 
@@ -268,33 +269,32 @@ public class CameraController : MonoBehaviour
 
 #region Offset
 
-    private void HandleOffsetBoundaries()
+private void HandleOffsetBoundaries()
+{
+    if (!target || !useTargetOffsetBoundaries || cameraState == CameraState.Locked) return;
+    
+    bool horizontalDelay = Time.time < _lastStateChangeTime + 1f;
+    Vector3 position = transform.position;
+    
+    // Only apply boundary handling if we have active triggers
+    // AND they have non-zero boundaries
+    if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
     {
-        if (!target || !useTargetOffsetBoundaries || cameraState == CameraState.Locked) return;
-        
-        if (Time.time < _lastStateChangeTime + 2f)
-        {
-            return;
-        }
-        Vector3 position = transform.position;
-        
-        // Only apply boundary handling if we have active triggers
-        // AND they have non-zero boundaries
-        if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
-        {
-            // Calculate offset-based boundaries
-            float offsetMinX = target.position.x + minHorizontalOffset;
-            float offsetMaxX = target.position.x + maxHorizontalOffset;
-            float offsetMinY = target.position.y + minVerticalOffset;
-            float offsetMaxY = target.position.y + maxVerticalOffset;
+        // Calculate offset-based boundaries
+        float offsetMinX = target.position.x + minHorizontalOffset;
+        float offsetMaxX = target.position.x + maxHorizontalOffset;
+        float offsetMinY = target.position.y + minVerticalOffset;
+        float offsetMaxY = target.position.y + maxVerticalOffset;
 
-            // Check if offset boundaries are within trigger boundaries and respect camera state
-            bool useOffsetX = offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary 
-                && cameraState != CameraState.HorizontalLocked;
-            bool useOffsetY = offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary 
-                && cameraState != CameraState.VerticalLocked;
+        // Check if offset boundaries are within trigger boundaries and respect camera state
+        bool useOffsetX = offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary 
+            && cameraState != CameraState.HorizontalLocked;
+        bool useOffsetY = offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary 
+            && cameraState != CameraState.VerticalLocked;
 
-            // Apply X boundaries
+        // Apply X boundaries (with delay check)
+        if (!horizontalDelay)
+        {
             if (useOffsetX)
             {
                 // Use both offset and trigger boundaries
@@ -309,42 +309,46 @@ public class CameraController : MonoBehaviour
                 // Use only trigger boundaries if not horizontal locked
                 position.x = Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary);
             }
-
-            // Apply Y boundaries
-            if (useOffsetY)
-            {
-                // Use both offset and trigger boundaries
-                position.y = Mathf.Clamp(
-                    position.y,
-                    Mathf.Max(offsetMinY, _minYBoundary),
-                    Mathf.Min(offsetMaxY, _maxYBoundary)
-                );
-            }
-            else if (cameraState != CameraState.VerticalLocked)
-            {
-                // Use only trigger boundaries if not vertical locked
-                position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
-            }
         }
-        else if (cameraState == CameraState.Free) // No active triggers, just use offset boundaries if in free state
+
+        // Apply Y boundaries (no delay)
+        if (useOffsetY)
+        {
+            // Use both offset and trigger boundaries
+            position.y = Mathf.Clamp(
+                position.y,
+                Mathf.Max(offsetMinY, _minYBoundary),
+                Mathf.Min(offsetMaxY, _maxYBoundary)
+            );
+        }
+        else if (cameraState != CameraState.VerticalLocked)
+        {
+            // Use only trigger boundaries if not vertical locked
+            position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
+        }
+    }
+    else if (cameraState == CameraState.Free) // No active triggers, just use offset boundaries if in free state
+    {
+        if (!horizontalDelay)
         {
             position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
+        }
+        position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
+    }
+    else // Handle locked states without triggers
+    {
+        if (!horizontalDelay && cameraState != CameraState.HorizontalLocked)
+        {
+            position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
+        }
+        if (cameraState != CameraState.VerticalLocked)
+        {
             position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
         }
-        else // Handle locked states without triggers
-        {
-            if (cameraState != CameraState.HorizontalLocked)
-            {
-                position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
-            }
-            if (cameraState != CameraState.VerticalLocked)
-            {
-                position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
-            }
-        }
-        
-        transform.position = position;
     }
+    
+    transform.position = position;
+}
     
     public void SetDynamicOffset(Vector3 offset)
     {
@@ -461,11 +465,7 @@ public class CameraController : MonoBehaviour
             _debugStringBuilder.AppendFormat("X: {0:0.0} to {1:0.0}\n", _minXBoundary, _maxXBoundary);
             _debugStringBuilder.AppendFormat("Y: {0:0.0} to {1:0.0}\n", _minYBoundary, _maxYBoundary);
         }
-
-        // Shake Effect
-        if (_isShaking) {
-            _debugStringBuilder.AppendFormat("\nShake Active: ({0:0.0}, {1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
-        }
+        
 
         // Active Triggers
         if (_activeTriggers.Count > 0) {
@@ -475,11 +475,16 @@ public class CameraController : MonoBehaviour
                 _debugStringBuilder.AppendFormat("{0}. {1} [{2}]{3}{4}{5}\n", 
                     i + 1, 
                     "Trigger",
-                    trigger.setCameraStateOnEnter ? trigger.cameraStateOnEnter.ToString() : "No State",
+                    trigger.setCameraStateOnEnter ? trigger.cameraStateOnEnter.ToString() : "",
                     trigger.limitCameraToBoundary ? " (Bounded)" : "",
                     trigger.setCameraZoom ? string.Format(" (Zoom: {0:+0.0;-0.0;0})", trigger.zoomOffset) : "",
                     trigger.setCameraOffset ? string.Format(" (Offset: {0:0.0}, {1:0.0})", trigger.offset.x, trigger.offset.y) : "");
             }
+        }
+        
+        // Shake Effect
+        if (_isShaking) {
+            _debugStringBuilder.AppendFormat("\nShake Active: ({0:0.0}, {1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
         }
 
         textObject.text = _debugStringBuilder.ToString();

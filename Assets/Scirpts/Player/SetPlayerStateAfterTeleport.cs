@@ -24,6 +24,7 @@ public class SetPlayerStateAfterTeleport : StateMachineBehaviour
         base.OnStateExit(animator, stateInfo, layerIndex);
         PlayerController.Instance.SetPlayerState(PlayerState.Controllable);
     }
+    
     // OnStateMove is called right after Animator.OnAnimatorMove()
     //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{

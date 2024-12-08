@@ -7,22 +7,37 @@ using UnityEngine.UI;
 public class LevelSelectionMenu : MonoBehaviour
 {
     
-    [Header("Buttons")]
+    [Header("References")]
+    [SerializeField] private GameObject mainMenuPosition;
     [SerializeField] private Button buttonLevelSelectBack;
+    [SerializeField] private Button buttonShowcaseLevel;
+    [SerializeField] private Button buttonTestLevel;
     [SerializeField] private Button buttonLevelPrefab;
     [SerializeField] private GameObject levelsContainer;
     [SerializeField] private SceneField[] levels;
     
-    [Header("References")]
-    [SerializeField] private GameObject mainMenuPosition;
+
     
 
-    void Start()
+    private void Start()
     {
         if (buttonLevelSelectBack != null)
         {
             buttonLevelSelectBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonLevelSelectBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
+        }
+        if (buttonShowcaseLevel != null)
+        {
+            buttonShowcaseLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonShowcaseLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+            buttonShowcaseLevel.onClick.AddListener(() => SceneManager.LoadScene("Showcase Level"));
+        }
+        
+        if (buttonTestLevel != null)
+        {
+            buttonTestLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonTestLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+            buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("Test Level"));
         }
 
         if (levels.Length == 0 || !buttonLevelPrefab || !levelsContainer) return;

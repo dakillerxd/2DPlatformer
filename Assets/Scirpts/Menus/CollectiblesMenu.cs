@@ -7,16 +7,25 @@ using UnityEngine.UI;
 public class CollectiblesMenu : MonoBehaviour
 {
     
-    [Header("References")]
-    [SerializeField] private Button buttonLevelSelectBack;
-    [SerializeField] private Button buttonResetCollectibles;
-    [SerializeField] private GameObject mainMenuPosition;
+    [Header("Collectibles")]
     [SerializeField] private TextMeshProUGUI coinsHeaderText;
     [SerializeField] private TextMeshProUGUI coinsText;
+    
+
+    
+    
+    [Header("Unlocks")]
     [SerializeField] private TextMeshProUGUI unlocksHeaderText;
     [SerializeField] private TextMeshProUGUI unlocksText;
-    [FormerlySerializedAs("unlock1")] [SerializeField] private Toggle googlyEyesToggle;
+    [SerializeField] private Toggle googlyEyesToggle;
+    [SerializeField] private Toggle propellerHatToggle;
     private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
+    
+    
+    [Header("Other")]
+    [SerializeField] private GameObject mainMenuPosition;
+    [SerializeField] private Button buttonLevelSelectBack;
+    [SerializeField] private Button buttonResetCollectibles;
     
     
 
@@ -49,6 +58,12 @@ public class CollectiblesMenu : MonoBehaviour
             googlyEyesToggle.interactable = GameManager.Instance.googlyEyesModeReceived;
             googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleGooglyEyeMode(value));
         }
+        
+        if (propellerHatToggle != null) {
+            propellerHatToggle.isOn = GameManager.Instance.propellerHat;
+            propellerHatToggle.interactable = GameManager.Instance.propellerHatReceived;
+            propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.TogglePropellerHat(value));
+        }
     }
 
 
@@ -59,9 +74,9 @@ public class CollectiblesMenu : MonoBehaviour
         if (GameManager.Instance?.collectibles == null) return;
         
         unlocksText.text = 
-            $"{GameManager.Instance.collectiblesForGooglyEyes} Coins: {(GameManager.Instance.googlyEyesModeReceived ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
-            $"{GameManager.Instance.collectiblesForBonusLevel1} Coins: {(GameManager.Instance.bonusLevel1Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n" +
-            $"{GameManager.Instance.collectiblesForBonusLevel2} Coins: {(GameManager.Instance.bonusLevel2Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
+            $"{GameManager.Instance.collectiblesForUnlock1} Coins: {(GameManager.Instance.googlyEyesModeReceived ? "<color=green>Propeller Hat</color>" : "<color=red>Propeller Hat</color>")}\n \n" +
+            $"{GameManager.Instance.collectiblesForUnlock2} Coins: {(GameManager.Instance.propellerHatReceived ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
+            $"{GameManager.Instance.collectiblesForUnlock3} Coins: {(GameManager.Instance.bonusLevel1Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
     }
     
     

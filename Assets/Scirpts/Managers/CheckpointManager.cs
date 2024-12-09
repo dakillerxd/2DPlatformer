@@ -47,6 +47,12 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         playerSpawnPoint = newSpawnPoint;
         Debug.Log("Set spawn point to: " + playerSpawnPoint);
     }
+    
+    public void SetStartTeleporter(SceneTeleporter newStartTeleporter)
+    {
+        startTeleporter = newStartTeleporter;
+        Debug.Log("Set start teleporter to: " + startTeleporter);
+    }
 
     public void PlayTeleporterAnimation()
     {

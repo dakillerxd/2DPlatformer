@@ -1304,6 +1304,7 @@ public class PlayerController : MonoBehaviour {
         
         // SetPlayerState(PlayerState.Frozen);
         // PlayAnimation("ReceiveAbility");
+        HealToFullHealth();
         VFXManager.Instance?.SpawnParticleEffect(healVfx, transform.position, Quaternion.identity);
         SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
         
@@ -1314,6 +1315,11 @@ public class PlayerController : MonoBehaviour {
         normalEye.SetActive(!GameManager.Instance.googlyEyes);
         googlyEye.SetActive(GameManager.Instance.googlyEyes);
         propellerHat.SetActive(GameManager.Instance.propellerHat);
+
+        if (propellerHat)
+        {
+            googlyEye.transform.localScale = new Vector3(1, 1, 1);
+        }
         
     }
     

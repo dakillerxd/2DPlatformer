@@ -48,11 +48,11 @@ public class GameManager : MonoBehaviour
     [Space(10)]
     public Collectible[] collectibles;
     public bool googlyEyesModeReceived {get ; private set;}
+    public bool propellerHatReceived {get ; private set;}
     public bool bonusLevel1Received {get ; private set;}
-    public bool bonusLevel2Received {get ; private set;}
-    public int collectiblesForGooglyEyes {get ; private set;} // Set in awake
-    public int collectiblesForBonusLevel1 {get ; private set;} // Set in awake
-    public int collectiblesForBonusLevel2 {get ; private set;} // Set in awake
+    public int collectiblesForUnlock1 {get ; private set;} // Set in awake
+    public int collectiblesForUnlock2 {get ; private set;} // Set in awake
+    public int collectiblesForUnlock3 {get ; private set;} // Set in awake
 
     
     [Tab("References")] // ----------------------------------------------------------------------
@@ -72,9 +72,9 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        collectiblesForGooglyEyes = 2;
-        collectiblesForBonusLevel1 = 7;
-        collectiblesForBonusLevel2 = 7;
+        collectiblesForUnlock1 = 2;
+        collectiblesForUnlock2 = 4;
+        collectiblesForUnlock3 = 7;
     }
     
     private void Start() {
@@ -194,7 +194,11 @@ public class GameManager : MonoBehaviour
         googlyEyes = state;
         // VFXManager.Instance?.ToggleChromaticAberration(state);
         VFXManager.Instance?.ToggleLensDistortion(state);
-        Debug.Log("Googly Eyes Mode: " + state);
+    }
+    
+    public void TogglePropellerHat(bool state) {
+
+        propellerHat = state;
     }
 
     #endregion GameStates
@@ -251,9 +255,10 @@ public class GameManager : MonoBehaviour
             collectible.collected = SaveManager.Instance.LoadBool("Collectible " + collectible.connectedLevel.SceneName);
         }
 
-        googlyEyesModeReceived = TotalCollectiblesCollected() >= collectiblesForGooglyEyes;
-        bonusLevel1Received = TotalCollectiblesCollected() >= collectiblesForBonusLevel1;
-        bonusLevel2Received = TotalCollectiblesCollected() >= collectiblesForBonusLevel2;
+        propellerHatReceived = TotalCollectiblesCollected() >= collectiblesForUnlock1;
+        googlyEyesModeReceived = TotalCollectiblesCollected() >= collectiblesForUnlock2;
+        bonusLevel1Received = TotalCollectiblesCollected() >= collectiblesForUnlock3;
+
     }
     
     public void ResetCollectibles() {

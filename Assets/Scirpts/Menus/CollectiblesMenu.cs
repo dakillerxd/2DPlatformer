@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -13,12 +14,14 @@ public class CollectiblesMenu : MonoBehaviour
     
 
     
-    
     [Header("Unlocks")]
     [SerializeField] private TextMeshProUGUI unlocksHeaderText;
     [SerializeField] private TextMeshProUGUI unlocksText;
     [SerializeField] private Toggle googlyEyesToggle;
     [SerializeField] private Toggle propellerHatToggle;
+    [SerializeField] private GameObject normalEyes;
+    [SerializeField] private GameObject googlyEyes;
+    [SerializeField] private GameObject propellerHat;
     private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
     
     
@@ -49,6 +52,13 @@ public class CollectiblesMenu : MonoBehaviour
         UpdateUnlocks();
         UpdateCoinText();
         UpdateUnlocksText();
+    }
+
+    private void Update()
+    {
+        if (normalEyes != null) normalEyes.SetActive(!GameManager.Instance.googlyEyes);
+        if (googlyEyes != null) googlyEyes.SetActive(GameManager.Instance.googlyEyes);
+        if (propellerHat != null) propellerHat.SetActive(GameManager.Instance.propellerHat);
     }
 
     private void UpdateUnlocks()

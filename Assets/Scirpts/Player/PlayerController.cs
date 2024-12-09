@@ -841,7 +841,6 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Gravity functions 
     
-    
     #region Collision functions //------------------------------------
 
     private void CollisionChecks() {
@@ -984,7 +983,6 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Collision functions
     
-    
     #region Health/Checkpoint functions //------------------------------------
     
     [Button] public void RespawnFromCheckpoint() {
@@ -1117,7 +1115,6 @@ public class PlayerController : MonoBehaviour {
 
     #endregion Health/Checkpoint functions
     
-
     #region Other functions //------------------------------------
     private void CheckForInput() {
 
@@ -1322,7 +1319,7 @@ public class PlayerController : MonoBehaviour {
         googlyEye.SetActive(GameManager.Instance.googlyEyes);
         propellerHat.SetActive(GameManager.Instance.propellerHat);
 
-        if (propellerHat)
+        if (GameManager.Instance.propellerHat)
         {
             googlyEye.transform.localScale = new Vector3(1, 1, 1);
         }
@@ -1403,8 +1400,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     #endregion
-    
-    
     
     #region Debugging functions //------------------------------------
 

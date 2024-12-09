@@ -151,7 +151,7 @@ public class CameraController : MonoBehaviour
             cameraState = currentTrigger.cameraStateOnEnter;
         }
 
-        // Accumulate zoom offsets from all active triggers
+        // Only accumulate zoom offsets from triggers that have setCameraZoom enabled
         foreach (var trigger in _activeTriggers)
         {
             if (trigger.setCameraZoom)
@@ -160,10 +160,10 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        // Accumulate offsets from all active triggers
+        // Only accumulate offsets from triggers that have setCameraOffset enabled
         foreach (var trigger in _activeTriggers)
         {
-            if (trigger.setCameraOffset)
+            if (trigger.setCameraOffset)  // Only add offset if setCameraOffset is true
             {
                 _targetTriggerOffset += trigger.offset;
             }
@@ -238,15 +238,27 @@ public class CameraController : MonoBehaviour
 
             case CameraState.VerticalLocked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedY = Mathf.SmoothDamp(transform.position.y, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
+                    // Apply Y offset to fixed position
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, cameraPos.position.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                } else {
+                    // If no fixed position, follow target with Y offset
+                    smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
+                // Follow target with X offset
                 smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 break;
 
             case CameraState.HorizontalLocked:
                 if (_activeTriggers.Count > 0 && _activeTriggers[_activeTriggers.Count - 1].cameraPosition != null) {
-                    smoothedX = Mathf.SmoothDamp(transform.position.x, _activeTriggers[_activeTriggers.Count - 1].cameraPosition.position.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                    Transform cameraPos = _activeTriggers[_activeTriggers.Count - 1].cameraPosition;
+                    // Apply X offset to fixed position
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, cameraPos.position.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
+                } else {
+                    // If no fixed position, follow target with X offset
+                    smoothedX = Mathf.SmoothDamp(transform.position.x, targetPos.x + _targetTriggerOffset.x, ref _currentVelocityX, baseHorizontalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 }
+                // Follow target with Y offset
                 smoothedY = Mathf.SmoothDamp(transform.position.y, targetPos.y + _targetTriggerOffset.y, ref _currentVelocityY, baseVerticalFollowDelay, Mathf.Infinity, Time.deltaTime);
                 break;
 

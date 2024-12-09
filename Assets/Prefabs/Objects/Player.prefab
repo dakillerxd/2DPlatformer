@@ -820,7 +820,7 @@ MonoBehaviour:
   isMoving: 0
   baseHorizontalOffset: 1
   baseVerticalOffset: 1.5
-  horizontalMoveDiminisher: 1
+  horizontalMoveDiminisher: 1.5
   verticalMoveDiminisher: 1
   runningZoomOffset: 2
   frozenZoomOffset: -2

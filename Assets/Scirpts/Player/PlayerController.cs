@@ -490,14 +490,12 @@ public class PlayerController : MonoBehaviour {
             } else {
                 jumpDirection = "None";
             }
+            
 
             if ((isGrounded || _canCoyoteJump) && !isJumping) { // Ground jump
                 
                 if (_canCoyoteJump && !isGrounded) { _logText = $"Coyote Jumped: {_coyoteJumpTime}";}
-                // Jump
                 ExecuteJump(0, "None");
-                PlayAnimationTrigger("Jump");
-                SoundManager.Instance?.PlaySoundFX("Player Jump");
                 
                 // Reset coyote state
                 _coyoteJumpTime = 0;
@@ -505,27 +503,27 @@ public class PlayerController : MonoBehaviour {
                 
             } else if (!isGrounded && !wallJumpAbility && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump
                 
-                // Jump
                 ExecuteJump(1, jumpDirection);
                 VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimationTrigger("Jump");
-                SoundManager.Instance?.PlaySoundFX("Player Air Jump");
                 
             } else if (!isGrounded && wallJumpAbility && !(_isTouchingWallOnLeft || _isTouchingWallOnRight) && !_canCoyoteJump && doubleJumpAbility && _remainingAirJumps > 0) { // Double Jump when wall jump ability
                 
-                // Jump
                 ExecuteJump(1, jumpDirection);
                 VFXManager.Instance?.PlayVfxEffect(airJumpVfx, true); 
-                PlayAnimationTrigger("Jump");
-                SoundManager.Instance?.PlaySoundFX("Player Air Jump");
+                
             }
         }
-        
     }
+    
+    
     
     private void ExecuteJump(int jumpCost, string side) {
         
         VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
+        PlayAnimationTrigger("Jump");
+        
+        float randPeach = Random.Range(1f, 1.05f);
+        SoundManager.Instance?.PlaySoundFX("Player Jump",0,randPeach);
         
         // Jump
         if (side == "Right") {
@@ -723,7 +721,9 @@ public class PlayerController : MonoBehaviour {
         
         // Effects
         VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
-        SoundManager.Instance?.PlaySoundFX("Player Jump");
+        // PlayAnimationTrigger("Jump");
+        float randPeach = Random.Range(1f, 1.05f);
+        SoundManager.Instance?.PlaySoundFX("Player Jump",0,randPeach);
 
         // Jump
         if (side == "Right") {
@@ -796,18 +796,16 @@ public class PlayerController : MonoBehaviour {
     {
         if (!isFalling || !isGrounded || isDashing) return; // Check if landed
         
-        SoundManager.Instance?.PlaySoundFX("Player Land");
-        
         
         if (fallSpeed < -maxFallSpeed)
         {
+            //     rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
             PlayAnimationTrigger("LandMaxFall");
-            // TurnStunLocked(0.1f);
+            if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
             CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
-            //     rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
+            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.8f);
         }
         else if (fallSpeed < -fastFallSpeed)
         {
@@ -815,16 +813,24 @@ public class PlayerController : MonoBehaviour {
             CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
+            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.85f);
         }
         else if (fallSpeed < -9)
         {
             PlayAnimationTrigger("Land");
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
+            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.9f);
         }
         else if (fallSpeed < -6)
         {
             PlayAnimationTrigger("Land");
+            SoundManager.Instance?.PlaySoundFX("Player Land");
+            
+        }
+        else
+        {
+            SoundManager.Instance?.PlaySoundFX("Player Land");
         }
         
             

@@ -89,7 +89,7 @@ public class SoundManager : MonoBehaviour
 
 #region Sounds
 
-    public void PlaySoundFX(string name, float delay = 0f, Transform spawnTransform = null) {
+    public void PlaySoundFX(string name, float delay = 0f, float peach = 0 , Transform spawnTransform = null) {
         
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
         if (soundFx == null || soundFx.clips.Length == 0) {
@@ -101,7 +101,7 @@ public class SoundManager : MonoBehaviour
             return;
         }
         
-        StartCoroutine(PlayDelayed(soundFx, delay, spawnTransform));
+        StartCoroutine(PlayDelayed(soundFx, delay, peach, spawnTransform));
     }
     
     public void PlayMusic(string name) {
@@ -147,7 +147,7 @@ public class SoundManager : MonoBehaviour
         }
     }
     
-    private IEnumerator PlayDelayed(Sound soundFx, float delay, Transform spawnTransform)
+    private IEnumerator PlayDelayed(Sound soundFx, float delay, float peach, Transform spawnTransform)
     {
 
         int rand;
@@ -171,7 +171,7 @@ public class SoundManager : MonoBehaviour
             audioSource.panStereo = soundFx.stereoPan;
             audioSource.spatialBlend = soundFx.spatialBlend;
             audioSource.reverbZoneMix = soundFx.reverbZoneMix;
-            audioSource.pitch = soundFx.pitch;
+            audioSource.pitch = peach <= 0 ? soundFx.pitch : peach;
             audioSource.loop = soundFx.loop;
             audioSource.Play();
 
@@ -185,6 +185,7 @@ public class SoundManager : MonoBehaviour
                 
             soundFx.source.clip = clipsType[rand];
             soundFx.source.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
+            soundFx.source.pitch = peach <= 0 ? soundFx.pitch : peach;
             soundFx.source.Play();
         }
     }

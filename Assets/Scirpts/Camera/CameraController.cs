@@ -306,11 +306,9 @@ private void HandleOffsetBoundaries()
         float offsetMinY = target.position.y + minVerticalOffset;
         float offsetMaxY = target.position.y + maxVerticalOffset;
 
-        // Check if offset boundaries are within trigger boundaries and respect camera state
-        bool useOffsetX = offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary 
-            && cameraState != CameraState.HorizontalLocked;
-        bool useOffsetY = offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary 
-            && cameraState != CameraState.VerticalLocked;
+        // Check if offset boundaries are within trigger boundaries
+        bool useOffsetX = offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary;
+        bool useOffsetY = offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary;
 
         // Apply X boundaries (with delay check)
         if (!horizontalDelay)
@@ -324,9 +322,9 @@ private void HandleOffsetBoundaries()
                     Mathf.Min(offsetMaxX, _maxXBoundary)
                 );
             }
-            else if (cameraState != CameraState.HorizontalLocked)
+            else
             {
-                // Use only trigger boundaries if not horizontal locked
+                // Use only trigger boundaries
                 position.x = Mathf.Clamp(position.x, _minXBoundary, _maxXBoundary);
             }
         }
@@ -341,30 +339,19 @@ private void HandleOffsetBoundaries()
                 Mathf.Min(offsetMaxY, _maxYBoundary)
             );
         }
-        else if (cameraState != CameraState.VerticalLocked)
+        else
         {
-            // Use only trigger boundaries if not vertical locked
+            // Use only trigger boundaries
             position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
         }
     }
-    else if (cameraState == CameraState.Free) // No active triggers, just use offset boundaries if in free state
+    else // No active triggers, use offset boundaries
     {
         if (!horizontalDelay)
         {
             position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
         }
         position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
-    }
-    else // Handle locked states without triggers
-    {
-        if (!horizontalDelay && cameraState != CameraState.HorizontalLocked)
-        {
-            position.x = Mathf.Clamp(position.x, target.position.x + minHorizontalOffset, target.position.x + maxHorizontalOffset);
-        }
-        if (cameraState != CameraState.VerticalLocked)
-        {
-            position.y = Mathf.Clamp(position.y, target.position.y + minVerticalOffset, target.position.y + maxVerticalOffset);
-        }
     }
     
     transform.position = position;
@@ -511,108 +498,108 @@ private void HandleOffsetBoundaries()
     }
     
 #if UNITY_EDITOR
-    private void OnDrawGizmosSelected() 
-    { 
-        if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
+private void OnDrawGizmosSelected() 
+{ 
+    if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
+    {
+        // Calculate offset and trigger boundaries
+        float offsetMinX = target.position.x + minHorizontalOffset;
+        float offsetMaxX = target.position.x + maxHorizontalOffset;
+        float offsetMinY = target.position.y + minVerticalOffset;
+        float offsetMaxY = target.position.y + maxVerticalOffset;
+
+        bool drawHorizontalOffsets = true;
+        bool drawVerticalOffsets = true;
+
+        // Check if we have active triggers with boundaries
+        if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
         {
-            // Calculate offset and trigger boundaries
-            float offsetMinX = target.position.x + minHorizontalOffset;
-            float offsetMaxX = target.position.x + maxHorizontalOffset;
-            float offsetMinY = target.position.y + minVerticalOffset;
-            float offsetMaxY = target.position.y + maxVerticalOffset;
-
-            bool drawHorizontalOffsets = cameraState != CameraState.HorizontalLocked;
-            bool drawVerticalOffsets = cameraState != CameraState.VerticalLocked;
-
-            // Check if we have active triggers with boundaries
-            if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
-            {
-                // Check each axis independently
-                drawHorizontalOffsets &= offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary;
-                drawVerticalOffsets &= offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary;
-            }
-
-            // Draw vertical lines for horizontal offset boundaries
-            if (drawHorizontalOffsets)
-            {
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMinY, 0),
-                    new Vector3(offsetMinX, offsetMaxY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(offsetMaxX, offsetMaxY, 0),
-                    new Vector3(offsetMaxX, offsetMinY, 0),
-                    Color.blue);
-            }
-
-            // Draw horizontal lines for vertical offset boundaries
-            if (drawVerticalOffsets)
-            {
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMinY, 0),
-                    new Vector3(offsetMaxX, offsetMinY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMaxY, 0),
-                    new Vector3(offsetMaxX, offsetMaxY, 0),
-                    Color.blue);
-            }
+            // Check each axis independently
+            drawHorizontalOffsets &= offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary;
+            drawVerticalOffsets &= offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary;
         }
-        
-        // Draw boundaries for all active triggers
-        for (int i = 0; i < _activeTriggers.Count; i++)
-        {
-            Vector4 boundaries = _activeTriggers[i].GetBoundaries();
 
-            // Calculate color - darker red for outer triggers, brighter red for inner triggers
-            float intensity = 0.3f + (0.7f * (i / Mathf.Max(1, (float)(_activeTriggers.Count - 1))));
-            Color boundaryColor = new Color(1f, 0f, 0f, intensity);
-            
-            // Draw actual camera constraint area if limitCameraToBoundary is true
-            if (_activeTriggers[i].limitCameraToBoundary)
-            {
-                float minX = boundaries.x + (_cameraWidth/2);
-                float maxX = boundaries.y - (_cameraWidth/2);
-                float minY = boundaries.z + (_cameraHeight/2);
-                float maxY = boundaries.w - (_cameraHeight/2);
-                
-                Debug.DrawLine(
-                    new Vector3(minX, minY, 0),
-                    new Vector3(minX, maxY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(maxX, minY, 0),
-                    new Vector3(maxX, maxY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(minX, minY, 0),
-                    new Vector3(maxX, minY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(minX, maxY, 0),
-                    new Vector3(maxX, maxY, 0),
-                    Color.blue);
-            }
-            
-            // Draw full trigger area boundaries with dashed lines
+        // Draw vertical lines for horizontal offset boundaries
+        if (drawHorizontalOffsets)
+        {
             Debug.DrawLine(
-                new Vector3(boundaries.x, boundaries.z, 0),
-                new Vector3(boundaries.x, boundaries.w, 0),
-                boundaryColor);
+                new Vector3(offsetMinX, offsetMinY, 0),
+                new Vector3(offsetMinX, offsetMaxY, 0),
+                Color.blue);
             Debug.DrawLine(
-                new Vector3(boundaries.y, boundaries.z, 0),
-                new Vector3(boundaries.y, boundaries.w, 0),
-                boundaryColor);
+                new Vector3(offsetMaxX, offsetMaxY, 0),
+                new Vector3(offsetMaxX, offsetMinY, 0),
+                Color.blue);
+        }
+
+        // Draw horizontal lines for vertical offset boundaries
+        if (drawVerticalOffsets)
+        {
             Debug.DrawLine(
-                new Vector3(boundaries.x, boundaries.z, 0),
-                new Vector3(boundaries.y, boundaries.z, 0),
-                boundaryColor);
+                new Vector3(offsetMinX, offsetMinY, 0),
+                new Vector3(offsetMaxX, offsetMinY, 0),
+                Color.blue);
             Debug.DrawLine(
-                new Vector3(boundaries.x, boundaries.w, 0),
-                new Vector3(boundaries.y, boundaries.w, 0),
-                boundaryColor);
+                new Vector3(offsetMinX, offsetMaxY, 0),
+                new Vector3(offsetMaxX, offsetMaxY, 0),
+                Color.blue);
         }
     }
+    
+    // Draw boundaries for all active triggers
+    for (int i = 0; i < _activeTriggers.Count; i++)
+    {
+        Vector4 boundaries = _activeTriggers[i].GetBoundaries();
+
+        // Calculate color - darker red for outer triggers, brighter red for inner triggers
+        float intensity = 0.3f + (0.7f * (i / Mathf.Max(1, (float)(_activeTriggers.Count - 1))));
+        Color boundaryColor = new Color(1f, 0f, 0f, intensity);
+        
+        // Draw actual camera constraint area if limitCameraToBoundary is true
+        if (_activeTriggers[i].limitCameraToBoundary)
+        {
+            float minX = boundaries.x + (_cameraWidth/2);
+            float maxX = boundaries.y - (_cameraWidth/2);
+            float minY = boundaries.z + (_cameraHeight/2);
+            float maxY = boundaries.w - (_cameraHeight/2);
+            
+            Debug.DrawLine(
+                new Vector3(minX, minY, 0),
+                new Vector3(minX, maxY, 0),
+                Color.blue);
+            Debug.DrawLine(
+                new Vector3(maxX, minY, 0),
+                new Vector3(maxX, maxY, 0),
+                Color.blue);
+            Debug.DrawLine(
+                new Vector3(minX, minY, 0),
+                new Vector3(maxX, minY, 0),
+                Color.blue);
+            Debug.DrawLine(
+                new Vector3(minX, maxY, 0),
+                new Vector3(maxX, maxY, 0),
+                Color.blue);
+        }
+        
+        // Draw full trigger area boundaries with dashed lines
+        Debug.DrawLine(
+            new Vector3(boundaries.x, boundaries.z, 0),
+            new Vector3(boundaries.x, boundaries.w, 0),
+            boundaryColor);
+        Debug.DrawLine(
+            new Vector3(boundaries.y, boundaries.z, 0),
+            new Vector3(boundaries.y, boundaries.w, 0),
+            boundaryColor);
+        Debug.DrawLine(
+            new Vector3(boundaries.x, boundaries.z, 0),
+            new Vector3(boundaries.y, boundaries.z, 0),
+            boundaryColor);
+        Debug.DrawLine(
+            new Vector3(boundaries.x, boundaries.w, 0),
+            new Vector3(boundaries.y, boundaries.w, 0),
+            boundaryColor);
+    }
+}
 #endif
 #endregion
 

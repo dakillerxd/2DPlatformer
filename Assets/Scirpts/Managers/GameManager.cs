@@ -197,20 +197,6 @@ public class GameManager : MonoBehaviour
     }
     
     
-    public void ToggleGooglyEyeMode(bool state) {
-        
-        googlyEyes = state;
-    }
-    
-    public void TogglePropellerHat(bool state) {
-
-        propellerHat = state;
-    }
-    
-    public void ToggleCurlyMustache(bool state) {
-
-        curlyMustache = state;
-    }
 
     #endregion GameStates
     
@@ -292,6 +278,29 @@ public class GameManager : MonoBehaviour
 
     
     #endregion Collectibles
+
+    #region Cosmetics
+
+
+    public void ToggleGooglyEyeMode(bool state) {
+        
+        googlyEyes = state;
+        PlayerController.Instance?.ToggleCosmetics();
+    }
+
+    public void TogglePropellerHat(bool state) {
+
+        propellerHat = state;
+        PlayerController.Instance?.ToggleCosmetics();
+    }
+    
+    public void ToggleCurlyMustache(bool state) {
+
+        curlyMustache = state;
+        PlayerController.Instance?.ToggleCosmetics();
+    }
+
+    #endregion
     
     #region Debugging functions
 

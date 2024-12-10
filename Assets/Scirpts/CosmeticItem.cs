@@ -16,7 +16,7 @@ public class CosmeticItem : MonoBehaviour
     
     
     
-    private void OnValidate()
+    private void Start()
     {
         titleText.text = System.Text.RegularExpressions.Regex.Replace(cosmeticItem.ToString(), "([A-Z])", " $1").Trim();
         
@@ -66,7 +66,7 @@ public class CosmeticItem : MonoBehaviour
                 break;
         }
         
-        CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
+        // CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
         SoundManager.Instance?.PlaySoundFX("Player Receive Collectible");
         PlayerController.Instance?.ToggleCosmetics();
         Destroy(gameObject);

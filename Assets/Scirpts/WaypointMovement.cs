@@ -1,14 +1,19 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 using VInspector;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Serialization;
 
 public class WaypointMovement : MonoBehaviour {
     
+
     [Header("Settings")]
-    [SerializeField] private bool loop = true;
+    [SerializeField] public bool enableMovement = true;
+    [SerializeField] private bool loopBetweenPoints = true;
     [SerializeField] private bool resetPositionOnPlayerDeath;
+    [SerializeField] private bool disableOnPlayerDeath;
     [SerializeField, Min(0)] private float maxSpeed = 2f;
     [SerializeField, Range(0, 100)] private float accelerationPercent = 100f;
     [SerializeField, Range(0, 100)] private float decelerationPercent = 100f;
@@ -51,7 +56,22 @@ public class WaypointMovement : MonoBehaviour {
     
     private void OnPlayerDeath() {
         ResetPosition();
+        
+        if (disableOnPlayerDeath) { enableMovement = false; }
     }
+
+    public void EnableMovement()
+    {
+        enableMovement = true;
+    }
+
+    public bool IsMovementEnabled()
+    {
+        return enableMovement;
+    }
+    
+    
+
 
     [Button] private void ResetPosition()
     {
@@ -100,7 +120,7 @@ public class WaypointMovement : MonoBehaviour {
     
     private void MoveBetweenWaypoints() {
         
-        if (waypoints.Count <= 1) return;
+        if (waypoints.Count <= 1 || enableMovement == false) return;
         
         if (waypointWaitTimer > 0)
         {
@@ -141,7 +161,7 @@ public class WaypointMovement : MonoBehaviour {
             objectRigidBody.linearVelocity = Vector2.zero;
             waypointWaitTimer = waypointWaitTime;
             
-            if (loop)
+            if (loopBetweenPoints)
             {
                 currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
             }
@@ -267,7 +287,7 @@ public class WaypointMovement : MonoBehaviour {
         Vector3 lastLabelPosition = waypoints[waypoints.Count - 1].transform.position + Vector3.up * yOffSet;
         Handles.Label(lastLabelPosition, (waypoints.Count - 1).ToString(), style);
 
-        if (loop)
+        if (loopBetweenPoints)
         {
             Gizmos.DrawLine(waypoints[waypoints.Count - 1].transform.position, waypoints[0].transform.position);
         }

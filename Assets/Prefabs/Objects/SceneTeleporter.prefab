@@ -24427,11 +24427,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f3f5114e94b224c8dcfb45aa9f18e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  teleportType: 0
   activated: 0
-  goToNextLevel: 1
+  pullDuration: 1.5
   sceneToLoad:
     m_SceneAsset: {fileID: 0}
     m_SceneName: Level1
+  destinationPoint: {fileID: 0}
+  sameSceneTeleportDelay: 0
   animator: {fileID: 3965280894130747936}
 --- !u!1 &4882779443881044937
 GameObject:

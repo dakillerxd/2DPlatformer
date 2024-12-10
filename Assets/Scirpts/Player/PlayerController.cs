@@ -447,7 +447,6 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Movement functions
     
-    
     #region Jump functions //------------------------------------
 
     private void HandleJump() {
@@ -577,7 +576,6 @@ public class PlayerController : MonoBehaviour {
         }
     }
     #endregion Jump functions
-
       
     #region Abilitis functions //------------------------------------
     
@@ -741,7 +739,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     #endregion Abilitis functions
-    
     
     #region Gravity function //------------------------------------
 
@@ -1319,10 +1316,10 @@ public class PlayerController : MonoBehaviour {
         googlyEye.SetActive(GameManager.Instance.googlyEyes);
         propellerHat.SetActive(GameManager.Instance.propellerHat);
 
-        if (GameManager.Instance.propellerHat)
-        {
-            googlyEye.transform.localScale = new Vector3(1, 1, 1);
-        }
+        // if (GameManager.Instance.propellerHat)
+        // {
+        //     googlyEye.transform.localScale = new Vector3(1, 1, 1);
+        // }
         
     }
     

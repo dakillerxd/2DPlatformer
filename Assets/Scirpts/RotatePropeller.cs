@@ -7,6 +7,7 @@ public class RotatePropeller : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool rotate = true;
     [SerializeField] private float rotationSpeed = 200f;
+    [SerializeField] private float maxRotationSpeed = 400f;
     [SerializeField] private Rigidbody2D rigidBody2D;
     
     private void Update()
@@ -19,8 +20,8 @@ public class RotatePropeller : MonoBehaviour
             
             float  clampedLinearVelocityX = Mathf.Clamp( rigidBody2D.linearVelocityX, -5f, 5f);
             float  clampedLinearVelocityY = Mathf.Clamp( rigidBody2D.linearVelocityY, -5f, 5f);
-            float rotationAmount = rotationSpeed * (clampedLinearVelocityX + (clampedLinearVelocityY) * 2f) * Time.deltaTime;
-            transform.Rotate(Vector3.up * rotationAmount);
+            float rotationAmount = rotationSpeed * (clampedLinearVelocityX + (clampedLinearVelocityY) * 2f) ;
+            transform.Rotate(Vector3.up * (Mathf.Clamp( rotationAmount, -maxRotationSpeed, maxRotationSpeed) * Time.deltaTime));
             
         } else {
             transform.Rotate(Vector3.up * (rotationSpeed * Time.deltaTime));

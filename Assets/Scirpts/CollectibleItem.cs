@@ -1,4 +1,3 @@
-using CustomAttribute;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;

@@ -18,6 +18,13 @@ public enum GameDifficulty {
     Hard,
 }
 
+public enum CosmeticItems
+{
+    GooglyEye,
+    PropellerHat,
+    CurlyMustache
+}
+
 [System.Serializable]
 public class Collectible
 {
@@ -45,11 +52,12 @@ public class GameManager : MonoBehaviour
     [Header("Unlocks")]
     public bool googlyEyes;
     public bool propellerHat;
+    public bool curlyMustache;
     [Space(10)]
     public Collectible[] collectibles;
     public bool googlyEyesModeReceived {get ; private set;}
     public bool propellerHatReceived {get ; private set;}
-    public bool bonusLevel1Received {get ; private set;}
+    public bool curlyMustacheReceived {get ; private set;}
     public int collectiblesForUnlock1 {get ; private set;} // Set in awake
     public int collectiblesForUnlock2 {get ; private set;} // Set in awake
     public int collectiblesForUnlock3 {get ; private set;} // Set in awake
@@ -74,7 +82,7 @@ public class GameManager : MonoBehaviour
 
         collectiblesForUnlock1 = 2;
         collectiblesForUnlock2 = 4;
-        collectiblesForUnlock3 = 7;
+        collectiblesForUnlock3 = 6;
     }
     
     private void Start() {
@@ -192,13 +200,16 @@ public class GameManager : MonoBehaviour
     public void ToggleGooglyEyeMode(bool state) {
         
         googlyEyes = state;
-        // VFXManager.Instance?.ToggleChromaticAberration(state);
-        VFXManager.Instance?.ToggleLensDistortion(state);
     }
     
     public void TogglePropellerHat(bool state) {
 
         propellerHat = state;
+    }
+    
+    public void ToggleCurlyMustache(bool state) {
+
+        curlyMustache = state;
     }
 
     #endregion GameStates
@@ -257,7 +268,7 @@ public class GameManager : MonoBehaviour
 
         propellerHatReceived = TotalCollectiblesCollected() >= collectiblesForUnlock1;
         googlyEyesModeReceived = TotalCollectiblesCollected() >= collectiblesForUnlock2;
-        bonusLevel1Received = TotalCollectiblesCollected() >= collectiblesForUnlock3;
+        curlyMustacheReceived = TotalCollectiblesCollected() >= collectiblesForUnlock3;
 
     }
     

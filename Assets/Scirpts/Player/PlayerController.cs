@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public enum PlayerState {
     Controllable,
@@ -154,6 +153,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private GameObject propellerHat;
     [SerializeField] private GameObject normalEye;
     [SerializeField] private GameObject googlyEye;
+    [SerializeField] private GameObject curlyMustache;
     [SerializeField] private SpriteRenderer[] spriteRenderers;
 
 
@@ -1310,11 +1310,12 @@ public class PlayerController : MonoBehaviour {
         
     }
 
-    private void ToggleCosmetics()
+    public void ToggleCosmetics()
     {
         normalEye.SetActive(!GameManager.Instance.googlyEyes);
         googlyEye.SetActive(GameManager.Instance.googlyEyes);
         propellerHat.SetActive(GameManager.Instance.propellerHat);
+        curlyMustache.SetActive(GameManager.Instance.curlyMustache);
 
         // if (GameManager.Instance.propellerHat)
         // {

@@ -54,6 +54,7 @@ MonoBehaviour:
   toggleDebugText: 284
   googlyEyes: 0
   propellerHat: 0
+  curlyMustache: 0
   collectibles:
   - connectedLevel:
       m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
@@ -93,11 +94,6 @@ MonoBehaviour:
   - connectedLevel:
       m_SceneAsset: {fileID: 102900000, guid: ca4a4456747d3474e9e5324203c0978e, type: 3}
       m_SceneName: Level8
-    counts: 0
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 587bcde8593451546a597c81479094c7, type: 3}
-      m_SceneName: LevelTest
     counts: 0
     collected: 0
   inputManagerPrefab: {fileID: 6668247925252254685, guid: 11d09469762d9de4590abaad657a7eef, type: 3}

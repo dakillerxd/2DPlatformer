@@ -19,9 +19,11 @@ public class CollectiblesMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI unlocksText;
     [SerializeField] private Toggle googlyEyesToggle;
     [SerializeField] private Toggle propellerHatToggle;
+    [SerializeField] private Toggle curlyMustacheToggle;
     [SerializeField] private GameObject normalEyes;
     [SerializeField] private GameObject googlyEyes;
     [SerializeField] private GameObject propellerHat;
+    [SerializeField] private GameObject curlyMustache;
     private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
     
     
@@ -59,6 +61,7 @@ public class CollectiblesMenu : MonoBehaviour
         if (normalEyes != null) normalEyes.SetActive(!GameManager.Instance.googlyEyes);
         if (googlyEyes != null) googlyEyes.SetActive(GameManager.Instance.googlyEyes);
         if (propellerHat != null) propellerHat.SetActive(GameManager.Instance.propellerHat);
+        if (curlyMustache != null) curlyMustache.SetActive(GameManager.Instance.curlyMustache);
     }
 
     private void UpdateUnlocks()
@@ -74,6 +77,12 @@ public class CollectiblesMenu : MonoBehaviour
             propellerHatToggle.interactable = GameManager.Instance.propellerHatReceived;
             propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.TogglePropellerHat(value));
         }
+        
+        if (curlyMustacheToggle != null) {
+            curlyMustacheToggle.isOn = GameManager.Instance.curlyMustache;
+            curlyMustacheToggle.interactable = GameManager.Instance.curlyMustacheReceived;
+            curlyMustacheToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleCurlyMustache(value));
+        }
     }
 
 
@@ -86,7 +95,7 @@ public class CollectiblesMenu : MonoBehaviour
         unlocksText.text = 
             $"{GameManager.Instance.collectiblesForUnlock1} Coins: {(GameManager.Instance.googlyEyesModeReceived ? "<color=green>Propeller Hat</color>" : "<color=red>Propeller Hat</color>")}\n \n" +
             $"{GameManager.Instance.collectiblesForUnlock2} Coins: {(GameManager.Instance.propellerHatReceived ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
-            $"{GameManager.Instance.collectiblesForUnlock3} Coins: {(GameManager.Instance.bonusLevel1Received ? "<color=green>Bonus level</color>" : "<color=red>Bonus level</color>")}\n \n";
+            $"{GameManager.Instance.collectiblesForUnlock3} Coins: {(GameManager.Instance.curlyMustacheReceived ? "<color=green>Curly Mustache</color>" : "<color=red>Curly Mustache</color>")}\n \n";
     }
     
     

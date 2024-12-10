@@ -11,7 +11,6 @@ public class TeleportTrigger : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     private bool _triggered;
     
-    
     private void Start()
     {
         if(hideOnStart) spriteRenderer.enabled = false;
@@ -23,18 +22,24 @@ public class TeleportTrigger : MonoBehaviour
         
         _triggered = true;
 
-        Vector3 XYPosition = new Vector3(teleportLocation.position.x, teleportLocation.position.y + 10f, CameraController.Instance.transform.position.z);
-        PlayerController.Instance.transform.position = teleportLocation.position;
-        // CameraController.Instance.transform.position = XYPosition;
+        // Calculate the relative X offset from the trigger's position
+        float xOffset = other.transform.position.x - transform.position.x;
+        
+        // Apply that same offset to the teleport location
+        Vector3 newPosition = new Vector3(
+            teleportLocation.position.x + xOffset,
+            teleportLocation.position.y,
+            other.transform.position.z
+        );
+        
+        PlayerController.Instance.transform.position = newPosition;
         
         StartCoroutine(ResetTrigger());
     }
-
 
     private IEnumerator ResetTrigger()
     {
         yield return new WaitForSeconds(1f);
         _triggered = false;
     }
-   
 }

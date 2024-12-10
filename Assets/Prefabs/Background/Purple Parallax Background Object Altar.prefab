@@ -9,8 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1849186548037619955}
-  - component: {fileID: 4970815300966755695}
-  - component: {fileID: 6252367540588538885}
+  - component: {fileID: 7330970689352888111}
   m_Layer: 0
   m_Name: Purple Parallax Background Object Altar
   m_TagString: Untagged
@@ -26,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2102550395682742535}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.25, y: -73.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -34,7 +33,7 @@ Transform:
   - {fileID: 5465460381674413773}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4970815300966755695
+--- !u!114 &7330970689352888111
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,35 +42,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2102550395682742535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa50fa8b9fb95d149b0961bbb80caee9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a1307e73fed3c14eaf4fa35948b7860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useCustomLayer: 0
+  backgroundType: 3
+  useCustomLayer: 1
   orderInLayer: -17
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  followCamera: 0
-  useParallaxEffect: 1
-  parallaxEffectX: 0.1
-  parallaxEffectY: 0
-  parallaxRange: 20
---- !u!114 &6252367540588538885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2102550395682742535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 212b246944a941848abeb93605e9c293, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableHover: 1
-  hoverSpeed: 1
-  hoverAmount: 0.5
-  hoverDirection: {x: 0, y: 1, z: 0}
+  maxHorizontalParallax: 0.5
+  maxVerticalParallax: 0.5
+  nearestDistance: 0
+  farthestDistance: 100
+  drawGizmos: 1
+  cameraOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &7991274842180255920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -141,6 +126,9 @@ PrefabInstance:
       addedObject: {fileID: 6296012635538199649}
     - targetCorrespondingSourceObject: {fileID: 7318898950169036765, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 4225025639570202125}
+    - targetCorrespondingSourceObject: {fileID: 7318898950169036765, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2008601529031016889}
   m_SourcePrefab: {fileID: 100100000, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
 --- !u!1 &826205955776939885 stripped
@@ -161,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableRotation: 1
+  resetRotationOnDisable: 0
   xRotation:
     continuousRotation: 0
     reverseDirection: 0
@@ -179,6 +168,22 @@ MonoBehaviour:
     oscillationAmount: 0
     oscillationSpeed: 0
     rotationSpeed: 35
+--- !u!114 &4225025639570202125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 826205955776939885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212b246944a941848abeb93605e9c293, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverSpeed: 1
+  hoverAmount: 0.5
+  hoverDirection: {x: 0, y: 1, z: 0}
 --- !u!114 &2008601529031016889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,7 +225,7 @@ MonoBehaviour:
     m_TrimEdge: 0.04
     m_FlipX: 0
     m_FlipY: 0
-    m_InitialTrim: 0.04
+    m_InitialTrim: 0
   m_CastingOption: 1
   m_PreviousTrimEdge: 0.04
   m_PreviousEdgeProcessing: 1

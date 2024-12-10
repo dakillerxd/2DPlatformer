@@ -588,6 +588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotate: 1
   rotationSpeed: 200
+  rigidBody2D: {fileID: 2783392023027556574}
 --- !u!1 &2816693931097038581
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,6 +799,8 @@ MonoBehaviour:
   - {fileID: 6138145497957891696}
   - {fileID: 322137302083228050}
   - {fileID: 5029860559335663396}
+  - {fileID: 5007184319971177783}
+  - {fileID: 2598596616698034732}
   hurtVfx: {fileID: 5060159489429807464, guid: 2fe82b81a05eb4c499f6106eab7c6bcc, type: 3}
   jumpVfx: {fileID: 0}
   airJumpVfx: {fileID: 5789889679916270293}

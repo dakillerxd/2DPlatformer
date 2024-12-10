@@ -146,14 +146,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -214,7 +206,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -298,14 +299,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -366,7 +359,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (4)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -450,14 +452,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -518,7 +512,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -602,14 +605,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -670,7 +665,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (7)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -754,14 +758,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -822,7 +818,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -906,14 +911,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -974,7 +971,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (5)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1058,14 +1064,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -1126,7 +1124,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1210,14 +1217,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 811423209663564099}
     m_Modifications:
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
-      propertyPath: m_ShadowMesh.m_InitialTrim
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2684006167705230973, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8
@@ -1278,7 +1277,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Background Object Far (6)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008601529031016889, guid: 6a860e1a9b5b86b4bbb93d7673accbbc, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6067531577075818826, guid: 2a9d9824c21eddf458d39efd15f8b60a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

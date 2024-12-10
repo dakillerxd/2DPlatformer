@@ -87,7 +87,7 @@ MonoBehaviour:
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  maxHorizontalParallax: 0.2
+  maxHorizontalParallax: 0.4
   maxVerticalParallax: 0.2
   nearestDistance: 0
   farthestDistance: 100
@@ -143,7 +143,7 @@ MonoBehaviour:
   sortingLayer:
     m_LayerName: Background
     m_LayerID: 438391897
-  maxHorizontalParallax: 0.5
+  maxHorizontalParallax: 0.6
   maxVerticalParallax: 0.2
   nearestDistance: 0
   farthestDistance: 100

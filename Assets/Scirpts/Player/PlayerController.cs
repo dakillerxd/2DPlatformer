@@ -81,8 +81,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] [Range(0, 3f)] private float ledgeCheckHorizontalDistance = 0.5f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 2f;
     [SerializeField] [Range(0, 3f)] private float groundCheckVerticalDistance = 2f;
-    private bool _isTouchingGround;
-    private bool _isTouchingPlatform;
     private bool _isTouchingWall;
     private bool _isTouchingWallOnRight;
     private bool _isTouchingWallOnLeft;
@@ -744,7 +742,7 @@ public class PlayerController : MonoBehaviour {
 
     private void HandleGravity() {
         
-          if (!_isTouchingGround && !isWallSliding)
+          if (!isGrounded && !isWallSliding)
           {
               // In air
               HandleAirGravity();
@@ -791,6 +789,7 @@ public class PlayerController : MonoBehaviour {
     
     private void HandleGroundedGravity()
     {
+        
         if (!isFalling || !isGrounded || isDashing) return; // Check if landed
         
         
@@ -834,6 +833,8 @@ public class PlayerController : MonoBehaviour {
         atMaxFallSpeed = false;
         isFastFalling = false;
         isFalling = false;
+
+
     }
     
     #endregion Gravity functions 
@@ -844,12 +845,10 @@ public class PlayerController : MonoBehaviour {
 
         // Check if touching
         LayerMask combinedGroundMask = groundLayer | platformLayer;
-        _isTouchingGround = collFeet.IsTouchingLayers(combinedGroundMask);
-        _isTouchingPlatform = collFeet.IsTouchingLayers(platformLayer);
         _isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
         
         
-        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0);
+        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0.02f, 0);
         Vector2 checkCenter = collFeet.bounds.center;
         // Debug visualization
         Vector2 halfSize = checkSize * 0.5f;
@@ -866,19 +865,20 @@ public class PlayerController : MonoBehaviour {
         
         // Check if on ground
         isGrounded =  Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
+        isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
         
-        // Ledge checks
         if (isGrounded) {
-            // Check collision with walls on the right
+            
+            // Check for ledge on the right
             RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
             Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
             ledgeOnRight = !hitRight;
             
-
-            // Check collision with walls on the left
+            // Check for ledge on the left
             RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
             Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
             ledgeOnLeft = !hitLeft;
+            
             
         } else { // if the player is in the air check there is ground below him
             
@@ -886,11 +886,6 @@ public class PlayerController : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, groundCheckVerticalDistance, combinedGroundMask );
             Debug.DrawRay(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (groundCheckVerticalDistance), Color.red);
             _isGroundBelow = hit;
-        }
-        
-        // Check if on platform
-        if (_isTouchingPlatform) {
-            isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
         }
         
         // Check if touching a wall
@@ -1245,7 +1240,6 @@ public class PlayerController : MonoBehaviour {
         VFXManager.Instance?.StopVfxEffect(peakFallSpeedVfx, true);
         _isTouchingWallOnLeft = false;
         _isTouchingWallOnRight = false;
-        _isTouchingGround = false;
         isGrounded = false;
         currentPlayerState = state;
         

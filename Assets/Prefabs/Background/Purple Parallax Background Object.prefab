@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 681505879220694248}
   - component: {fileID: 3970601572395410770}
+  - component: {fileID: 4280454613068613895}
   - component: {fileID: 7873562455228306347}
   m_Layer: 0
   m_Name: Purple Parallax Background Object
@@ -58,6 +59,22 @@ MonoBehaviour:
   farthestDistance: 100
   drawGizmos: 1
   cameraOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &4280454613068613895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937474444554429757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212b246944a941848abeb93605e9c293, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverSpeed: 1
+  hoverAmount: 1
+  hoverDirection: {x: 0, y: 1, z: 0}
 --- !u!114 &7873562455228306347
 MonoBehaviour:
   m_ObjectHideFlags: 0

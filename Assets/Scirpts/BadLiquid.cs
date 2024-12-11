@@ -5,14 +5,16 @@ public class BadLiquid : MonoBehaviour
 {
     private bool _triggered;
     
-   private void OnTriggerEnter2D(Collider2D other)
+   
+   private void OnCollisionEnter2D(Collision2D collision)
    {
-        if(!other.CompareTag("Player") || _triggered) return;
-        _triggered = true;
-        var player = other.gameObject.GetComponentInParent<PlayerController>();
-        player.DamageHealth(player.maxHealth,false, "Respawn Trigger");
-        SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
-        StartCoroutine(ResetTrigger());
+       if(!collision.gameObject.CompareTag("Player") || _triggered) return;
+       
+       _triggered = true;
+       var player = collision.gameObject.GetComponentInParent<PlayerController>();
+       player.DamageHealth(player.maxHealth,false, "Bad Liquid");
+       SoundManager.Instance?.PlaySoundFX("Player Fall off Map");
+       StartCoroutine(ResetTrigger());
    }
 
 

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3656567962269508406}
   - component: {fileID: 322137302083228050}
   - component: {fileID: 1095834076264238407}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GooglyEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4457131412005088319}
   - component: {fileID: 5029860559335663396}
   - component: {fileID: 8091235377797086207}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Pupil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -237,7 +237,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6612070668362302577}
   - component: {fileID: 343424669824601193}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LineEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -376,7 +376,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8881584446754720342}
   - component: {fileID: 5007184319971177783}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: spr_player_hat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -462,7 +462,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3607687199892762826}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -497,7 +497,7 @@ GameObject:
   - component: {fileID: 6926411473619562970}
   - component: {fileID: 2598596616698034732}
   - component: {fileID: 2846664401834558127}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: spr_player_hatprop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -589,6 +589,7 @@ MonoBehaviour:
   rotate: 1
   rotationSpeed: 300
   maxRotationSpeed: 1000
+  stopLerpSpeed: 2
   rigidBody2D: {fileID: 2783392023027556574}
 --- !u!1 &2816693931097038581
 GameObject:
@@ -599,7 +600,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7533880227214146117}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PropellerHat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -635,7 +636,7 @@ GameObject:
   - component: {fileID: 2783392023027556574}
   - component: {fileID: 631767106991630361}
   - component: {fileID: 6010112362093298342}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -840,7 +841,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3658711945977759838}
   - component: {fileID: 8767898529786398378}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Feet
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -909,7 +910,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8123881546023184429}
   - component: {fileID: 4743390106982236867}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -996,7 +997,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5456902685513578049}
   - component: {fileID: 6138145497957891696}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: NormalEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1082,7 +1083,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2170483418551630433}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ParticleEffects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1122,7 +1123,7 @@ GameObject:
   - component: {fileID: 255158068133556850}
   - component: {fileID: 5334675468563607329}
   - component: {fileID: 5126758405747697653}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CurlyMustache
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1223,7 +1224,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9067867616452130285}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1257,7 +1258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2059101552201072757}
   - component: {fileID: 3011048009788441902}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Light 2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1341,7 +1342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5585958558111689940}
   - component: {fileID: 7882390600563638155}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Gfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1429,7 +1430,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4523606492481414005}
   - component: {fileID: 6793365586128216939}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Body
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1509,6 +1510,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Vfx_PlayerPeakMoveSpeed
       objectReference: {fileID: 0}
+    - target: {fileID: 1077272797993549907, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2489592728956220137, guid: 50f32e249c9617647a83d11f4c1eb936, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.161
@@ -1575,6 +1580,10 @@ PrefabInstance:
     - target: {fileID: 5224745617554692757, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerWallSliding
+      objectReference: {fileID: 0}
+    - target: {fileID: 5224745617554692757, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8928154913662448529, guid: 8c0af6ebefce9a546a16241a0549ef4b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1643,6 +1652,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Vfx_PlayerGroundRun
       objectReference: {fileID: 0}
+    - target: {fileID: 3964079908397169605, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6609791200768836940, guid: b686edff14d8d8f469d2f16795ace2f0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.15
@@ -1704,6 +1717,10 @@ PrefabInstance:
     - target: {fileID: 5224745617554692757, guid: 2e1b6eefe420ea342b869a161b5e13f5, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerBleed
+      objectReference: {fileID: 0}
+    - target: {fileID: 5224745617554692757, guid: 2e1b6eefe420ea342b869a161b5e13f5, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8928154913662448529, guid: 2e1b6eefe420ea342b869a161b5e13f5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1768,9 +1785,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2170483418551630433}
     m_Modifications:
+    - target: {fileID: 2452588576427922636, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4581527946544122590, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerDash
+      objectReference: {fileID: 0}
+    - target: {fileID: 4581527946544122590, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5810593304749069595, guid: edf48ea85c80c78489d83d097dd3688c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1835,9 +1860,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2170483418551630433}
     m_Modifications:
+    - target: {fileID: 2452588576427922636, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4581527946544122590, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerAirJump
+      objectReference: {fileID: 0}
+    - target: {fileID: 4581527946544122590, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5810593304749069595, guid: 886f18ca0997ba14a97e030b7779bec8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1905,6 +1938,10 @@ PrefabInstance:
     - target: {fileID: 847003137737453770, guid: 7cd4f415867f7a0498124b25fa2266dc, type: 3}
       propertyPath: m_Name
       value: Vfx_PlayerPeakFallSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 847003137737453770, guid: 7cd4f415867f7a0498124b25fa2266dc, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3427743228155701463, guid: 7cd4f415867f7a0498124b25fa2266dc, type: 3}
       propertyPath: m_LocalPosition.x

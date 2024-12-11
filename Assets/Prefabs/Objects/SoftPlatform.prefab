@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74a6b8fb3f9f9ba44b7db9b0b2ddf5f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dropDownCooldown: 0.4
+  dropDownCooldown: 0.5
 --- !u!1 &8433462296425570164
 GameObject:
   m_ObjectHideFlags: 0

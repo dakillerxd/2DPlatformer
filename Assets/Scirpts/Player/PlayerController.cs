@@ -332,7 +332,6 @@ public class PlayerController : MonoBehaviour {
             
             _wasLastRunningState = isRunning;
         }
-
     }
 
     private float CalculateTargetMoveSpeed()
@@ -764,6 +763,7 @@ public class PlayerController : MonoBehaviour {
         rigidBody.linearVelocityY = fallSpeed;
 
     }
+    
     private void CheckFallSpeed() {
 
         fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
@@ -841,66 +841,130 @@ public class PlayerController : MonoBehaviour {
     
     #region Collision functions //------------------------------------
 
+    // private void CollisionChecks() { // Old
+    //
+    //     // Check if touching
+    //     LayerMask combinedGroundMask = groundLayer | platformLayer;
+    //     _isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
+    //     
+    //     
+    //     Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0.02f, 0);
+    //     Vector2 checkCenter = collFeet.bounds.center;
+    //     
+    //
+    //
+    //     
+    //     // Debug visualization
+    //     Vector2 halfSize = checkSize * 0.5f;
+    //     Vector2 topLeft = checkCenter + new Vector2(-halfSize.x, halfSize.y);
+    //     Vector2 topRight = checkCenter + new Vector2(halfSize.x, halfSize.y);
+    //     Vector2 bottomLeft = checkCenter + new Vector2(-halfSize.x, -halfSize.y);
+    //     Vector2 bottomRight = checkCenter + new Vector2(halfSize.x, -halfSize.y);
+    //     Color color = Color.red;
+    //     Debug.DrawLine(topLeft, topRight, color);
+    //     Debug.DrawLine(topRight, bottomRight, color);
+    //     Debug.DrawLine(bottomRight, bottomLeft, color);
+    //     Debug.DrawLine(bottomLeft, topLeft, color);
+    //     
+    //     
+    //     // Check if on ground
+    //     isGrounded =  Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
+    //     isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
+    //     
+    //     if (isGrounded) {
+    //         
+    //         // Check for ledge on the right
+    //         RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
+    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
+    //         ledgeOnRight = !hitRight;
+    //         
+    //         // Check for ledge on the left
+    //         RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
+    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
+    //         ledgeOnLeft = !hitLeft;
+    //         
+    //         
+    //     } else { // if the player is in the air check there is ground below him
+    //         
+    //         // Check collision with ground
+    //         RaycastHit2D hit = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, groundCheckVerticalDistance, combinedGroundMask );
+    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (groundCheckVerticalDistance), Color.red);
+    //         _isGroundBelow = hit;
+    //     }
+    //     
+    //     // Check if touching a wall
+    //     if (_isTouchingWall) {
+    //
+    //         // Check collision with walls on the right
+    //         RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask );
+    //         Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
+    //         _isTouchingWallOnRight = hitRight;
+    //
+    //         // Check collision with walls on the left
+    //         RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
+    //         Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
+    //         _isTouchingWallOnLeft = hitLeft;
+    //     }
+    // }
+    
     private void CollisionChecks() {
-
-        // Check if touching
+        
         LayerMask combinedGroundMask = groundLayer | platformLayer;
-        _isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
         
-        
-        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0.02f, 0);
+        // Ground box size
+        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, -0.3f, 0);
         Vector2 checkCenter = collFeet.bounds.center;
+        Vector2 bottomPoint = checkCenter - new Vector2(0, collFeet.bounds.size.y / 2);
+        
         // Debug visualization
         Vector2 halfSize = checkSize * 0.5f;
-        Vector2 topLeft = checkCenter + new Vector2(-halfSize.x, halfSize.y);
-        Vector2 topRight = checkCenter + new Vector2(halfSize.x, halfSize.y);
-        Vector2 bottomLeft = checkCenter + new Vector2(-halfSize.x, -halfSize.y);
-        Vector2 bottomRight = checkCenter + new Vector2(halfSize.x, -halfSize.y);
+        Vector2 topLeft = bottomPoint + new Vector2(-halfSize.x, halfSize.y);
+        Vector2 topRight = bottomPoint + new Vector2(halfSize.x, halfSize.y);
+        Vector2 bottomLeft = bottomPoint + new Vector2(-halfSize.x, -halfSize.y);
+        Vector2 bottomRight = bottomPoint + new Vector2(halfSize.x, -halfSize.y);
         Color color = Color.red;
         Debug.DrawLine(topLeft, topRight, color);
         Debug.DrawLine(topRight, bottomRight, color);
         Debug.DrawLine(bottomRight, bottomLeft, color);
         Debug.DrawLine(bottomLeft, topLeft, color);
         
-        
         // Check if on ground
-        isGrounded =  Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
-        isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
+        isGrounded = Physics2D.OverlapBox(bottomPoint, checkSize, 0f, combinedGroundMask);
+        isOnPlatform = Physics2D.OverlapBox(bottomPoint, checkSize, 0f, platformLayer);
         
         if (isGrounded) {
-            
             // Check for ledge on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
-            ledgeOnRight = !hitRight;
+            RaycastHit2D hitGroundRight = Physics2D.Raycast(new Vector3(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask);
+            Debug.DrawRay(new Vector3(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down * (ledgeCheckVerticalDistance), color);
+            ledgeOnRight = !hitGroundRight;
             
             // Check for ledge on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
-            ledgeOnLeft = !hitLeft;
-            
+            RaycastHit2D hitGroundLeft = Physics2D.Raycast(new Vector3(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask);
+            Debug.DrawRay(new Vector3(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down * (ledgeCheckVerticalDistance), color);
+            ledgeOnLeft = !hitGroundLeft;
             
         } else { // if the player is in the air check there is ground below him
-            
             // Check collision with ground
-            RaycastHit2D hit = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, groundCheckVerticalDistance, combinedGroundMask );
-            Debug.DrawRay(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (groundCheckVerticalDistance), Color.red);
-            _isGroundBelow = hit;
+            RaycastHit2D hitGround = Physics2D.Raycast(new Vector3(bottomPoint.x, bottomPoint.y, 0), Vector2.down, groundCheckVerticalDistance, combinedGroundMask);
+            Debug.DrawRay(new Vector3(bottomPoint.x, bottomPoint.y, 0), Vector2.down * (groundCheckVerticalDistance), color);
+            _isGroundBelow = hitGround;
         }
         
+        
         // Check if touching a wall
-        if (_isTouchingWall) {
+        // On the right
+        RaycastHit2D hitWallRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
+        Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), color);
+        _isTouchingWallOnRight = hitWallRight;
 
-            // Check collision with walls on the right
-            RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask );
-            Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
-            _isTouchingWallOnRight = hitRight;
+        // On the left
+        RaycastHit2D hitWallLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
+        Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), color);
+        _isTouchingWallOnLeft = hitWallLeft;
 
-            // Check collision with walls on the left
-            RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
-            Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
-            _isTouchingWallOnLeft = hitLeft;
-        }
+        _isTouchingWall = _isTouchingWallOnLeft || _isTouchingWallOnRight;
+
+
     }
     
     private void OnCollisionEnter2D(Collision2D collision) {

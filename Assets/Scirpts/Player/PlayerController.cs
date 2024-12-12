@@ -244,15 +244,15 @@ public class PlayerController : MonoBehaviour {
         isFacingRight = true;
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
         CheckpointManager.Instance?.SetSpawnPoint(transform.position);
-        UIManager.Instance?.UpdateAbilitiesUI();
-        UIManager.Instance?.StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
         ToggleCosmetics();
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
 
+        
+        
         if (!Application.isEditor)
         {
-            RespawnFromSpawnPoint();
+            RespawnFromCheckpoint();
         }
     }
     
@@ -963,8 +963,7 @@ public class PlayerController : MonoBehaviour {
         _isTouchingWallOnLeft = hitWallLeft;
 
         _isTouchingWall = _isTouchingWallOnLeft || _isTouchingWallOnRight;
-
-
+        
     }
     
     private void OnCollisionEnter2D(Collision2D collision) {
@@ -980,8 +979,7 @@ public class PlayerController : MonoBehaviour {
                 _onGroundObject = _movingRigidbody != null;
             }
         }
-
-         
+        
         
         if (collision.gameObject.TryGetComponent(out SoftObject so)) {
             _softObject = so;
@@ -991,7 +989,7 @@ public class PlayerController : MonoBehaviour {
         switch (collision.gameObject.tag) {
             case "Enemy":
                 
-                EnemyController enemyCont = collision.gameObject.GetComponent<EnemyController>();
+                EnemyController enemy = collision.gameObject.GetComponent<EnemyController>();
                 Vector2 enemyNormal = collision.GetContact(0).normal;
                 Vector2 enemyPushForce = enemyNormal * 6f;
                 Vector2 enemyDashForce = enemyNormal * dashPushForce;
@@ -999,17 +997,24 @@ public class PlayerController : MonoBehaviour {
                 
                 // Damage and push the enemy if the player is dashing
                 if (isDashing) {
-                    enemyCont.Push(-enemyDashForce);
-                    CameraController.Instance.ShakeCamera(0.3f, 2f, 1f, 1f);
+                    _movingRigidbody = null;
+                    _movingRigidbodyLastVelocityX = 0;
+                    isDashing = false;
+                    rigidBody.linearVelocity = Vector2.zero;
+                    enemy.Push(-enemyDashForce);
+                    Push(enemyPushForce/2);
+                    CameraController.Instance?.ShakeCamera(0.3f, 2f, 1f, 1f);
                     return;
                 }
                 
                 // Damage and push the player and enemy
-                if (collision.collider == enemyCont.collHead) {
+                if (collision.collider == enemy.collHead) {
 
                     Push(enemyPushForce);
                     
                 } else {
+                    _movingRigidbody = null;
+                    _movingRigidbodyLastVelocityX = 0;
                     Push(enemyPushForce);
                     DamageHealth(1, true, collision.gameObject.name);
                 }
@@ -1375,10 +1380,10 @@ public class PlayerController : MonoBehaviour {
         propellerHat.SetActive(GameManager.Instance.propellerHat);
         curlyMustache.SetActive(GameManager.Instance.curlyMustache);
 
-        // if (GameManager.Instance.propellerHat)
-        // {
-        //     googlyEye.transform.localScale = new Vector3(1, 1, 1);
-        // }
+        if (GameManager.Instance.propellerHat || GameManager.Instance.curlyMustache)
+        {
+            googlyEye.transform.localScale = new Vector3(1.7f, 1.7f, 1.7f);
+        }
         
     }
     
@@ -1473,8 +1478,7 @@ public class PlayerController : MonoBehaviour {
                 AppendStat("Air Jumps", $"{_remainingAirJumps}/{maxAirJumps}");
             }
             if (dashAbility) {
-                AppendStat("Dashes", $"{_remainingDashes}/{maxDashes}");
-                AppendStat("Dash CD", $"{_dashCooldownTimer:F1}s/{dashCooldownDuration:F1}s");
+                AppendStat("Dashes", $"{_remainingDashes}/{maxDashes}, {_dashCooldownTimer:F1}s/{dashCooldownDuration:F1}s");
             }
 
             
@@ -1485,6 +1489,7 @@ public class PlayerController : MonoBehaviour {
                 { "Was Running", wasRunning },
                 { "Jumping", isJumping },
                 { "Wall Sliding", isWallSliding },
+                { "Dashing", isDashing},
                 { "Fast Dropping", isFastDropping },
                 { "Fast Falling", isFastFalling },
                 { "Max Fall Speed", atMaxFallSpeed }
@@ -1512,10 +1517,10 @@ public class PlayerController : MonoBehaviour {
             
             // Ground Object Info
             if (_movingRigidbody != null) {
-                AppendStat("Ground Object", $"Vel: {_movingRigidbody.linearVelocityX:F1} Last: {_movingRigidbodyLastVelocityX:F1}");
+                AppendStat("Ground Object", $"{_movingRigidbody.gameObject.name} Vel: {_movingRigidbody.linearVelocityX:F1} Last: {_movingRigidbodyLastVelocityX:F1}");
             }
             if (_softObject != null) {
-                AppendStat("Soft Object", "Active");
+                AppendStat("Soft Object", $"{_softObject.gameObject.name}");
             }
             
             // Log Section

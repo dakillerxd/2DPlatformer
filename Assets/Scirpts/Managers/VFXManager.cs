@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Collections;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Volume))]
@@ -33,6 +34,30 @@ public class VFXManager : MonoBehaviour
         globalVolume.profile.TryGet<MotionBlur>(out _motionBlur);
         globalVolume.profile.TryGet<ChromaticAberration>(out _chromaticAberration);
         globalVolume.profile.TryGet<LensDistortion>(out _lensDistortion);
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        
+        ToggleChromaticAberration(false);
+        ToggleLensDistortion(false);
+        
+        if (nextScene.name == "MainMenu") {
+            
+            ToggleMotionBlur(true, 0.3f);
+        } else {
+            ToggleMotionBlur(false);
+        }
     }
 
 
@@ -80,7 +105,6 @@ public class VFXManager : MonoBehaviour
     }
 
 #endregion Particle Effects
-
 
 
 #region Global Volume

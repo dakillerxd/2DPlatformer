@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveManager : MonoBehaviour
 {
@@ -14,6 +15,25 @@ public class SaveManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+    
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        if (nextScene.name != "MainMenu") return;
+        if (!HasKey("HighestLevel") || LoadInt("HighestLevel") < 1)
+        {
+            SaveInt("HighestLevel", 1); // or whatever starting value
         }
     }
 

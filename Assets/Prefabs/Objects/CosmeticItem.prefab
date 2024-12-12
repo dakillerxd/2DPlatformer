@@ -864,7 +864,7 @@ GameObject:
   - component: {fileID: 9130855472979036114}
   - component: {fileID: 6199443759942599963}
   m_Layer: 0
-  m_Name: PrefabCosmeticItem
+  m_Name: CosmeticItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

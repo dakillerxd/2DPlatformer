@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     [Tab("Settings")]
     [Header("Health")]
-    [SerializeField] private int maxHealth = 1;
+    public int maxHealth = 1;
     private int currentHealth;
     private bool isInvincible;
     private float invincibilityTime;
@@ -56,11 +56,6 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private ParticleSystem spawnVfx;
     [SerializeField] private ParticleSystem bleedVfx;
     [SerializeField] private ParticleSystem healVfx;
-
-    [Header("SFX")]
-    [SerializeField] private AudioSource jumpSfx;
-    [SerializeField] private AudioSource spawnSfx;
-    [SerializeField] private AudioSource deathSfx;
     [EndTab]
     
     private void Start() {
@@ -83,10 +78,9 @@ public class EnemyController : MonoBehaviour
         HandleGravity();
         HandleMovement();
     }
-
-    //------------------------------------
     
-    #region  Movement functions
+    
+    #region  Movement functions //------------------------------------
     
     private void HandleMovement() {
 
@@ -194,10 +188,8 @@ public class EnemyController : MonoBehaviour
     }
     
     #endregion Movement functions
-    
-    //------------------------------------
 
-    #region Collison functions
+    #region Collison functions //------------------------------------
     
     
     private void CollisionChecks() {
@@ -256,40 +248,7 @@ public class EnemyController : MonoBehaviour
     
     #endregion Collision functions
     
-    //------------------------------------
-    
-    #region Sfx/Vfx functions
-    private void PlayVfxEffect(ParticleSystem  effect, bool forcePlay = false) {
-        
-        if (!effect) return;
-        if (forcePlay) {effect.Play();} else { if (!effect.isPlaying) { effect.Play(); } }
-    }
-
-    private void StopVfxEffect(ParticleSystem effect, bool clear = false) {
-        if (!effect) return;
-        
-        if (effect.isPlaying) { 
-            if (clear) { effect.Clear(); } 
-            effect.Stop(); 
-        }
-    }
-
-    private void SpawnVfxEffect(ParticleSystem effect) {
-        if (!effect) return;
-        Instantiate(effect, transform.position, Quaternion.identity);
-    }
-
-    private void PlaySfxEffect(AudioSource effect) {
-        if (!effect) return;
-        effect.Play();
-    }
-    
-    
-    #endregion Sfx/Vfx functions
-    
-    //------------------------------------
-    
-    #region Health functions
+    #region Health functions //------------------------------------
     
     public void DamageHealth(int damage, bool setInvincible) {
 
@@ -298,7 +257,7 @@ public class EnemyController : MonoBehaviour
             if (setInvincible) { TurnInvincible();}
             TurnStunLocked();
             currentHealth -= damage;
-            SpawnVfxEffect(hurtVfx);
+            VFXManager.Instance?.SpawnParticleEffect(hurtVfx, transform.position, deathVfx.transform.rotation);
             Debug.Log("Enemy took " + damage + " damage. Current health: " + currentHealth);
         } 
         CheckIfDead();
@@ -313,14 +272,13 @@ public class EnemyController : MonoBehaviour
         rigidBody.linearVelocity = Vector2.ClampMagnitude(rigidBody.linearVelocity, maxPushSpeed);
     }
     
-    private void CheckIfDead() {
-
-        if (currentHealth <= 0) {
-
-            SpawnVfxEffect(deathVfx);
-            PlaySfxEffect(deathSfx);
-            Destroy(gameObject);
-        }
+    private void CheckIfDead()
+    {
+        if (currentHealth > 0) return;
+        
+        VFXManager.Instance?.SpawnParticleEffect(deathVfx, transform.position, deathVfx.transform.rotation);
+        SoundManager.Instance?.PlaySoundFX("Enemy Death");
+        Destroy(gameObject);
     }
     private void TurnInvincible(float invincibilityDuration = 0.3f) {
 

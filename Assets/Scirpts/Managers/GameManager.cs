@@ -1,7 +1,6 @@
 using UnityEngine;
 using CustomAttribute;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using VInspector;
 
 public enum GameStates {
@@ -42,13 +41,16 @@ public class GameManager : MonoBehaviour
     [Header("Settings")]
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
+    public bool funnyMode;
     public bool debugMode;
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
-    [SerializeField] private KeyCode toggleDebugText = KeyCode.F3;
+    [SerializeField] private KeyCode toggleDebugMode = KeyCode.F3;
+    [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F4;
+    [EndTab]
     
     
-    [Tab("Collectibles")] // ----------------------------------------------------------------------
+    [Tab("Unlocks-Collectibles")] // ----------------------------------------------------------------------
     [Header("Unlocks")]
     public bool googlyEyes;
     public bool propellerHat;
@@ -61,7 +63,7 @@ public class GameManager : MonoBehaviour
     public int collectiblesForUnlock1 {get ; private set;} // Set in awake
     public int collectiblesForUnlock2 {get ; private set;} // Set in awake
     public int collectiblesForUnlock3 {get ; private set;} // Set in awake
-
+    [EndTab]
     
     [Tab("References")] // ----------------------------------------------------------------------
     public InputManager inputManagerPrefab;
@@ -69,6 +71,7 @@ public class GameManager : MonoBehaviour
     public UIManager uiManagerPrefab;
     public VFXManager vfxManagerPrefab;
     private Camera _camera;
+    [EndTab]
     
     private void Awake() {
         
@@ -107,19 +110,11 @@ public class GameManager : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
-        LoadCollectibles();
-        
-        UIManager.Instance.ToggleDebugUI(debugMode);
-        UIManager.Instance.UpdateUI();
-        
-        VFXManager.Instance?.ToggleChromaticAberration(false);
-        VFXManager.Instance?.ToggleLensDistortion(false);
+        if (!_camera) { _camera = Camera.main;}
         
         if (nextScene.name == "MainMenu") {
-            VFXManager.Instance?.ToggleMotionBlur(true, 0.3f);
-        } else {
-            VFXManager.Instance?.ToggleMotionBlur(false);
             
+            LoadCollectibles();
         }
     }
     
@@ -128,10 +123,13 @@ public class GameManager : MonoBehaviour
         UpdateTextInfo();
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
-        if (Input.GetKeyUp(toggleDebugText)) { ToggleDebugText(); }
+        if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugText(); }
+        if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); }
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
+        
     }
     
+
     public void QuitGame()
     {
         Application.Quit();
@@ -141,7 +139,7 @@ public class GameManager : MonoBehaviour
         #endif
     }
 
-    #region GameStates
+    #region GameStates // -----------------------------------------
 
     public void TogglePause() {
         
@@ -152,6 +150,23 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    private void ToggleFunnyMode()
+    {
+        funnyMode = !funnyMode;
+        UIManager.Instance?.UpdateUI();
+    }
+    
+    private void ToggleDebugText() {
+        debugMode = !debugMode;
+        UIManager.Instance.ToggleDebugUI(debugMode);
+    }
+
+    private void UpdateTextInfo() {
+        
+        if (!debugMode) return;
+        
+        UIManager.Instance?.UpdateDebugUI();
+    }
     
     public void SetGameState(GameStates state) {
         currentGameState = state;
@@ -200,7 +215,7 @@ public class GameManager : MonoBehaviour
 
     #endregion GameStates
     
-    #region Collectibles
+    #region Collectibles // ---------------------------------
     
     public void CollectCollectible(string connectedLevelName) {
         foreach (Collectible collectible in collectibles) {
@@ -279,7 +294,7 @@ public class GameManager : MonoBehaviour
     
     #endregion Collectibles
 
-    #region Cosmetics
+    #region Cosmetics // ----------------------------------
 
 
     public void ToggleGooglyEyeMode(bool state) {
@@ -301,25 +316,8 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
-    
-    #region Debugging functions
-
-    private void ToggleDebugText() {
-        debugMode = !debugMode;
-        UIManager.Instance.ToggleDebugUI(debugMode);
-    }
-
-    private void UpdateTextInfo() {
-        
-        if (!debugMode) return;
-        if (!_camera) { _camera = Camera.main;}
-        
-        UIManager.Instance.UpdateDebugUI();
-    }
-    
 
     
-    #endregion Debugging functions
 
 }
 

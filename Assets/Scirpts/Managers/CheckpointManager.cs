@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VInspector;
 
 #if UNITY_EDITOR
@@ -35,13 +36,27 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         {
             Instance = this;
         }
-    }
+        
+        if (SceneManager.GetActiveScene().name != "Showcase Level" || SceneManager.GetActiveScene().name != "Test Level")
+        {
+            
+            if (SaveManager.Instance.LoadInt("HighestLevel") <= SceneManager.GetActiveScene().buildIndex)
+            {
+                SaveManager.Instance.SaveInt("HighestLevel", SceneManager.GetActiveScene().buildIndex);
+            }
+        
+            SaveManager.Instance.SaveString("SavedLevel", SceneManager.GetActiveScene().name);
+            activeCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint") switch
+            {
+                0 => null,
+                _ => checkpointList[SaveManager.Instance.LoadInt("SavedCheckpoint") - 1]
+            };
+        }
 
-    private void Start() 
-    {
-        FindAllCheckpoints();
     }
-
+    
+    
+    
     public void SetSpawnPoint(Vector2 newSpawnPoint) 
     {
         playerSpawnPoint = newSpawnPoint;
@@ -95,11 +110,6 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         checkpointList = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).ToList();
         Debug.Log($"Found {checkpointList.Count} checkpoints in the scene.");
 
-        // foreach (Checkpoint checkpoint in checkpointList) 
-        // {
-        //     checkpoint.SeCheckpointColor(disabledCheckpointColor);
-        // }
-
         RenameCheckpoints();
     }
 
@@ -109,6 +119,12 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         
         DeactivateLastCheckpoint();
         activeCheckpoint = checkpoint;
+        
+        if (SceneManager.GetActiveScene().name != "Showcase Level" || SceneManager.GetActiveScene().name != "Test Level")
+        {
+            SaveManager.Instance.SaveInt("SavedCheckpoint", checkpointList.IndexOf(checkpoint) + 1);
+        }
+        
     }
 
     public void DeactivateCheckpoint(Checkpoint checkpoint)

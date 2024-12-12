@@ -84,6 +84,30 @@ public class UIManager : MonoBehaviour
 
     }
     
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        ToggleDebugUI(GameManager.Instance.debugMode);
+        UpdateUI();
+        
+        if (nextScene.name == "MainMenu") return;
+        UpdateAbilitiesUI();
+        StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+
+    }
+
+    
+    
+    
     private void InitializeUI()
     {
         

@@ -440,166 +440,198 @@ private void HandleOffsetBoundaries()
     private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
     public void UpdateDebugText(TextMeshProUGUI textObject) {
         _debugStringBuilder.Clear();
-
-        // Basic Camera Info
-        _debugStringBuilder.AppendFormat("Camera State: {0}\n", cameraState);
-        _debugStringBuilder.AppendFormat("Target: {0}\n", target ? target.name : "None");
-
-        // Position and Movement
-        _debugStringBuilder.AppendFormat("Position: ({0:0.0}, {1:0.0})\n", transform.position.x, transform.position.y);
         
-        // Offset Info
+        // Core Stats Section
+        AppendHeader("Camera");
+        AppendStat("State", cameraState.ToString());
+        AppendStat("Target", target ? target.name : "None");
+        AppendStat("Position", $"X: {transform.position.x:F1} Y: {transform.position.y:F1}");
+        AppendStat("Zoom", $"Current: {_camera.orthographicSize:F1} Base: {defaultZoom:F1}");
+        
+        // Offset Section
+        AppendHeader("Offset");
         Vector2 targetOffset = target ? _targetDynamicOffset : Vector2.zero;
-        _debugStringBuilder.AppendFormat("Offset: ({0:0.0}, {1:0.0}) (Target: ({2:0.0}, {3:0.0}), Triggers: ({4:0.0}, {5:0.0}))\n",
-            targetOffset.x + _targetTriggerOffset.x,
-            targetOffset.y + _targetTriggerOffset.y,
-            targetOffset.x,
-            targetOffset.y,
-            _targetTriggerOffset.x,
-            _targetTriggerOffset.y);
+        AppendStat("Dynamic", $"X: {targetOffset.x:F1} Y: {targetOffset.y:F1}");
+        AppendStat("Trigger", $"X: {_targetTriggerOffset.x:F1} Y: {_targetTriggerOffset.y:F1}");
+        AppendStat("Total", $"X: {(targetOffset.x + _targetTriggerOffset.x):F1} Y: {(targetOffset.y + _targetTriggerOffset.y):F1}");
         
+        // Zoom Section
+        AppendHeader("Zoom");
+        AppendStatGroup(new Dictionary<string, (float value, float? max)> {
+            { "Dynamic", (_targetDynamicZoom, null) },
+            { "Trigger", (_triggerZoomOffset, null) },
+            { "Total", (_camera.orthographicSize, maxZoom) }
+        });
         
-        // Zoom Info 
-        _debugStringBuilder.AppendFormat("Zoom: {0:0.0} (Base: {1:0.0}, Target: {2:0.0}, Trigger: {3:0.0})\n", 
-            _camera.orthographicSize, 
-            defaultZoom,
-            _targetDynamicZoom,
-            _triggerZoomOffset);
-
-        // Boundaries
+        // Boundaries Section
         if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0)) {
-            _debugStringBuilder.AppendFormat("\nBoundaries:\n");
-            _debugStringBuilder.AppendFormat("X: {0:0.0} to {1:0.0}\n", _minXBoundary, _maxXBoundary);
-            _debugStringBuilder.AppendFormat("Y: {0:0.0} to {1:0.0}\n", _minYBoundary, _maxYBoundary);
+            AppendHeader("Boundaries");
+            AppendStat("Horizontal", $"{_minXBoundary:F1} to {_maxXBoundary:F1}");
+            AppendStat("Vertical", $"{_minYBoundary:F1} to {_maxYBoundary:F1}");
         }
         
-
-        // Active Triggers
+        // Effects Section
+        AppendHeader("Effects");
+        AppendStatGroup(new Dictionary<string, bool> {
+            { "Shaking", _isShaking }
+        });
+        if (_isShaking) {
+            AppendStat("Shake Offset", $"X: {_shakeOffset.x:F1} Y: {_shakeOffset.y:F1}");
+        }
+        
+        // Active Triggers Section
         if (_activeTriggers.Count > 0) {
-            _debugStringBuilder.AppendFormat("\nActive Triggers ({0}):\n", _activeTriggers.Count);
+            AppendHeader($"Active Triggers ({_activeTriggers.Count})");
             for (int i = 0; i < _activeTriggers.Count; i++) {
                 var trigger = _activeTriggers[i];
-                _debugStringBuilder.AppendFormat("{0}. {1} [{2}]{3}{4}{5}\n", 
-                    i + 1, 
-                    "Trigger",
-                    trigger.setCameraStateOnEnter ? trigger.cameraStateOnEnter.ToString() : "",
-                    trigger.limitCameraToBoundary ? " (Bounded)" : "",
-                    trigger.setCameraZoom ? string.Format(" (Zoom: {0:+0.0;-0.0;0})", trigger.zoomOffset) : "",
-                    trigger.setCameraOffset ? string.Format(" (Offset: {0:0.0}, {1:0.0})", trigger.offset.x, trigger.offset.y) : "");
+                var properties = new List<string>();
+                
+                if (trigger.setCameraStateOnEnter) 
+                    properties.Add(trigger.cameraStateOnEnter.ToString());
+                if (trigger.limitCameraToBoundary) 
+                    properties.Add("Bounded");
+                if (trigger.setCameraZoom) 
+                    properties.Add($"Zoom: {trigger.zoomOffset:+0.0;-0.0;0}");
+                if (trigger.setCameraOffset) 
+                    properties.Add($"Offset: ({trigger.offset.x:F1}, {trigger.offset.y:F1})");
+                    
+                string propertyString = properties.Count > 0 ? $" [{string.Join(", ", properties)}]" : "";
+                _debugStringBuilder.AppendLine($"{i + 1}. Trigger{propertyString}");
             }
-        }
-        
-        // Shake Effect
-        if (_isShaking) {
-            _debugStringBuilder.AppendFormat("\nShake Active: ({0:0.0}, {1:0.0})\n", _shakeOffset.x, _shakeOffset.y);
         }
 
         textObject.text = _debugStringBuilder.ToString();
     }
+
+    private void AppendHeader(string header) {
+        _debugStringBuilder.AppendLine($"\n<color=#00FF00>{header}</color>");
+    }
+
+    private void AppendStat(string label, string value) {
+        _debugStringBuilder.AppendLine($"{label}: {value}");
+    }
+
+    private void AppendStatGroup(Dictionary<string, bool> states) {
+        foreach (var (label, state) in states) {
+            if (state) {
+                _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}");
+            } else {
+                _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}");
+            }
+        }
+    }
+
+    private void AppendStatGroup(Dictionary<string, (float value, float? max)> states) {
+        foreach (var (label, info) in states) {
+            string maxText = info.max.HasValue ? $"/{info.max:F1}" : "";
+            _debugStringBuilder.AppendLine($"{label}: {info.value:F1}{maxText}");
+        }
+    }
     
 #if UNITY_EDITOR
-private void OnDrawGizmosSelected() 
-{ 
-    if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
-    {
-        // Calculate offset and trigger boundaries
-        float offsetMinX = target.position.x + minHorizontalOffset;
-        float offsetMaxX = target.position.x + maxHorizontalOffset;
-        float offsetMinY = target.position.y + minVerticalOffset;
-        float offsetMaxY = target.position.y + maxVerticalOffset;
-
-        bool drawHorizontalOffsets = true;
-        bool drawVerticalOffsets = true;
-
-        // Check if we have active triggers with boundaries
-        if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
+    private void OnDrawGizmosSelected() 
+    { 
+        if (target && useTargetOffsetBoundaries && cameraState != CameraState.Locked)
         {
-            // Check each axis independently
-            drawHorizontalOffsets &= offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary;
-            drawVerticalOffsets &= offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary;
+            // Calculate offset and trigger boundaries
+            float offsetMinX = target.position.x + minHorizontalOffset;
+            float offsetMaxX = target.position.x + maxHorizontalOffset;
+            float offsetMinY = target.position.y + minVerticalOffset;
+            float offsetMaxY = target.position.y + maxVerticalOffset;
+
+            bool drawHorizontalOffsets = true;
+            bool drawVerticalOffsets = true;
+
+            // Check if we have active triggers with boundaries
+            if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
+            {
+                // Check each axis independently
+                drawHorizontalOffsets &= offsetMinX >= _minXBoundary && offsetMaxX <= _maxXBoundary;
+                drawVerticalOffsets &= offsetMinY >= _minYBoundary && offsetMaxY <= _maxYBoundary;
+            }
+
+            // Draw vertical lines for horizontal offset boundaries
+            if (drawHorizontalOffsets)
+            {
+                Debug.DrawLine(
+                    new Vector3(offsetMinX, offsetMinY, 0),
+                    new Vector3(offsetMinX, offsetMaxY, 0),
+                    Color.blue);
+                Debug.DrawLine(
+                    new Vector3(offsetMaxX, offsetMaxY, 0),
+                    new Vector3(offsetMaxX, offsetMinY, 0),
+                    Color.blue);
+            }
+
+            // Draw horizontal lines for vertical offset boundaries
+            if (drawVerticalOffsets)
+            {
+                Debug.DrawLine(
+                    new Vector3(offsetMinX, offsetMinY, 0),
+                    new Vector3(offsetMaxX, offsetMinY, 0),
+                    Color.blue);
+                Debug.DrawLine(
+                    new Vector3(offsetMinX, offsetMaxY, 0),
+                    new Vector3(offsetMaxX, offsetMaxY, 0),
+                    Color.blue);
+            }
         }
-
-        // Draw vertical lines for horizontal offset boundaries
-        if (drawHorizontalOffsets)
+        
+        // Draw boundaries for all active triggers
+        for (int i = 0; i < _activeTriggers.Count; i++)
         {
-            Debug.DrawLine(
-                new Vector3(offsetMinX, offsetMinY, 0),
-                new Vector3(offsetMinX, offsetMaxY, 0),
-                Color.blue);
-            Debug.DrawLine(
-                new Vector3(offsetMaxX, offsetMaxY, 0),
-                new Vector3(offsetMaxX, offsetMinY, 0),
-                Color.blue);
-        }
+            Vector4 boundaries = _activeTriggers[i].GetBoundaries();
 
-        // Draw horizontal lines for vertical offset boundaries
-        if (drawVerticalOffsets)
-        {
+            // Calculate color - darker red for outer triggers, brighter red for inner triggers
+            float intensity = 0.3f + (0.7f * (i / Mathf.Max(1, (float)(_activeTriggers.Count - 1))));
+            Color boundaryColor = new Color(1f, 0f, 0f, intensity);
+            
+            // Draw actual camera constraint area if limitCameraToBoundary is true
+            if (_activeTriggers[i].limitCameraToBoundary)
+            {
+                float minX = boundaries.x + (_cameraWidth/2);
+                float maxX = boundaries.y - (_cameraWidth/2);
+                float minY = boundaries.z + (_cameraHeight/2);
+                float maxY = boundaries.w - (_cameraHeight/2);
+                
+                Debug.DrawLine(
+                    new Vector3(minX, minY, 0),
+                    new Vector3(minX, maxY, 0),
+                    Color.blue);
+                Debug.DrawLine(
+                    new Vector3(maxX, minY, 0),
+                    new Vector3(maxX, maxY, 0),
+                    Color.blue);
+                Debug.DrawLine(
+                    new Vector3(minX, minY, 0),
+                    new Vector3(maxX, minY, 0),
+                    Color.blue);
+                Debug.DrawLine(
+                    new Vector3(minX, maxY, 0),
+                    new Vector3(maxX, maxY, 0),
+                    Color.blue);
+            }
+            
+            // Draw full trigger area boundaries with dashed lines
             Debug.DrawLine(
-                new Vector3(offsetMinX, offsetMinY, 0),
-                new Vector3(offsetMaxX, offsetMinY, 0),
-                Color.blue);
+                new Vector3(boundaries.x, boundaries.z, 0),
+                new Vector3(boundaries.x, boundaries.w, 0),
+                boundaryColor);
             Debug.DrawLine(
-                new Vector3(offsetMinX, offsetMaxY, 0),
-                new Vector3(offsetMaxX, offsetMaxY, 0),
-                Color.blue);
+                new Vector3(boundaries.y, boundaries.z, 0),
+                new Vector3(boundaries.y, boundaries.w, 0),
+                boundaryColor);
+            Debug.DrawLine(
+                new Vector3(boundaries.x, boundaries.z, 0),
+                new Vector3(boundaries.y, boundaries.z, 0),
+                boundaryColor);
+            Debug.DrawLine(
+                new Vector3(boundaries.x, boundaries.w, 0),
+                new Vector3(boundaries.y, boundaries.w, 0),
+                boundaryColor);
         }
     }
     
-    // Draw boundaries for all active triggers
-    for (int i = 0; i < _activeTriggers.Count; i++)
-    {
-        Vector4 boundaries = _activeTriggers[i].GetBoundaries();
-
-        // Calculate color - darker red for outer triggers, brighter red for inner triggers
-        float intensity = 0.3f + (0.7f * (i / Mathf.Max(1, (float)(_activeTriggers.Count - 1))));
-        Color boundaryColor = new Color(1f, 0f, 0f, intensity);
-        
-        // Draw actual camera constraint area if limitCameraToBoundary is true
-        if (_activeTriggers[i].limitCameraToBoundary)
-        {
-            float minX = boundaries.x + (_cameraWidth/2);
-            float maxX = boundaries.y - (_cameraWidth/2);
-            float minY = boundaries.z + (_cameraHeight/2);
-            float maxY = boundaries.w - (_cameraHeight/2);
-            
-            Debug.DrawLine(
-                new Vector3(minX, minY, 0),
-                new Vector3(minX, maxY, 0),
-                Color.blue);
-            Debug.DrawLine(
-                new Vector3(maxX, minY, 0),
-                new Vector3(maxX, maxY, 0),
-                Color.blue);
-            Debug.DrawLine(
-                new Vector3(minX, minY, 0),
-                new Vector3(maxX, minY, 0),
-                Color.blue);
-            Debug.DrawLine(
-                new Vector3(minX, maxY, 0),
-                new Vector3(maxX, maxY, 0),
-                Color.blue);
-        }
-        
-        // Draw full trigger area boundaries with dashed lines
-        Debug.DrawLine(
-            new Vector3(boundaries.x, boundaries.z, 0),
-            new Vector3(boundaries.x, boundaries.w, 0),
-            boundaryColor);
-        Debug.DrawLine(
-            new Vector3(boundaries.y, boundaries.z, 0),
-            new Vector3(boundaries.y, boundaries.w, 0),
-            boundaryColor);
-        Debug.DrawLine(
-            new Vector3(boundaries.x, boundaries.z, 0),
-            new Vector3(boundaries.y, boundaries.z, 0),
-            boundaryColor);
-        Debug.DrawLine(
-            new Vector3(boundaries.x, boundaries.w, 0),
-            new Vector3(boundaries.y, boundaries.w, 0),
-            boundaryColor);
-    }
-}
 #endif
 #endregion
 

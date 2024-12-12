@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button buttonStart;
+    [SerializeField] private Button buttonResume;
     [SerializeField] private Button buttonLevelSelect;
     [SerializeField] private Button buttonCollectibles;
     [SerializeField] private Button buttonOptions;
@@ -32,9 +33,27 @@ public class MainMenu : MonoBehaviour
 
     private void SetupButtons()
     {
+        
+        if (buttonResume != null)
+        {
+            if (SaveManager.Instance.LoadString("SavedLevel") != "")
+            {
+                buttonResume.gameObject.SetActive(true);
+                buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+                buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+                buttonResume.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
+                buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
+            } else {
+                buttonResume.gameObject.SetActive(false);
+            }
+
+        }
+        
+        
         if (buttonStart != null)
         {
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonStart.onClick.AddListener(() => SaveManager.Instance.SaveInt("SavedCheckpoint", 0));
             buttonStart.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
             buttonStart.onClick.AddListener(() => SceneManager.LoadScene(1));
         }

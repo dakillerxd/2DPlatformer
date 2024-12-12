@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using VInspector;
 
 [System.Serializable]
@@ -14,7 +15,7 @@ public class Sound
     [Range(0f, 1.1f)] public float reverbZoneMix = 1f;
     public bool loop = false;
     public AudioClip[] clips;
-    public AudioClip[] googlyEyesModeClips;
+    public AudioClip[] funnyModeClips;
     [HideInInspector] public AudioSource source;
     
 }
@@ -152,9 +153,9 @@ public class SoundManager : MonoBehaviour
 
         int rand;
         AudioClip[] clipsType;
-        if (GameManager.Instance.googlyEyes && soundFx.googlyEyesModeClips.Length > 0) {
-            rand = Random.Range(0, soundFx.googlyEyesModeClips.Length);
-            clipsType = soundFx.googlyEyesModeClips;
+        if (GameManager.Instance.funnyMode && soundFx.funnyModeClips.Length > 0) {
+            rand = Random.Range(0, soundFx.funnyModeClips.Length);
+            clipsType = soundFx.funnyModeClips;
         } else {
             rand = Random.Range(0, soundFx.clips.Length);
             clipsType = soundFx.clips;

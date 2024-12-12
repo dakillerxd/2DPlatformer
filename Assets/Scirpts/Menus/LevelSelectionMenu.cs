@@ -1,4 +1,4 @@
-using CustomAttribute;
+using CustomAttributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,7 +18,7 @@ public class LevelSelectionMenu : MonoBehaviour
     
 
     
-
+    
     private void Start()
     {
         if (buttonLevelSelectBack != null)
@@ -29,6 +29,7 @@ public class LevelSelectionMenu : MonoBehaviour
         if (buttonShowcaseLevel != null)
         {
             buttonShowcaseLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonShowcaseLevel.onClick.AddListener(() => SaveManager.Instance.SaveInt("SavedCheckpoint", 0));
             buttonShowcaseLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
             buttonShowcaseLevel.onClick.AddListener(() => SceneManager.LoadScene("Showcase Level"));
         }
@@ -39,17 +40,23 @@ public class LevelSelectionMenu : MonoBehaviour
             buttonTestLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
             buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("Test Level"));
         }
+        
+
+        
 
         if (levels.Length == 0 || !buttonLevelPrefab || !levelsContainer) return;
         
         
         foreach (SceneField level in levels)
         {
-            GameObject button = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
-            button.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            button.GetComponent<Button>().onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-            button.GetComponent<Button>().onClick.AddListener(() => SceneManager.LoadScene(level));
-            button.GetComponentInChildren<TextMeshProUGUI>().text = level.SceneName.Replace("Level", "").Trim();
+            GameObject buttonObject = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
+            Button button = buttonObject.GetComponent<Button>();
+            button.interactable = level.BuildIndex <= SaveManager.Instance.LoadInt("HighestLevel");
+            button.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            button.onClick.AddListener(() => SaveManager.Instance.SaveInt("SavedCheckpoint", 0));
+            button.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+            button.onClick.AddListener(() => SceneManager.LoadScene(level.SceneName));
+            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = level.SceneName.Replace("Level", "").Trim();
             
         }
     }

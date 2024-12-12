@@ -55,7 +55,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Player Air Jump
     volume: 1
@@ -66,7 +66,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Player Dash
     volume: 1
@@ -77,7 +77,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 7147c2e1a1854d74e848b86df8546fe1, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Player Hurt
     volume: 1
@@ -88,8 +88,8 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
-    googlyEyesModeClips:
-    - {fileID: 8300000, guid: 6453b8ce16dd67e44bca113c0c22a91a, type: 3}
+    funnyModeClips:
+    - {fileID: 8300000, guid: 2a807d2b9f6358e449eae597fed4c0ba, type: 3}
     source: {fileID: 0}
   - name: Player Death
     volume: 1
@@ -100,8 +100,8 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
-    googlyEyesModeClips:
-    - {fileID: 8300000, guid: 2a807d2b9f6358e449eae597fed4c0ba, type: 3}
+    funnyModeClips:
+    - {fileID: 8300000, guid: 6453b8ce16dd67e44bca113c0c22a91a, type: 3}
     source: {fileID: 0}
   - name: Player Fall off Map
     volume: 1
@@ -112,7 +112,8 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 0d39a29e32221eb4d81a94d9be5314a8, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips:
+    - {fileID: 8300000, guid: 6453b8ce16dd67e44bca113c0c22a91a, type: 3}
     source: {fileID: 0}
   - name: Player Receive Ability
     volume: 1
@@ -123,7 +124,19 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
-    googlyEyesModeClips:
+    funnyModeClips:
+    - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
+    source: {fileID: 0}
+  - name: Player Receive Collectible
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
+    funnyModeClips:
     - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
     source: {fileID: 0}
   - name: Player Land
@@ -135,7 +148,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: e354fe03bf37e8d46ac9ea1c81aeafcc, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: ?Player Spawn
     volume: 1
@@ -145,7 +158,7 @@ MonoBehaviour:
     reverbZoneMix: 1
     loop: 0
     clips: []
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: ?Player Pushed
     volume: 1
@@ -156,7 +169,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Teleport
     volume: 1
@@ -167,7 +180,7 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 8a2f58971e849e949b67bd9bc758116d, type: 3}
-    googlyEyesModeClips: []
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Checkpoint Set
     volume: 1
@@ -178,18 +191,6 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
-    googlyEyesModeClips: []
-    source: {fileID: 0}
-  - name: Player Receive Collectible
-    volume: 1
-    pitch: 1
-    stereoPan: 0
-    spatialBlend: 0
-    reverbZoneMix: 1
-    loop: 0
-    clips:
-    - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
-    googlyEyesModeClips:
-    - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
+    funnyModeClips: []
     source: {fileID: 0}
   music: []

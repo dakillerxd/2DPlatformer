@@ -56,11 +56,13 @@ public class SceneTeleporter : MonoBehaviour
         switch (teleportType)
         {
             case TeleportType.NextScene:
+                SaveManager.Instance.SaveInt("SavedCheckpoint", 0);
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
                 break;
                 
             case TeleportType.SelectedScene:
                 if (sceneToLoad != null) {
+                    SaveManager.Instance.SaveInt("SavedCheckpoint", 0);
                     SceneManager.LoadScene(sceneToLoad.SceneName);
                 }
                 break;

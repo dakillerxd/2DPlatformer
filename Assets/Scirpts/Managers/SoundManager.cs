@@ -90,8 +90,9 @@ public class SoundManager : MonoBehaviour
 
 #region Sounds
 
-    public void PlaySoundFX(string name, float delay = 0f, float peach = 0 , Transform spawnTransform = null) {
+    public void PlaySoundFX(string name, float peach = 0 ,AudioSource audioSource = null) {
         
+        // Find sound
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
         if (soundFx == null || soundFx.clips.Length == 0) {
 
@@ -102,7 +103,53 @@ public class SoundManager : MonoBehaviour
             return;
         }
         
-        StartCoroutine(PlayDelayed(soundFx, delay, peach, spawnTransform));
+        // Choose random clip
+        int rand; 
+        AudioClip[] clipsType;
+        if (GameManager.Instance.funnyMode && soundFx.funnyModeClips.Length > 0) {
+            rand = Random.Range(0, soundFx.funnyModeClips.Length);
+            clipsType = soundFx.funnyModeClips;
+        } else {
+            rand = Random.Range(0, soundFx.clips.Length);
+            clipsType = soundFx.clips;
+        }
+
+       
+        if (audioSource == null)  // Play sound using sound manager
+        {
+           
+            soundFx.source.clip = clipsType[rand];
+            soundFx.source.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
+            soundFx.source.pitch = peach <= 0 ? soundFx.pitch : peach;
+            soundFx.source.Play();
+            
+        } else { // Play sound using specific audio source
+            
+            audioSource.clip = clipsType[rand];
+            audioSource.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
+            audioSource.pitch = peach <= 0 ? soundFx.pitch : peach;
+            audioSource.loop = soundFx.loop;
+            audioSource.panStereo = soundFx.stereoPan;
+            audioSource.spatialBlend = soundFx.spatialBlend;
+            audioSource.reverbZoneMix = soundFx.reverbZoneMix;
+            audioSource.Play();
+        }
+
+    }
+    
+    
+    public void StopSoundFx(string name) {
+        
+        Sound s = soundEffects.Find(sound => sound.name == name);
+        if (s == null) {
+            
+        #if UNITY_EDITOR 
+            // Debug.Log("SoundFX: " + name + " not found!"); 
+        #endif
+            
+            return;
+        }
+        s.source.Stop();
     }
     
     public void PlayMusic(string name) {
@@ -121,20 +168,6 @@ public class SoundManager : MonoBehaviour
         newMusic.source.Play();
     }
 
-
-    public void StopSoundFx(string name) {
-        
-        Sound s = soundEffects.Find(sound => sound.name == name);
-        if (s == null) {
-            
-            #if UNITY_EDITOR
-            // Debug.Log("SoundFX: " + name + " not found!"); 
-            #endif
-            
-            return;
-        }
-        s.source.Stop();
-    }
     
     
     private void StopAllMusic() {
@@ -147,49 +180,9 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
+
+
     
-    private IEnumerator PlayDelayed(Sound soundFx, float delay, float peach, Transform spawnTransform)
-    {
-
-        int rand;
-        AudioClip[] clipsType;
-        if (GameManager.Instance.funnyMode && soundFx.funnyModeClips.Length > 0) {
-            rand = Random.Range(0, soundFx.funnyModeClips.Length);
-            clipsType = soundFx.funnyModeClips;
-        } else {
-            rand = Random.Range(0, soundFx.clips.Length);
-            clipsType = soundFx.clips;
-        }
-         
-
-        yield return new WaitForSeconds(delay);
-        if (spawnTransform) {
-                
-            AudioSource audioSource = Instantiate(soundFXPrefab, spawnTransform.position, Quaternion.identity);
-            audioSource.gameObject.name = "Sfx " + soundFx.name;
-            audioSource.clip = clipsType[rand];
-            audioSource.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
-            audioSource.panStereo = soundFx.stereoPan;
-            audioSource.spatialBlend = soundFx.spatialBlend;
-            audioSource.reverbZoneMix = soundFx.reverbZoneMix;
-            audioSource.pitch = peach <= 0 ? soundFx.pitch : peach;
-            audioSource.loop = soundFx.loop;
-            audioSource.Play();
-
-            if (!audioSource.loop)
-            {
-                float length = audioSource.clip.length;
-                Destroy(audioSource.gameObject, length);
-            }
-            
-        } else {
-                
-            soundFx.source.clip = clipsType[rand];
-            soundFx.source.volume = soundFx.volume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume;
-            soundFx.source.pitch = peach <= 0 ? soundFx.pitch : peach;
-            soundFx.source.Play();
-        }
-    }
     
 #endregion
 

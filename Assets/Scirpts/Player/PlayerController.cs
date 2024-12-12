@@ -507,7 +507,7 @@ public class PlayerController : MonoBehaviour {
         PlayAnimationTrigger("Jump");
         
         float randPeach = Random.Range(1f, 1.05f);
-        SoundManager.Instance?.PlaySoundFX("Player Jump",0,randPeach);
+        SoundManager.Instance?.PlaySoundFX("Player Jump",randPeach);
         
         // Jump
         if (side == "Right") {
@@ -706,7 +706,7 @@ public class PlayerController : MonoBehaviour {
         VFXManager.Instance?.StopVfxEffect(wallSlideVfx, true);
         // PlayAnimationTrigger("Jump");
         float randPeach = Random.Range(1f, 1.05f);
-        SoundManager.Instance?.PlaySoundFX("Player Jump",0,randPeach);
+        SoundManager.Instance?.PlaySoundFX("Player Jump",randPeach);
 
         // Jump
         if (side == "Right") {
@@ -789,7 +789,7 @@ public class PlayerController : MonoBehaviour {
             CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.8f);
+            SoundManager.Instance?.PlaySoundFX("Player Land",0.8f);
         }
         else if (fallSpeed < -fastFallSpeed)
         {
@@ -797,14 +797,14 @@ public class PlayerController : MonoBehaviour {
             CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.85f);
+            SoundManager.Instance?.PlaySoundFX("Player Land",0.85f );
         }
         else if (fallSpeed < -9)
         {
             PlayAnimationTrigger("Land");
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
-            SoundManager.Instance?.PlaySoundFX("Player Land",0, 0.9f);
+            SoundManager.Instance?.PlaySoundFX("Player Land",0.9f);
         }
         else if (fallSpeed < -6)
         {

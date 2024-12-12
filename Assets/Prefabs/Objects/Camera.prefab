@@ -45,7 +45,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -150,20 +150,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dece43db101b299439a1ee4e9586b68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraState: 3
   baseVerticalFollowDelay: 0.5
   baseHorizontalFollowDelay: 0.5
-  baseHorizontalOffset: 1
-  baseVerticalOffset: 1.5
   useTargetOffsetBoundaries: 1
   minHorizontalOffset: -4
   maxHorizontalOffset: 4
   minVerticalOffset: -3
   maxVerticalOffset: 3
-  verticalMoveDiminisher: 1.5
-  horizontalMoveDiminisher: 1.5
   defaultZoom: 4
   minZoom: 2
   maxZoom: 6
   zoomSpeed: 0.5
-  target: {fileID: 0}
   triggerPrefab: {fileID: 4529777456246908639, guid: 40eddc7bb4437304d9bb20eb7a7efecb, type: 3}
+  target: {fileID: 0}

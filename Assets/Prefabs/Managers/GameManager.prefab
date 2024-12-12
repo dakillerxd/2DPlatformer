@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb380c64ecb614448f81d01b0b27485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGameState: 0
+  currentGameState: 1
   currentGameDifficulty: 0
   funnyMode: 0
   debugMode: 0
@@ -54,9 +54,6 @@ MonoBehaviour:
   restartSceneKey: 283
   toggleDebugMode: 284
   toggleFunnyMode: 285
-  googlyEyes: 0
-  propellerHat: 0
-  curlyMustache: 0
   unlocks:
   - unlockName: Curly Mustache
     unlockState: 0

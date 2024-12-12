@@ -193,4 +193,15 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3371895b19c6c0a4e95b2d00f9f4f8b6, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
+  - name: Lava Boiling
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 1
+    reverbZoneMix: 1
+    loop: 1
+    clips:
+    - {fileID: 8300000, guid: 4ba5d5aff5b41ca4b9ec45787ec75c54, type: 3}
+    funnyModeClips: []
+    source: {fileID: 0}
   music: []

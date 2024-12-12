@@ -3,8 +3,16 @@ using UnityEngine;
 
 public class BadLiquid : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private  AudioSource audioSource;
     private bool _triggered;
     
+    
+    private void Start()
+    {
+        if (audioSource) SoundManager.Instance?.PlaySoundFX("Lava Boiling", 0 , audioSource);
+        
+    }
    
    private void OnCollisionEnter2D(Collision2D collision)
    {

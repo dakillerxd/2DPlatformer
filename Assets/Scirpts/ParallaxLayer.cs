@@ -157,6 +157,7 @@ public class ParallaxLayer : MonoBehaviour
     
     [Button]
     private void SetChildrenLayer() {
+        if(!useCustomLayer) return;
         SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
 
         foreach (SpriteRenderer child in spriteRenderers) {

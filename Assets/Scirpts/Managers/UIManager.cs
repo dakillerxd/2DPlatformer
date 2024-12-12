@@ -84,6 +84,11 @@ public class UIManager : MonoBehaviour
 
     }
     
+    private  void Update()
+    {
+        UpdateDebugUI();
+    }
+    
     private void OnEnable()
     {
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
@@ -363,24 +368,23 @@ public class UIManager : MonoBehaviour
         fpsText.enabled = state;
     }
     
-    public void UpdateDebugUI() {
-
-        if (GameManager.Instance.debugMode)
+    private void UpdateDebugUI()
+    {
+        if (!GameManager.Instance.debugMode) return;
+        
+        if (playerDebugText)
         {
-            if (playerDebugText)
-            {
-                PlayerController.Instance?.UpdateDebugText(playerDebugText);
-            }
+            PlayerController.Instance?.UpdateDebugText(playerDebugText);
+        }
 
-            if (cameraDebugText)
-            {
-                CameraController.Instance?.UpdateDebugText(cameraDebugText);
-            }
+        if (cameraDebugText)
+        {
+            CameraController.Instance?.UpdateDebugText(cameraDebugText);
+        }
 
-            if (fpsText)
-            {
-                UpdateFpsText();
-            }
+        if (fpsText)
+        {
+            UpdateFpsText();
         }
     }
     

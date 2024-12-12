@@ -296,7 +296,7 @@ private void HandleOffsetBoundaries()
     bool horizontalDelay = Time.time < _lastStateChangeTime + 1f;
     Vector3 position = transform.position;
     
-    // Only apply boundary handling if we have active triggers
+    // Only apply boundary handling if we have unlockState triggers
     // AND they have non-zero boundaries
     if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
     {
@@ -345,7 +345,7 @@ private void HandleOffsetBoundaries()
             position.y = Mathf.Clamp(position.y, _minYBoundary, _maxYBoundary);
         }
     }
-    else // No active triggers, use offset boundaries
+    else // No unlockState triggers, use offset boundaries
     {
         if (!horizontalDelay)
         {
@@ -542,7 +542,7 @@ private void HandleOffsetBoundaries()
             bool drawHorizontalOffsets = true;
             bool drawVerticalOffsets = true;
 
-            // Check if we have active triggers with boundaries
+            // Check if we have unlockState triggers with boundaries
             if (_activeTriggers.Count > 0 && (_minXBoundary != 0 || _maxXBoundary != 0 || _minYBoundary != 0 || _maxYBoundary != 0))
             {
                 // Check each axis independently
@@ -577,7 +577,7 @@ private void HandleOffsetBoundaries()
             }
         }
         
-        // Draw boundaries for all active triggers
+        // Draw boundaries for all unlockState triggers
         for (int i = 0; i < _activeTriggers.Count; i++)
         {
             Vector4 boundaries = _activeTriggers[i].GetBoundaries();

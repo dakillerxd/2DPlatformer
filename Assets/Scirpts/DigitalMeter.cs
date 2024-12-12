@@ -20,6 +20,8 @@ public class DigitalMeter : MonoBehaviour
    [SerializeField] private string units = "m";
    [SerializeField] [Range(0, 10)] private int decimals = 2;
    
+#if UNITY_EDITOR
+    
    private void OnDrawGizmos()
    {
        if (!target) return;
@@ -65,12 +67,13 @@ public class DigitalMeter : MonoBehaviour
        #endif
    }
 
-   #if UNITY_EDITOR
+   
    private void OnValidate()
    {
        decimals = Mathf.Max(0, decimals);
        fontSize = Mathf.Max(1, fontSize);
        labelOffset = Mathf.Max(0, labelOffset);
    }
+   
    #endif
 }

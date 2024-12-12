@@ -1,6 +1,7 @@
 using UnityEngine;
 using CustomAttribute;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using VInspector;
 
 public enum GameStates {
@@ -25,10 +26,19 @@ public enum CosmeticItems
 }
 
 [System.Serializable]
+public class Unlock
+{
+    public string unlockName;
+    public bool unlockState;
+    public int unlockedAtCollectible;
+    [CustomAttribute.ReadOnly] public bool received;
+}
+
+[System.Serializable]
 public class Collectible
 {
     public SceneField connectedLevel;
-    public bool counts = true;
+    public bool countsTowardsUnlocks = true;
     [CustomAttribute.ReadOnly] public bool collected;
 }
 
@@ -51,18 +61,9 @@ public class GameManager : MonoBehaviour
     
     
     [Tab("Unlocks-Collectibles")] // ----------------------------------------------------------------------
-    [Header("Unlocks")]
-    public bool googlyEyes;
-    public bool propellerHat;
-    public bool curlyMustache;
+    public Unlock[] unlocks;
     [Space(10)]
     public Collectible[] collectibles;
-    public bool googlyEyesModeReceived {get ; private set;}
-    public bool propellerHatReceived {get ; private set;}
-    public bool curlyMustacheReceived {get ; private set;}
-    public int collectiblesForUnlock1 {get ; private set;} // Set in awake
-    public int collectiblesForUnlock2 {get ; private set;} // Set in awake
-    public int collectiblesForUnlock3 {get ; private set;} // Set in awake
     [EndTab]
     
     [Tab("References")] // ----------------------------------------------------------------------
@@ -82,10 +83,6 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        collectiblesForUnlock1 = 2;
-        collectiblesForUnlock2 = 4;
-        collectiblesForUnlock3 = 6;
     }
     
     private void Start() {
@@ -120,10 +117,9 @@ public class GameManager : MonoBehaviour
     
     
     private void Update() {
-        UpdateTextInfo();
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
-        if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugText(); }
+        if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugMode(); }
         if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); }
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
         
@@ -141,7 +137,7 @@ public class GameManager : MonoBehaviour
 
     #region GameStates // -----------------------------------------
 
-    public void TogglePause() {
+    private void TogglePause() {
         
         if (currentGameState == GameStates.GamePlay) {
             SetGameState(GameStates.Paused);
@@ -156,17 +152,11 @@ public class GameManager : MonoBehaviour
         UIManager.Instance?.UpdateUI();
     }
     
-    private void ToggleDebugText() {
+    private void ToggleDebugMode() {
         debugMode = !debugMode;
         UIManager.Instance.ToggleDebugUI(debugMode);
     }
-
-    private void UpdateTextInfo() {
-        
-        if (!debugMode) return;
-        
-        UIManager.Instance?.UpdateDebugUI();
-    }
+    
     
     public void SetGameState(GameStates state) {
         currentGameState = state;
@@ -215,16 +205,73 @@ public class GameManager : MonoBehaviour
 
     #endregion GameStates
     
-    #region Collectibles // ---------------------------------
+    #region Collectibles/Unlocks // ---------------------------------
+
+    private void CheckUnlocks()
+    {
+        
+        foreach (Unlock unlock in unlocks)
+        {
+            if (TotalCollectiblesCollected() >= unlock.unlockedAtCollectible)
+            {
+                unlock.received = TotalCollectiblesCollected() >= unlock.unlockedAtCollectible;
+            }
+        }
+    }
+    
+    public void ToggleUnlock(string unlockName, bool state)
+    {
+        foreach (Unlock unlock in unlocks)
+        {
+            if (unlock.unlockName == unlockName)
+            {
+                unlock.unlockState = state;
+                SaveManager.Instance.SaveBool(unlockName, unlock.unlockState);
+                PlayerController.Instance?.ToggleAllCosmetics();
+                return;
+            }
+        }
+        Debug.LogError("Unlock not found");
+    }
+
+    public bool CheckUnlockReceived(string unlockName)
+    {
+        foreach (Unlock unlock in unlocks)
+        {
+            if (unlock.unlockName == unlockName)
+            {
+                return unlock.received;
+            }
+        }
+        Debug.LogError("Unlock not found");
+        return false;
+    }
+    
+    public bool CheckUnlockActive(string unlockName)
+    {
+        foreach (Unlock unlock in unlocks)
+        {
+            if (unlock.unlockName == unlockName)
+            {
+                return unlock.unlockState;
+            }
+        }
+        Debug.LogError("Unlock not found");
+        return false;
+    }
+    
+
     
     public void CollectCollectible(string connectedLevelName) {
+        
+        if (IsCollectibleCollected(connectedLevelName)) { return; }
+        
         foreach (Collectible collectible in collectibles) {
             if (collectible.connectedLevel.SceneName == connectedLevelName) {
                 collectible.collected = true;
                 SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
                 return;
             }
-            Debug.LogError("Collectible not found");
         }
     }
     
@@ -238,22 +285,22 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public int TotalCollectiblesAmount()
+    public int TotalCollectiblesAmount() // The total amount of collectibles in the game
     {
         int total = 0;
         foreach (Collectible collectible in collectibles) {
-            if (collectible.counts) {
+            if (collectible.countsTowardsUnlocks) {
                 total++;
             }
         }
         return total;
     }
     
-    public int TotalCollectiblesCollected()
+    public int TotalCollectiblesCollected() // The total amount of the collected collectibles
     {
         int total = 0;
         foreach (Collectible collectible in collectibles) {
-            if (collectible.collected && collectible.counts) {
+            if (collectible.collected && collectible.countsTowardsUnlocks) {
                 total++;
             }
         }
@@ -267,9 +314,7 @@ public class GameManager : MonoBehaviour
             collectible.collected = SaveManager.Instance.LoadBool("Collectible " + collectible.connectedLevel.SceneName);
         }
 
-        propellerHatReceived = TotalCollectiblesCollected() >= collectiblesForUnlock1;
-        googlyEyesModeReceived = TotalCollectiblesCollected() >= collectiblesForUnlock2;
-        curlyMustacheReceived = TotalCollectiblesCollected() >= collectiblesForUnlock3;
+        CheckUnlocks();
 
     }
     
@@ -279,43 +324,20 @@ public class GameManager : MonoBehaviour
             SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
         }
         
-        googlyEyes = false;
         LoadCollectibles();
     }
     
     [Button] public void CollectAllCollectibles() {
+        
         foreach (Collectible collectible in collectibles) {
             collectible.collected = true;
             SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     
     #endregion Collectibles
-
-    #region Cosmetics // ----------------------------------
-
-
-    public void ToggleGooglyEyeMode(bool state) {
-        
-        googlyEyes = state;
-        PlayerController.Instance?.ToggleCosmetics();
-    }
-
-    public void TogglePropellerHat(bool state) {
-
-        propellerHat = state;
-        PlayerController.Instance?.ToggleCosmetics();
-    }
-    
-    public void ToggleCurlyMustache(bool state) {
-
-        curlyMustache = state;
-        PlayerController.Instance?.ToggleCosmetics();
-    }
-
-    #endregion
 
     
 

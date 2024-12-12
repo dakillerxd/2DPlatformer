@@ -37,22 +37,18 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
             Instance = this;
         }
         
+        // Load saved checkpoint
         if (SceneManager.GetActiveScene().name != "Showcase Level" || SceneManager.GetActiveScene().name != "Test Level")
         {
-            
-            if (SaveManager.Instance.LoadInt("HighestLevel") <= SceneManager.GetActiveScene().buildIndex)
-            {
-                SaveManager.Instance.SaveInt("HighestLevel", SceneManager.GetActiveScene().buildIndex);
-            }
-        
-            SaveManager.Instance.SaveString("SavedLevel", SceneManager.GetActiveScene().name);
             activeCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint") switch
             {
                 0 => null,
                 _ => checkpointList[SaveManager.Instance.LoadInt("SavedCheckpoint") - 1]
             };
         }
-
+        
+        // Save level information
+        SaveManager.Instance?.SaveGame(activeCheckpoint ? checkpointList.IndexOf(activeCheckpoint) + 1 : 0);
     }
     
     
@@ -60,59 +56,14 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
     public void SetSpawnPoint(Vector2 newSpawnPoint) 
     {
         playerSpawnPoint = newSpawnPoint;
-        Debug.Log("Set spawn point to: " + playerSpawnPoint);
     }
     
     public void SetStartTeleporter(SceneTeleporter newStartTeleporter)
     {
         startTeleporter = newStartTeleporter;
-        Debug.Log("Set start teleporter to: " + startTeleporter);
-    }
-
-    public void PlayTeleporterAnimation()
-    {
-        if (!startTeleporter) return;
-        
-        VFXManager.Instance?.PlayAnimationTrigger(startTeleporter.animator, "Spawn");
-    }
-
-    public void PlayCheckpointAnimation()
-    {
-        if (!activeCheckpoint) return;
-    
-        VFXManager.Instance?.PlayAnimationTrigger(activeCheckpoint.animator, "Spawn");
-    }
-     
-    [Button] private void AddCheckpoint() 
-    {
-        GameObject newCheckpoint = Instantiate(checkpointPrefab, transform.position, Quaternion.identity,transform);
-        checkpointList.Add(newCheckpoint.GetComponent<Checkpoint>());
-        newCheckpoint.name = "Checkpoint " + checkpointList.Count;
-        RenameCheckpoints();
-        
-        #if UNITY_EDITOR
-        UnityEditor.Selection.activeGameObject = newCheckpoint;
-        #endif
-    }
-    
-    private void RenameCheckpoints()
-    {
-        checkpointList.RemoveAll(w => w == null);
-        for (int i = 0; i < checkpointList.Count; i++)
-        {
-            checkpointList[i].name = "Checkpoint " + i;
-        }
     }
     
     
-    [Button] private void FindAllCheckpoints() 
-    {
-        checkpointList = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).ToList();
-        Debug.Log($"Found {checkpointList.Count} checkpoints in the scene.");
-
-        RenameCheckpoints();
-    }
-
     public void ActivateCheckpoint(Checkpoint checkpoint) 
     {
         if (activeCheckpoint == checkpoint) return;
@@ -120,10 +71,7 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         DeactivateLastCheckpoint();
         activeCheckpoint = checkpoint;
         
-        if (SceneManager.GetActiveScene().name != "Showcase Level" || SceneManager.GetActiveScene().name != "Test Level")
-        {
-            SaveManager.Instance.SaveInt("SavedCheckpoint", checkpointList.IndexOf(checkpoint) + 1);
-        }
+        SaveManager.Instance?.SaveGame(checkpointList.IndexOf(checkpoint) + 1);
         
     }
 
@@ -139,7 +87,52 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         activeCheckpoint = null;
     }
     
+    
+    
+    public void PlayTeleporterAnimation()
+    {
+        if (!startTeleporter) return;
+        
+        VFXManager.Instance?.PlayAnimationTrigger(startTeleporter.animator, "Spawn");
+    }
+
+    public void PlayCheckpointAnimation()
+    {
+        if (!activeCheckpoint) return;
+    
+        VFXManager.Instance?.PlayAnimationTrigger(activeCheckpoint.animator, "Spawn");
+    }
+
+    #region Debug
     #if UNITY_EDITOR
+    
+    [Button] private void AddCheckpoint() 
+    {
+        GameObject newCheckpoint = Instantiate(checkpointPrefab, transform.position, Quaternion.identity,transform);
+        checkpointList.Add(newCheckpoint.GetComponent<Checkpoint>());
+        newCheckpoint.name = "Checkpoint " + checkpointList.Count;
+        RenameCheckpoints();
+        
+        Selection.activeGameObject = newCheckpoint;
+    }
+    
+    private void RenameCheckpoints()
+    {
+        checkpointList.RemoveAll(w => w == null);
+        for (int i = 0; i < checkpointList.Count; i++)
+        {
+            checkpointList[i].name = "Checkpoint " + i;
+        }
+    }
+    
+    [Button] private void FindAllCheckpoints() 
+    {
+        checkpointList = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).ToList();
+        Debug.Log($"Found {checkpointList.Count} checkpoints in the scene.");
+
+        RenameCheckpoints();
+    }
+
     
     private List<Checkpoint> previousList = new List<Checkpoint>();
     private bool isProcessingDestroy = false;
@@ -194,4 +187,8 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         }
     }
     #endif
+    
+
+    #endregion
+
 }

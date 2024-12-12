@@ -12,6 +12,7 @@ public class LevelSelectionMenu : MonoBehaviour
     [SerializeField] private Button buttonLevelSelectBack;
     [SerializeField] private Button buttonShowcaseLevel;
     [SerializeField] private Button buttonTestLevel;
+    [SerializeField] private Button buttonResetLevels;
     [SerializeField] private Button buttonLevelPrefab;
     [SerializeField] private GameObject levelsContainer;
     [SerializeField] private SceneField[] levels;
@@ -41,13 +42,29 @@ public class LevelSelectionMenu : MonoBehaviour
             buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("Test Level"));
         }
         
+        if (buttonResetLevels != null)
+        {
+            buttonResetLevels.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonResetLevels.onClick.AddListener(() => SaveManager.Instance.ResetSave());
+            buttonResetLevels.onClick.AddListener(UpdateLevelButton);
+        }
 
-        
 
+        UpdateLevelButton();
+
+    }
+
+    private void UpdateLevelButton()
+    {
         if (levels.Length == 0 || !buttonLevelPrefab || !levelsContainer) return;
         
         
-        foreach (SceneField level in levels)
+        foreach (Transform child in levelsContainer.transform) // Delete all buttons before creating new ones
+        {
+            Destroy(child.gameObject);
+        }
+        
+        foreach (SceneField level in levels) // Create a button for each level in the list
         {
             GameObject buttonObject = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
             Button button = buttonObject.GetComponent<Button>();

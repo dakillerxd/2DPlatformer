@@ -24,7 +24,8 @@ public class CollectiblesMenu : MonoBehaviour
     [SerializeField] private GameObject googlyEyes;
     [SerializeField] private GameObject propellerHat;
     [SerializeField] private GameObject curlyMustache;
-    private readonly StringBuilder coinStringBuilder = new StringBuilder(256);
+    private readonly StringBuilder _collectiblesStringBuilder = new StringBuilder(256);
+    private readonly StringBuilder _unlockStringBuilder = new StringBuilder(256);
     
     
     [Header("Other")]
@@ -46,60 +47,61 @@ public class CollectiblesMenu : MonoBehaviour
             
             buttonResetCollectibles.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonResetCollectibles.onClick.AddListener(() => GameManager.Instance?.ResetCollectibles());
-            buttonResetCollectibles.onClick.AddListener(UpdateCoinText);
-            buttonResetCollectibles.onClick.AddListener(UpdateUnlocksText);
+            buttonResetCollectibles.onClick.AddListener(UpdateCollectibles);
             buttonResetCollectibles.onClick.AddListener(UpdateUnlocks);
         }
-
+        
+        UpdateCollectibles();
         UpdateUnlocks();
-        UpdateCoinText();
-        UpdateUnlocksText();
     }
 
     private void Update()
     {
-        if (normalEyes != null) normalEyes.SetActive(!GameManager.Instance.googlyEyes);
-        if (googlyEyes != null) googlyEyes.SetActive(GameManager.Instance.googlyEyes);
-        if (propellerHat != null) propellerHat.SetActive(GameManager.Instance.propellerHat);
-        if (curlyMustache != null) curlyMustache.SetActive(GameManager.Instance.curlyMustache);
+        if (normalEyes != null) normalEyes.SetActive(!GameManager.Instance.CheckUnlockActive("Googly Eye"));
+        if (googlyEyes != null) googlyEyes.SetActive(GameManager.Instance.CheckUnlockActive("Googly Eye"));
+        if (propellerHat != null) propellerHat.SetActive(GameManager.Instance.CheckUnlockActive("Propeller Hat"));
+        if (curlyMustache != null) curlyMustache.SetActive(GameManager.Instance.CheckUnlockActive("Curly Mustache"));
     }
 
     private void UpdateUnlocks()
     {
         if (googlyEyesToggle != null) {
-            googlyEyesToggle.isOn = GameManager.Instance.googlyEyes;
-            googlyEyesToggle.interactable = GameManager.Instance.googlyEyesModeReceived;
-            googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleGooglyEyeMode(value));
+            googlyEyesToggle.isOn = GameManager.Instance.CheckUnlockActive("Googly Eye");
+            googlyEyesToggle.interactable = GameManager.Instance.CheckUnlockReceived("Googly Eye");
+            googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Googly Eye", value));
         }
         
         if (propellerHatToggle != null) {
-            propellerHatToggle.isOn = GameManager.Instance.propellerHat;
-            propellerHatToggle.interactable = GameManager.Instance.propellerHatReceived;
-            propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.TogglePropellerHat(value));
+            propellerHatToggle.isOn = GameManager.Instance.CheckUnlockActive("Propeller Hat");
+            propellerHatToggle.interactable = GameManager.Instance.CheckUnlockReceived("Propeller Hat");
+            propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Propeller Hat", value));
+            
         }
         
         if (curlyMustacheToggle != null) {
-            curlyMustacheToggle.isOn = GameManager.Instance.curlyMustache;
-            curlyMustacheToggle.interactable = GameManager.Instance.curlyMustacheReceived;
-            curlyMustacheToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleCurlyMustache(value));
+            curlyMustacheToggle.isOn = GameManager.Instance.CheckUnlockActive("Curly Mustache");
+            curlyMustacheToggle.interactable = GameManager.Instance.CheckUnlockReceived("Curly Mustache");
+            curlyMustacheToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Curly Mustache", value));
         }
-    }
+
+        if (!unlocksText || GameManager.Instance.unlocks != null)
+        {
+            _unlockStringBuilder.Clear();
+            
+            foreach (Unlock unlock in GameManager.Instance.unlocks)
+            {
+                _unlockStringBuilder.AppendLine($"{unlock.unlockedAtCollectible} Coins: {unlock.unlockName} \n");
+            }
 
 
-    private void UpdateUnlocksText()
-    {
-        
-        if (!unlocksText) return;
-        if (GameManager.Instance?.collectibles == null) return;
-        
-        unlocksText.text = 
-            $"{GameManager.Instance.collectiblesForUnlock1} Coins: {(GameManager.Instance.googlyEyesModeReceived ? "<color=green>Propeller Hat</color>" : "<color=red>Propeller Hat</color>")}\n \n" +
-            $"{GameManager.Instance.collectiblesForUnlock2} Coins: {(GameManager.Instance.propellerHatReceived ? "<color=green>Googly Eyes</color>" : "<color=red>Googly Eyes</color>")}\n \n" +
-            $"{GameManager.Instance.collectiblesForUnlock3} Coins: {(GameManager.Instance.curlyMustacheReceived ? "<color=green>Curly Mustache</color>" : "<color=red>Curly Mustache</color>")}\n \n";
+            unlocksText.text = _unlockStringBuilder.ToString();
+        }
+
     }
     
     
-    private void UpdateCoinText() 
+    
+    private void UpdateCollectibles() 
     {
 
         if (coinsHeaderText)
@@ -110,19 +112,19 @@ public class CollectiblesMenu : MonoBehaviour
         
         if (coinsText == null) return;
         
-        coinStringBuilder.Clear();
+        _collectiblesStringBuilder.Clear();
         
         if (GameManager.Instance.collectibles != null)
         {
             foreach (Collectible collectible in GameManager.Instance.collectibles)
             {
-                if (collectible != null && collectible.counts)
+                if (collectible != null && collectible.countsTowardsUnlocks)
                 {
-                    coinStringBuilder.AppendFormat("{0}: {1}\n \n", collectible.connectedLevel?.SceneName ?? "Unknown", collectible.collected ? "<color=green>Collected</color>" : "<color=red>Not Collected</color>");
+                    _collectiblesStringBuilder.AppendFormat("{0}: {1}\n \n", collectible.connectedLevel?.SceneName ?? "Unknown", collectible.collected ? "<color=green>Collected</color>" : "<color=red>Not Collected</color>");
                 }
             }
             
-            coinsText.text = coinStringBuilder.ToString();
+            coinsText.text = _collectiblesStringBuilder.ToString();
         }
     }
     

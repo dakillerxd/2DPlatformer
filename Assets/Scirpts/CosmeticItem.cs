@@ -51,24 +51,24 @@ public class CosmeticItem : MonoBehaviour
     private  void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
+        PlayerController player = collision.GetComponentInParent<PlayerController>();
         
         
         switch (cosmeticItem)
         {
             case CosmeticItems.GooglyEye:
-                GameManager.Instance?.ToggleGooglyEyeMode(true);
+                player.ToggleCosmetic("Googly Eye", true);
                 break;
             case CosmeticItems.PropellerHat:
-                GameManager.Instance?.TogglePropellerHat(true);
+                player.ToggleCosmetic("Propeller Hat", true);
                 break;
             case CosmeticItems.CurlyMustache:
-                GameManager.Instance?.ToggleCurlyMustache(true);
+                player.ToggleCosmetic("Curly Mustache", true);
                 break;
         }
         
         // CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
         SoundManager.Instance?.PlaySoundFX("Player Receive Collectible");
-        PlayerController.Instance?.ToggleCosmetics();
         Destroy(gameObject);
         
     }

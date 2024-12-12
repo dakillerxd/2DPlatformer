@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour {
     
     [Header("Other")] 
     private string _logText;
-    
+    [EndTab]
     
     
     [Tab("Camera")] // ----------------------------------------------------------------------
@@ -243,15 +243,14 @@ public class PlayerController : MonoBehaviour {
         
         isFacingRight = true;
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
+        ToggleAllCosmetics();
         CheckpointManager.Instance?.SetSpawnPoint(transform.position);
-        ToggleCosmetics();
-        StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
-        StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
-
         
         
-        if (!Application.isEditor)
-        {
+        if (GameManager.Instance.debugMode) {
+            RespawnFromSpawnPoint();
+            
+        } else {
             RespawnFromCheckpoint();
         }
     }
@@ -1060,6 +1059,8 @@ public class PlayerController : MonoBehaviour {
         if (CheckpointManager.Instance.startTeleporter) {
             Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
             CheckpointManager.Instance.PlayTeleporterAnimation(); 
+            StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
+            StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         } else {
             Respawn(CheckpointManager.Instance.playerSpawnPoint);
         }
@@ -1373,18 +1374,33 @@ public class PlayerController : MonoBehaviour {
         
     }
 
-    public void ToggleCosmetics()
+    public void ToggleAllCosmetics()
     {
-        normalEye.SetActive(!GameManager.Instance.googlyEyes);
-        googlyEye.SetActive(GameManager.Instance.googlyEyes);
-        propellerHat.SetActive(GameManager.Instance.propellerHat);
-        curlyMustache.SetActive(GameManager.Instance.curlyMustache);
+        ToggleCosmetic("Propeller Hat", GameManager.Instance.CheckUnlockActive("Propeller Hat"));
+        ToggleCosmetic("Curly Mustache", GameManager.Instance.CheckUnlockActive("Curly Mustache"));
+        ToggleCosmetic("Googly Eye", GameManager.Instance.CheckUnlockActive("Googly Eye"));
+    }
 
-        if (GameManager.Instance.propellerHat || GameManager.Instance.curlyMustache)
+    public void ToggleCosmetic(string cosmetic, bool state)
+    {
+        switch (cosmetic)
+        {
+            case "Propeller Hat":
+                propellerHat.SetActive(state);
+                break;
+            case "Curly Mustache":
+                curlyMustache.SetActive(state);
+                break;
+            case "Googly Eye":
+                normalEye.SetActive(!state);
+                googlyEye.SetActive(state);
+                break;
+        }
+        
+        if (propellerHat || curlyMustache)
         {
             googlyEye.transform.localScale = new Vector3(1.7f, 1.7f, 1.7f);
         }
-        
     }
     
     

@@ -1,4 +1,4 @@
-using CustomAttribute;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -36,17 +36,29 @@ public class MainMenu : MonoBehaviour
         
         if (buttonResume != null)
         {
-            if (SaveManager.Instance.LoadString("SavedLevel") != "")
-            {
+            if (SaveManager.Instance.LoadInt("HighestLevel") < 1) {
+                
+                buttonResume.gameObject.SetActive(false);
+                
+            } else if (SaveManager.Instance.LoadInt("HighestLevel") == 1) {
+
+                if (SaveManager.Instance.LoadInt("SavedCheckpoint") > 0) {
+                    buttonResume.gameObject.SetActive(true);
+                    buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+                    buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+                    buttonResume.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
+                    buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
+                } else {
+                    buttonResume.gameObject.SetActive(false);
+                }
+                
+            } else if (SaveManager.Instance.LoadInt("HighestLevel") > 1) {
                 buttonResume.gameObject.SetActive(true);
                 buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
                 buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
                 buttonResume.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
                 buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
-            } else {
-                buttonResume.gameObject.SetActive(false);
             }
-
         }
         
         

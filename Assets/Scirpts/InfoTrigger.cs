@@ -20,7 +20,6 @@ public class InfoTrigger : MonoBehaviour
     private Color _startColor;
     private Coroutine _fadeCoroutine;
     private bool _isFirstEntry = true;
-    private bool _isCoroutineRunning;
     private bool _isPlayerInTrigger;
     private Collider2D _triggerCollider;
 
@@ -33,7 +32,6 @@ public class InfoTrigger : MonoBehaviour
         if (hideTriggerOnStart) { triggerSprite.enabled = false; }
         _startColor = infoText.color;
         infoText.color = _invisibleColor;
-        _isCoroutineRunning = false;
         _isPlayerInTrigger = false;
         _triggerCollider = GetComponent<Collider2D>();
     }
@@ -88,15 +86,12 @@ public class InfoTrigger : MonoBehaviour
 
     private IEnumerator StartFadeWithDelay(float delay)
     {
-        _isCoroutineRunning = true;
         yield return new WaitForSeconds(delay);
         _fadeCoroutine = StartCoroutine(FadeText(true, fadeInTime));
-        _isCoroutineRunning = false;
     }
 
     private IEnumerator FadeText(bool fadeIn, float fadeTime)
     {
-        _isCoroutineRunning = true;
         Color startColor = infoText.color;
         Color targetColor = fadeIn ? _startColor : _invisibleColor;
         float elapsedTime = 0f;
@@ -109,7 +104,6 @@ public class InfoTrigger : MonoBehaviour
         }
         infoText.color = targetColor;
         _fadeCoroutine = null;
-        _isCoroutineRunning = false;
         if (destroyAfterFadeOut && !fadeIn) Destroy(gameObject);
     }
 }

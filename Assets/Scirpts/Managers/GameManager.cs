@@ -1,54 +1,15 @@
 using UnityEngine;
 using CustomAttribute;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using VInspector;
 
-public enum GameStates {
-    None,
-    GamePlay,
-    Paused,
-    GameOver
-}
-
-public enum GameDifficulty {
-    None,
-    Easy,
-    Normal,
-    Hard,
-}
-
-public enum CosmeticItems
-{
-    GooglyEye,
-    PropellerHat,
-    CurlyMustache
-}
-
-[System.Serializable]
-public class Unlock
-{
-    public string unlockName;
-    public bool unlockState;
-    public int unlockedAtCollectible;
-    [CustomAttribute.ReadOnly] public bool received;
-}
-
-[System.Serializable]
-public class Collectible
-{
-    public SceneField connectedLevel;
-    public bool countsTowardsUnlocks = true;
-    [CustomAttribute.ReadOnly] public bool collected;
-}
 
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     
-    [Tab("GameManager")] // ----------------------------------------------------------------------
-    [Header("Settings")]
+    [Tab("Settings")] // ------------------------------------------
     public GameStates currentGameState = GameStates.GamePlay;
     public GameDifficulty currentGameDifficulty = GameDifficulty.None;
     public bool funnyMode;
@@ -57,16 +18,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugMode = KeyCode.F3;
     [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F4;
-    [EndTab]
-    
-    
-    [Tab("Unlocks-Collectibles")] // ----------------------------------------------------------------------
+    // public Level[] levels;
     public Unlock[] unlocks;
-    [Space(10)]
     public Collectible[] collectibles;
     [EndTab]
     
-    [Tab("References")] // ----------------------------------------------------------------------
+    [Tab("References")] // ------------------------------------------
     public InputManager inputManagerPrefab;
     public SoundManager soundManagerPrefab;
     public UIManager uiManagerPrefab;

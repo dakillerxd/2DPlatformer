@@ -6,19 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.SceneManagement;
 
-public enum PlayerState {
-    Controllable,
-    Frozen,
-}
 
-public enum PlayerAbilities {
-    DoubleJump,
-    WallSlide,
-    WallJump,
-    Dash,
-}
 
 public class PlayerController : MonoBehaviour {
     

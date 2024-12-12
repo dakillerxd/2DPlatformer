@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using VInspector;
 
 
@@ -28,14 +29,6 @@ public class UIManager : MonoBehaviour
     [Header("Level Title")]
     [SerializeField] private  TMP_Text levelTitleText;
     
-    [Header("Time")]
-    [SerializeField] private TMP_Text[] timerTexts;
-    [SerializeField] private  Color timerWarningColor = Color.red;
-    private Color timerOriginalColor;
-    
-    [Header("Score")]
-    [SerializeField] private  TMP_Text[] scoreTexts;
-
     [Header("Abilities")] 
     [SerializeField] private  Color abilityUnlocked = Color.white;
     [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
@@ -52,13 +45,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonMainMenu;
     [SerializeField] private Button buttonQuit;
     [SerializeField] private Button buttonOptionsBack;
-    [SerializeField] private  TMP_Text pauseTimeText;
-    [SerializeField] private  TMP_Text pauseScoreText;
-    [SerializeField] private  TMP_Text pauseAmmoText;
+    [SerializeField] private  TMP_Text pauseCollectiblesText;
     
     [Tab("UI Game Over")] // ----------------------------------------------------------------------
-    [SerializeField] private  TMP_Text gameOverTimeText;
-    [SerializeField] private  TMP_Text gameOverScoreText;
+    [SerializeField] private  TMP_Text gameOverCollectiblesText;
     [SerializeField] private  TMP_Text gameOverTitleText;
     [SerializeField] private  TMP_Text gameOverMessageText;
     [SerializeField] private List<string> loseMessages = new List<string> { "1!", "2", };
@@ -121,13 +111,6 @@ public class UIManager : MonoBehaviour
             levelTitleText.CrossFadeAlpha(0, 0, false);
         }
         
-        if (timerTexts.Length > 0)
-        {
-            foreach (var timerText in timerTexts)
-            {
-                timerOriginalColor = timerText.color;
-            }
-        }
         
         if (buttonResume != null)
         {
@@ -173,6 +156,7 @@ public class UIManager : MonoBehaviour
                 break;
             case GameStates.Paused:
                 pauseScreenUI.SetActive(true);
+                ShowPanelMain();
                 break;
             case GameStates.GameOver:
                 gameOverUI.SetActive(true);
@@ -182,7 +166,6 @@ public class UIManager : MonoBehaviour
 
     }
 
-    
     
 
 #region  Gameplay Screen
@@ -197,47 +180,6 @@ public class UIManager : MonoBehaviour
     }
     
     
-    public void UpdateScoreUI()
-    {
-        if (scoreTexts.Length > 0)
-        {
-            foreach (var studentsText in scoreTexts)
-            {
-                studentsText.text = ScoreManager.Instance.currentScore.ToString();
-            }
-        }
-    }
-    
-    public void UpdateTimeUI() 
-    {
-        if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy)
-        {
-            foreach (var timerText in timerTexts)
-            {
-                timerText.text = "∞";
-                timerText.color = Color.yellow;
-            }
-        }
-        else {
-            if (timerTexts.Length > 0)
-            {
-                int timeLeftInt = Mathf.CeilToInt(TimerManager.Instance.currentGameTime);
-
-                foreach (var timerText in timerTexts)
-                {
-                    timerText.text = timeLeftInt.ToString();
-                }
-
-                Color timerColor = (timeLeftInt <= TimerManager.Instance.warningTime) ? timerWarningColor : timerOriginalColor;
-                foreach (var timerText in timerTexts)
-                {
-                    timerText.color = timerColor;
-                }
-            }
-
-        }
-
-    }
     
     public void StartLevelTitleEffect(float duration, string title) {
         if (!levelTitleText) return;
@@ -261,36 +203,13 @@ public class UIManager : MonoBehaviour
 #region Pause Screen
 
 
-    
+
     private void UpdatePauseScreenInfo()
     {
-        if (pauseTimeText != null)
+
+        if (pauseCollectiblesText != null)
         {
-            if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy) {
-
-                pauseTimeText.text = "∞";
-                pauseTimeText.color = Color.yellow;
-
-            }
-            else if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Normal) {
-
-                int timeLeftInt = Mathf.CeilToInt(TimerManager.Instance.currentGameTime);
-                int totalTimeInt = Mathf.CeilToInt(TimerManager.Instance.gameTime);
-                pauseTimeText.text = $"{timeLeftInt} / {totalTimeInt}";
-            }
-            else if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Hard) {
-
-                int timeLeftInt = Mathf.CeilToInt(TimerManager.Instance.currentGameTime);
-                int totalTimeInt = Mathf.CeilToInt(TimerManager.Instance.gameTimeHard);
-                pauseTimeText.text = $"{timeLeftInt} / {totalTimeInt}";
-            }
-
-        }
-
-        if (pauseScoreText != null)
-        {
-
-            pauseScoreText.text = ScoreManager.Instance.currentScore.ToString();
+            
         }
         
 
@@ -316,35 +235,12 @@ public class UIManager : MonoBehaviour
 
     private void UpdateGameOverInfo()
     {
-        if (gameOverTimeText != null)
-        {
-            if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Easy) {
 
-                gameOverTimeText.text = "∞";
-                gameOverTimeText.color = Color.yellow;
-
-            }
-            else if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Normal) {
-
-                int timeLeftInt = Mathf.CeilToInt(TimerManager.Instance.currentGameTime);
-                int totalTimeInt = Mathf.CeilToInt(TimerManager.Instance.gameTime);
-                gameOverTimeText.text = $"{timeLeftInt} / {totalTimeInt}";
-            }
-            else if (GameManager.Instance.currentGameDifficulty == GameDifficulty.Hard) {
-
-                int timeLeftInt = Mathf.CeilToInt(TimerManager.Instance.currentGameTime);
-                int totalTimeInt = Mathf.CeilToInt(TimerManager.Instance.gameTimeHard);
-                gameOverTimeText.text = $"{timeLeftInt} / {totalTimeInt}";
-            }
-        }
-
-        if (gameOverScoreText != null)
+        if (gameOverCollectiblesText != null)
         {
             
-            gameOverScoreText.text = ScoreManager.Instance.currentScore.ToString();
         }
         
-
     }
 
 

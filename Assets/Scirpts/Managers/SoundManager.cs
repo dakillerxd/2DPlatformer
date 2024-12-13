@@ -1,24 +1,9 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 using VInspector;
 
-[System.Serializable]
-public class Sound
-{
-    public string name;
-    [Range(0f, 2f)] public float volume = 1f;
-    [Range(0.1f, 3f)] public float pitch = 1f;
-    [Range(-1f, 1f)] public float stereoPan = 0f;
-    [Range(0f, 1f)] public float spatialBlend = 0f;
-    [Range(0f, 1.1f)] public float reverbZoneMix = 1f;
-    public bool loop = false;
-    public AudioClip[] clips;
-    public AudioClip[] funnyModeClips;
-    [HideInInspector] public AudioSource source;
-    
-}
+
 
 public class SoundManager : MonoBehaviour
 {
@@ -40,6 +25,22 @@ public class SoundManager : MonoBehaviour
         SetupSounds();
     }
     
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        PlayMusic(nextScene.name == "MainMenu" ? "MainMenu" : "Gameplay");
+    }
+    
+
     
 
 #region Setup
@@ -164,6 +165,10 @@ public class SoundManager : MonoBehaviour
         }
         
         StopAllMusic();
+
+        int rand = Random.Range(0, newMusic.clips.Length);
+        
+        newMusic.source.clip = newMusic.clips[rand];
         newMusic.source.volume = newMusic.volume * SettingsManager.Instance.musicVolume * SettingsManager.Instance.masterGameVolume;
         newMusic.source.Play();
     }

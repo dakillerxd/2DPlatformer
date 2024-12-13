@@ -1,5 +1,4 @@
 using UnityEngine;
-using CustomAttribute;
 using UnityEngine.SceneManagement;
 using VInspector;
 
@@ -10,14 +9,16 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     
     [Tab("Settings")] // ------------------------------------------
-    public GameStates currentGameState = GameStates.GamePlay;
-    public GameDifficulty currentGameDifficulty = GameDifficulty.None;
+    public GameStates gameState = GameStates.GamePlay;
+    public GameDifficulty gameDifficulty = GameDifficulty.None;
     public bool funnyMode;
     public bool debugMode;
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugMode = KeyCode.F3;
     [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F4;
+    [SerializeField] private KeyCode finishGame = KeyCode.F5;
+    
     // public Level[] levels;
     public Unlock[] unlocks;
     public Collectible[] collectibles;
@@ -68,7 +69,12 @@ public class GameManager : MonoBehaviour
         
         if (nextScene.name == "MainMenu") {
             
+            SetGameState(GameStates.None);
+            SetGameDifficulty(GameDifficulty.None);
             LoadCollectibles();
+        } else {
+            SetGameState(GameStates.GamePlay);
+            SetGameDifficulty(GameDifficulty.None);
         }
     }
     
@@ -76,8 +82,9 @@ public class GameManager : MonoBehaviour
     private void Update() {
         if (Input.GetKeyUp(quitGameKey)) { CustomSceneManager.Instance?.ExitGame(); }
         if (Input.GetKeyUp(restartSceneKey)) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
-        if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugMode(); }
-        if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); }
+        if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugMode(); SoundManager.Instance?.PlaySoundFX("Toggle");}
+        if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); SoundManager.Instance?.PlaySoundFX("Toggle");}
+        if (Input.GetKeyUp(finishGame)) { FinishGame(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
         
     }
@@ -91,14 +98,47 @@ public class GameManager : MonoBehaviour
         UnityEditor.EditorApplication.ExitPlaymode();
         #endif
     }
+    
+    [Button] public void FinishGame() {
+        
+        
+        // Collect all collectibles
+        CollectAllCollectibles();
+
+        
+        // Set highest level
+        SaveManager.Instance?.SaveInt("HighestLevel", 6);
+        SaveManager.Instance?.SaveString("SavedLevel", "Level1");
+        SaveManager.Instance?.SaveInt("TotalCollectibles", collectibles.Length);
+        
+        // Restart scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    
+    
+    
+    [Button] public void DeleteSave()
+    {
+        SaveManager.Instance?.DeleteAllKeys();
+        SaveManager.Instance?.SaveInt("HighestLevel", 1);
+        SaveManager.Instance?.SaveString("SavedLevel", "Level1");
+        SaveManager.Instance?.SaveInt("SavedCheckpoint", 0);
+        SettingsManager.Instance?.LoadAllSettings();
+        ResetCollectibles();
+        ResetUnlocks();
+        
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
     #region GameStates // -----------------------------------------
 
     private void TogglePause() {
         
-        if (currentGameState == GameStates.GamePlay) {
+        if (gameState == GameStates.GamePlay) {
             SetGameState(GameStates.Paused);
-        } else if (currentGameState == GameStates.Paused) {
+        } else if (gameState == GameStates.Paused) {
             SetGameState(GameStates.GamePlay);
         }
     }
@@ -111,13 +151,13 @@ public class GameManager : MonoBehaviour
     
     private void ToggleDebugMode() {
         debugMode = !debugMode;
-        UIManager.Instance.ToggleDebugUI(debugMode);
+        UIManager.Instance?.ToggleDebugUI(debugMode);
     }
     
     
     public void SetGameState(GameStates state) {
-        currentGameState = state;
-        UIManager.Instance.UpdateUI();
+        gameState = state;
+        UIManager.Instance?.UpdateUI();
         
         switch (state) {
             case GameStates.GamePlay:
@@ -139,7 +179,7 @@ public class GameManager : MonoBehaviour
     }
     
     public void SetGameDifficulty(GameDifficulty gameMode) {
-        currentGameDifficulty = gameMode;
+        gameDifficulty = gameMode;
 
         switch(gameMode)
         {
@@ -152,6 +192,9 @@ public class GameManager : MonoBehaviour
             case GameDifficulty.Hard:
 
                 break;
+            
+            case GameDifficulty.None:
+                break;
             default:
                 Debug.LogError("Invalid Game Mode, Setting Normal");
                 break;
@@ -162,7 +205,7 @@ public class GameManager : MonoBehaviour
 
     #endregion GameStates
     
-    #region Collectibles/Unlocks // ---------------------------------
+    #region Unlockss // ---------------------------------
 
     private void CheckUnlocks()
     {
@@ -171,7 +214,7 @@ public class GameManager : MonoBehaviour
         {
             if (TotalCollectiblesCollected() >= unlock.unlockedAtCollectible)
             {
-                unlock.received = TotalCollectiblesCollected() >= unlock.unlockedAtCollectible;
+                unlock.unlockReceived = TotalCollectiblesCollected() >= unlock.unlockedAtCollectible;
             }
         }
     }
@@ -197,7 +240,7 @@ public class GameManager : MonoBehaviour
         {
             if (unlock.unlockName == unlockName)
             {
-                return unlock.received;
+                return unlock.unlockReceived;
             }
         }
         Debug.LogError("Unlock not found");
@@ -217,7 +260,18 @@ public class GameManager : MonoBehaviour
         return false;
     }
     
+    public void ResetUnlocks()
+    {
+        foreach (Unlock unlock in unlocks)
+        {
+            unlock.unlockReceived = false;
+        }
+    }
+    
+    #endregion Unlocks
 
+    
+    #region Collectibles // -----------------------------------------------
     
     public void CollectCollectible(string connectedLevelName) {
         
@@ -274,30 +328,33 @@ public class GameManager : MonoBehaviour
         CheckUnlocks();
 
     }
-    
-    public void ResetCollectibles() {
-        foreach (Collectible collectible in collectibles) {
-            collectible.collected = false;
-            SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
-        }
-        
-        LoadCollectibles();
-    }
-    
-    [Button] public void CollectAllCollectibles() {
-        
-        foreach (Collectible collectible in collectibles) {
-            collectible.collected = true;
-            SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
-        }
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+    private void ResetCollectibles()
+    {
+            foreach (Collectible collectible in collectibles) 
+            {
+                collectible.collected = false;
+                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+            }
+            
+            CheckUnlocks();
     }
 
+    private void CollectAllCollectibles()
+    {
+        
+            foreach (Collectible collectible in collectibles) 
+            {
+                collectible.collected = true;
+                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+            }
+
+            CheckUnlocks();
+    }
     
     #endregion Collectibles
 
     
-
 }
 
 

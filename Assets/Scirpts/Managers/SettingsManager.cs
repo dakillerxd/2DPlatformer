@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.Events;
 
 
 public class SettingsManager : MonoBehaviour
@@ -32,6 +32,10 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private float defaultSoundFXVolume = 0.50f;
     [SerializeField] private float defaultMusicVolume = 0.30f;
     
+    [Header("Events")]
+    public UnityEvent onSoundFXVolumeChange = new UnityEvent();
+    public UnityEvent onMusicVolumeChange = new UnityEvent();
+    public UnityEvent onMasterVolumeChange = new UnityEvent();
 
     private void Awake()
     {
@@ -121,18 +125,21 @@ public class SettingsManager : MonoBehaviour
     {
         masterGameVolume = volume;
         SaveManager.Instance.SaveFloat("MasterVolume", masterGameVolume);
+        onMasterVolumeChange.Invoke();
     }
     
     public void SetSoundFXVolume(float volume)
     {
         soundFXVolume = volume;
         SaveManager.Instance.SaveFloat("GameVolume", soundFXVolume);
+        onSoundFXVolumeChange.Invoke();
     }
 
     public void SetMusicVolume(float volume)
     {
         musicVolume = volume;
         SaveManager.Instance.SaveFloat("MusicVolume", musicVolume);
+        onMusicVolumeChange.Invoke();
     }
     
 }

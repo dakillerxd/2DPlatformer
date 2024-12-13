@@ -33,42 +33,46 @@ public class MainMenu : MonoBehaviour
 
     private void SetupButtons()
     {
-        
-        if (buttonResume != null)
+        if (buttonResume != null || buttonStart != null)
         {
-            if (SaveManager.Instance.LoadInt("HighestLevel") < 1) {
+            // Check save
+            if (SaveManager.Instance.LoadInt("HighestLevel") < 1) { // New game
                 
                 buttonResume.gameObject.SetActive(false);
+                buttonStart.gameObject.SetActive(true);
                 
-            } else if (SaveManager.Instance.LoadInt("HighestLevel") == 1) {
+            } else if (SaveManager.Instance.LoadInt("HighestLevel") == 1) { 
+            
 
-                if (SaveManager.Instance.LoadInt("SavedCheckpoint") > 0) {
+                if (SaveManager.Instance.LoadInt("SavedCheckpoint") > 0) { // At level one with a checkpoint saved
+                
                     buttonResume.gameObject.SetActive(true);
-                    buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                    buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-                    buttonResume.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
-                    buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
-                } else {
+                    buttonStart.gameObject.SetActive(false);
+
+                
+                } else { // At level 1 with no checkpoint saved
+                
                     buttonResume.gameObject.SetActive(false);
+                    buttonStart.gameObject.SetActive(true);
                 }
                 
-            } else if (SaveManager.Instance.LoadInt("HighestLevel") > 1) {
+            } else if (SaveManager.Instance.LoadInt("HighestLevel") > 1) { // At higher level then 1
+            
                 buttonResume.gameObject.SetActive(true);
-                buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-                buttonResume.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
-                buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
+                buttonStart.gameObject.SetActive(false);
+            
             }
-        }
-        
-        
-        if (buttonStart != null)
-        {
+            
+            
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonStart.onClick.AddListener(() => SaveManager.Instance.SaveInt("SavedCheckpoint", 0));
-            buttonStart.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+            buttonStart.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
             buttonStart.onClick.AddListener(() => SceneManager.LoadScene(1));
+            
+            
+            buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
         }
+        
         
         if (buttonLevelSelect != null)
         {
@@ -99,11 +103,7 @@ public class MainMenu : MonoBehaviour
         if (buttonQuit != null)
         {
             buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
+            buttonQuit.onClick.AddListener(() => GameManager.Instance?.QuitGame());
         }
     }
-    
-    
-    
-    
 }

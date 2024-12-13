@@ -46,14 +46,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb380c64ecb614448f81d01b0b27485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGameState: 1
-  currentGameDifficulty: 0
+  gameState: 0
+  gameDifficulty: 0
   funnyMode: 0
   debugMode: 0
   quitGameKey: 282
   restartSceneKey: 283
   toggleDebugMode: 284
   toggleFunnyMode: 285
+  finishGame: 286
   unlocks:
   - unlockName: Curly Mustache
     unlockState: 0
@@ -150,3 +151,12 @@ MonoBehaviour:
   defaultMasterGameVolume: 1
   defaultSoundFXVolume: 0.5
   defaultMusicVolume: 0.3
+  onSoundFXVolumeChange:
+    m_PersistentCalls:
+      m_Calls: []
+  onMusicVolumeChange:
+    m_PersistentCalls:
+      m_Calls: []
+  onMasterVolumeChange:
+    m_PersistentCalls:
+      m_Calls: []

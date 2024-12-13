@@ -1287,7 +1287,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private bool CanPlay() {
-        return currentPlayerState == PlayerState.Controllable && GameManager.Instance.currentGameState == GameStates.GamePlay;
+        return currentPlayerState == PlayerState.Controllable && GameManager.Instance.gameState == GameStates.GamePlay;
     }
     public void SetPlayerState(PlayerState state) {
         

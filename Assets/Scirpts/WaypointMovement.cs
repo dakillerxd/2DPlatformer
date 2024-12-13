@@ -33,19 +33,16 @@ public class WaypointMovement : MonoBehaviour {
         if (!objectRigidBody) { objectRigidBody = GetComponentInChildren<Rigidbody2D>(); } // Find the rigidbody
         if (waypoints.Count == 0) { AddWaypoint(); } // Add a waypoint if there is non
         ResetPosition(); // Move to first waypoint
+    }
+    
 
+    private void OnEnable()
+    {
         if (resetPositionOnPlayerDeath) {
             PlayerController.Instance?.onPlayerDeath.AddListener(OnPlayerDeath);
         }
-
     }
-    
 
-
-    private void FixedUpdate() {
-        MoveBetweenWaypoints();
-    }
-    
     private void OnDestroy()
     {
         if (resetPositionOnPlayerDeath)
@@ -53,6 +50,12 @@ public class WaypointMovement : MonoBehaviour {
             PlayerController.Instance?.onPlayerDeath.RemoveListener(OnPlayerDeath); 
         }
     }
+    
+    
+    private void FixedUpdate() {
+        MoveBetweenWaypoints();
+    }
+    
     
     private void OnPlayerDeath() {
         ResetPosition();
@@ -70,8 +73,6 @@ public class WaypointMovement : MonoBehaviour {
         return enableMovement;
     }
     
-    
-
 
     [Button] private void ResetPosition()
     {

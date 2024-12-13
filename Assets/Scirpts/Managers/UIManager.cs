@@ -148,7 +148,7 @@ public class UIManager : MonoBehaviour
         pauseScreenUI.SetActive(false);
         gameOverUI.SetActive(false);
         
-        switch (GameManager.Instance.currentGameState)
+        switch (GameManager.Instance.gameState)
         {
             case GameStates.GamePlay:
                 gamePlayUI.SetActive(true);

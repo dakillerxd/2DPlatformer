@@ -21,6 +21,7 @@ public class OptionsMenu : MonoBehaviour
     [SerializeField] private Scrollbar musicVolumeSlider;
     [SerializeField] private TextMeshProUGUI musicVolumeSliderAmount;
     [SerializeField] private Button buttonOptionsBack;
+    [SerializeField] private Button buttonDeleteSave;
     private Resolution[] uniqueResolutions;
         
     [Header("References")]
@@ -47,16 +48,24 @@ public class OptionsMenu : MonoBehaviour
 
     private void SetupButtons()
     {
-        if (!buttonOptionsBack) return;
-
-        if (SceneManager.GetActiveScene().name == "MainMenu") {
+        if (buttonOptionsBack)
+        {
+            if (SceneManager.GetActiveScene().name == "MainMenu") {
             
-            buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptionsBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
+                buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+                buttonOptionsBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
             
-        } else {
-            buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptionsBack.onClick.AddListener(() => UIManager.Instance.ShowPanelMain());
+            } else {
+                buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+                buttonOptionsBack.onClick.AddListener(() => UIManager.Instance.ShowPanelMain());
+            }
+        }
+        
+        
+        if (buttonDeleteSave)
+        {
+            buttonDeleteSave.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonDeleteSave.onClick.AddListener(() => GameManager.Instance?.DeleteSave());
         }
 
     }

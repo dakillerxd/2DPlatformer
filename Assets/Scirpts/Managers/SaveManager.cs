@@ -96,14 +96,9 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Delete all saved data
-    public void DeleteAll()
-    {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-    }
+    
 
-
+    // Save current game session
     public void SaveGame(int checkpoint = 0)
     {
         if (SceneManager.GetActiveScene().name == "Showcase Level" || SceneManager.GetActiveScene().name == "Test Level") return;
@@ -116,27 +111,17 @@ public class SaveManager : MonoBehaviour
         SaveString("SavedLevel", SceneManager.GetActiveScene().name); // Save level
 
         SaveInt("SavedCheckpoint", checkpoint); // Save checkpoint
-
+        
+        PlayerPrefs.Save();
     }
     
-    public void LoadGame()
-    {
-        if (!HasKey("SavedLevel")) return;
 
-        SceneManager.LoadScene(LoadString("SavedLevel"));
-    }
-
-    public void ResetSave()
+    // Delete all saved data
+    public void DeleteAllKeys()
     {
-        DeleteKey("SavedLevel");
-        DeleteKey("SavedCheckpoint");
-        DeleteKey("HighestLevel");
+        PlayerPrefs.DeleteAll();
         
-        if (!HasKey("HighestLevel") || LoadInt("HighestLevel") < 1)
-        {
-            SaveInt("HighestLevel", 1); // or whatever starting value
-        }
-        
+        PlayerPrefs.Save();
     }
 
 }

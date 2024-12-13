@@ -1,4 +1,6 @@
 using CustomAttribute;
+using UnityEngine;
+using UnityEngine.Serialization;
 using VInspector;
 
 
@@ -37,6 +39,21 @@ public enum PlayerAbilities {
 }
 
 
+[System.Serializable]
+public class Sound
+{
+    public string name;
+    [Range(0f, 2f)] public float volume = 1f;
+    [Range(0.1f, 3f)] public float pitch = 1f;
+    [Range(-1f, 1f)] public float stereoPan = 0f;
+    [Range(0f, 1f)] public float spatialBlend = 0f;
+    [Range(0f, 1.1f)] public float reverbZoneMix = 1f;
+    public bool loop = false;
+    public AudioClip[] clips;
+    public AudioClip[] funnyModeClips;
+    [HideInInspector] public AudioSource source;
+    
+}
 
 [System.Serializable]
 public class Unlock
@@ -44,7 +61,7 @@ public class Unlock
     public string unlockName;
     public bool unlockState;
     public int unlockedAtCollectible;
-    [CustomAttribute.ReadOnly] public bool received;
+    [FormerlySerializedAs("received")] [CustomAttribute.ReadOnly] public bool unlockReceived;
 }
 
 [System.Serializable]

@@ -870,9 +870,6 @@ MonoBehaviour:
   cameraDebugText: {fileID: 731938032923394786}
   fpsText: {fileID: 889990527183701017}
   levelTitleText: {fileID: 8385123227124560940}
-  timerTexts: []
-  timerWarningColor: {r: 1, g: 0, b: 0, a: 1}
-  scoreTexts: []
   abilityUnlocked: {r: 1, g: 1, b: 1, a: 1}
   abilityLocked: {r: 1, g: 1, b: 1, a: 0.101960786}
   doubleJump: {fileID: 2606735452208349425}
@@ -886,11 +883,8 @@ MonoBehaviour:
   buttonMainMenu: {fileID: 8196432464141742588}
   buttonQuit: {fileID: 2177876502771153894}
   buttonOptionsBack: {fileID: 6950016656302564929}
-  pauseTimeText: {fileID: 0}
-  pauseScoreText: {fileID: 0}
-  pauseAmmoText: {fileID: 0}
-  gameOverTimeText: {fileID: 0}
-  gameOverScoreText: {fileID: 0}
+  pauseCollectiblesText: {fileID: 0}
+  gameOverCollectiblesText: {fileID: 0}
   gameOverTitleText: {fileID: 0}
   gameOverMessageText: {fileID: 0}
   loseMessages: []
@@ -2010,6 +2004,10 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 1534388095637308408, guid: e3c6d6173a53c5d4b853b8afcffb25bf, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 657739312329871727, guid: 1a50865ce83cc7747bf609ac3de3b683, type: 2}
     - target: {fileID: 1764139195086415980, guid: e3c6d6173a53c5d4b853b8afcffb25bf, type: 3}
       propertyPath: m_Name
       value: TitleTextLevel

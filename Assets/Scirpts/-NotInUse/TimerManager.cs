@@ -51,7 +51,7 @@ public class TimerManager : MonoBehaviour
 
     void CountTimeDown() {
 
-        if ((GameManager.Instance.currentGameState == GameStates.GamePlay)  && !paused) {
+        if ((GameManager.Instance.gameState == GameStates.GamePlay)  && !paused) {
 
             currentGameTime -= Time.deltaTime;
             currentGameTime = Mathf.Max(currentGameTime, 0f);
@@ -69,7 +69,7 @@ public class TimerManager : MonoBehaviour
     }
 
     void CountTimeUp() {
-        if ((GameManager.Instance.currentGameState == GameStates.GamePlay)  && !paused) {
+        if ((GameManager.Instance.gameState == GameStates.GamePlay)  && !paused) {
 
             currentGameTime += Time.deltaTime;
         }

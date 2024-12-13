@@ -89,18 +89,14 @@ public class SceneTeleporter : MonoBehaviour
         Rigidbody2D rb = objectTransform.GetComponentInChildren<Rigidbody2D>();
         
         if (rb == null) {
-            Debug.LogError("No Rigidbody2D found on the player or its children!");
+            Debug.LogError("No Rigidbody2D found!");
             yield break;
         }
-
-        // Store original settings
-        RigidbodyType2D oRigidbodyType = rb.bodyType;
-        RigidbodyConstraints2D originalConstraints = rb.constraints;
-        Vector2 originalVelocity = rb.linearVelocity;
+        
 
         // Start effects
         VFXManager.Instance?.PlayAnimationTrigger(animator, "Teleport");
-        SoundManager.Instance?.PlaySoundFX("Teleport", 0.1f);
+        SoundManager.Instance?.PlaySoundFX("Teleport");
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
         CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);

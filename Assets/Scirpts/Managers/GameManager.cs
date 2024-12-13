@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [Tab("Settings")] // ------------------------------------------
     public GameStates gameState = GameStates.GamePlay;
     public GameDifficulty gameDifficulty = GameDifficulty.None;
-    public bool funnyMode;
+    public bool funnyMode; 
     public bool debugMode;
     [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;

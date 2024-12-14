@@ -214,6 +214,9 @@ public class PlayerController : MonoBehaviour {
     [Header("Zoom")]
     [SerializeField] private float runningZoomOffset = 2f;
     [SerializeField] private float frozenZoomOffset = -2f;
+
+    [Header("Shake")] 
+    [SerializeField] private float fallShakeMagnitude = 0.2f;
     [EndTab]
     
     
@@ -755,7 +758,7 @@ public class PlayerController : MonoBehaviour {
         
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
         if (isFastFalling) {
-            CameraController.Instance?.ShakeCamera(0.1f, 0.5f, 1f, 1f);
+            CameraController.Instance?.ShakeCamera(0.1f, fallShakeMagnitude, 1f, 1f);
             VFXManager.Instance?.ToggleMotionBlur(true);
         }else {
             VFXManager.Instance?.ToggleMotionBlur(false);

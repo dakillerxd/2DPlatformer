@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -137,6 +138,76 @@ public class SoundManager : MonoBehaviour
         }
 
     }
+
+    public void FadeSoundIn(string name, float pitch = 0, AudioSource audioSource = null, float fadeTime = 1f)
+    {
+        // Find sound and store its original volume
+        Sound soundFx = soundEffects.Find(sound => sound.name == name);
+        if (soundFx == null) return;
+        
+        float originalVolume = soundFx.volume;
+        soundFx.volume = 0f;
+        
+        // Use existing PlaySoundFX function
+        PlaySoundFX(name, pitch, audioSource);
+        
+        // Restore the original volume
+        soundFx.volume = originalVolume;
+        
+        // Get the target audio source
+        AudioSource targetSource = audioSource ?? soundFx.source;
+        targetSource.volume = 0f;
+        
+        // Start fade coroutine
+        StartCoroutine(FadeVolume(
+            targetSource,
+            0f,
+            originalVolume * SettingsManager.Instance.soundFXVolume * SettingsManager.Instance.masterGameVolume,
+            fadeTime
+        ));
+    }
+
+    public void FadeSoundOut(string name, float fadeTime = 1f)
+    {
+        Sound soundFx = soundEffects.Find(sound => sound.name == name);
+        if (soundFx == null || !soundFx.source.isPlaying)
+        {
+            // #if UNITY_EDITOR
+            // Debug.Log($"SoundFX: {name} not found or not playing!");
+            // #endif
+            return;
+        }
+
+        StartCoroutine(FadeVolume(
+            soundFx.source,
+            soundFx.source.volume,
+            0f,
+            fadeTime,
+            true  // Stop the sound after fade
+        ));
+    }
+
+    private IEnumerator FadeVolume(AudioSource audioSource, float startVolume, float targetVolume, float duration, bool stopAfterFade = false)
+    {
+        float elapsedTime = 0f;
+        
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float newVolume = Mathf.Lerp(startVolume, targetVolume, elapsedTime / duration);
+            audioSource.volume = newVolume;
+            yield return null;
+        }
+
+        audioSource.volume = targetVolume;
+        
+        if (stopAfterFade)
+        {
+            audioSource.Stop();
+        }
+    }
+
+
     
     
     public void StopSoundFx(string name) {

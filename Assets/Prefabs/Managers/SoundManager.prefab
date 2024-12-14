@@ -150,7 +150,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e354fe03bf37e8d46ac9ea1c81aeafcc, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
-  - name: ?Player Spawn
+  - name: Player Spawn?
     volume: 1
     pitch: 1
     stereoPan: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
     clips: []
     funnyModeClips: []
     source: {fileID: 0}
-  - name: ?Player Pushed
+  - name: Player Pushed?
     volume: 1
     pitch: 1
     stereoPan: 0
@@ -227,18 +227,29 @@ MonoBehaviour:
     funnyModeClips: []
     source: {fileID: 0}
   - name: CameraWhoosh
-    volume: 0.2
-    pitch: 0.9
+    volume: 0.1
+    pitch: 1.1
     stereoPan: 0
     spatialBlend: 0
     reverbZoneMix: 0
     loop: 0
     clips:
-    - {fileID: 8300000, guid: 9367b61da1d0e184d85865eabfe0c5af, type: 3}
+    - {fileID: 8300000, guid: 00cff35b0bd4b7d40a14dfdee07aed45, type: 3}
+    funnyModeClips: []
+    source: {fileID: 0}
+  - name: WallMoving
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 0
+    loop: 1
+    clips:
+    - {fileID: 8300000, guid: 47abfe0afe0e72447baf4cb846025ba1, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
   music:
-  - name: MainMenu1
+  - name: MainMenu?
     volume: 1
     pitch: 1
     stereoPan: 0
@@ -261,7 +272,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 223d4a8692be39b4993bccd792b271df, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
-  - name: Gameplay1
+  - name: Gameplay?
     volume: 1
     pitch: 1
     stereoPan: 0

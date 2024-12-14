@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using VInspector;
 
 public class MoveToPosition : MonoBehaviour
@@ -14,6 +15,12 @@ public class MoveToPosition : MonoBehaviour
    [SerializeField] private bool shakeCamera;
    [EnableIf(nameof(shakeCamera))]
    [SerializeField] private float magnitude = 5f; 
+   
+   
+   [Header("SFX")]
+   [SerializeField] private bool playSfx;
+   [EnableIf(nameof(playSfx))] 
+   [SerializeField] private string sfx;
    [EndIf]
    
    private bool _move;
@@ -55,5 +62,10 @@ public class MoveToPosition : MonoBehaviour
     public void SetMoving(bool move)
     {
         _move = move;
+        
+        if (!playSfx) return;
+        if (move) { SoundManager.Instance?.FadeSoundIn(sfx, fadeTime: 0.5f); }
+        else { SoundManager.Instance?.FadeSoundOut(sfx, fadeTime: 2f); }
+        
     }
 }

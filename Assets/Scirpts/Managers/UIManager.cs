@@ -115,26 +115,31 @@ public class UIManager : MonoBehaviour
         if (buttonResume != null)
         {
             buttonResume.onClick.RemoveAllListeners();
-            buttonResume.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
+            buttonResume.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
+            buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
         }
 
         if (buttonOptions != null)
         {
             buttonOptions.onClick.RemoveAllListeners();
             buttonOptions.onClick.AddListener(ShowPanelOptions);
+            buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
         }
         
         if (buttonMainMenu != null)
         {
             buttonMainMenu.onClick.RemoveAllListeners();
-            buttonMainMenu.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.None));
+            buttonMainMenu.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.None));
+            buttonMainMenu.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
+            
         }
 
         if (buttonQuit != null)
         {
             buttonQuit.onClick.RemoveAllListeners();
-            buttonQuit.onClick.AddListener(() => GameManager.Instance.QuitGame());
+            buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonQuit.onClick.AddListener(() => GameManager.Instance?.QuitGame());
         }
 
         ShowPanelMain();
@@ -156,6 +161,7 @@ public class UIManager : MonoBehaviour
                 break;
             case GameStates.Paused:
                 pauseScreenUI.SetActive(true);
+                UpdatePauseScreenInfo();
                 ShowPanelMain();
                 break;
             case GameStates.GameOver:
@@ -203,16 +209,19 @@ public class UIManager : MonoBehaviour
 #region Pause Screen
 
 
-
     private void UpdatePauseScreenInfo()
     {
 
         if (pauseCollectiblesText != null)
         {
+            if (GameManager.Instance.IsCollectibleCollected(SceneManager.GetActiveScene().name))
+            {
+                pauseCollectiblesText.text = "1/1";
+            } else {
+                pauseCollectiblesText.text = "0/1";
+            }
             
         }
-        
-
     }
 
     public void ShowPanelMain()
@@ -268,14 +277,14 @@ public class UIManager : MonoBehaviour
     {
         if (!GameManager.Instance.debugMode) return;
         
-        if (playerDebugText)
+        if (playerDebugText && PlayerController.Instance)
         {
-            PlayerController.Instance?.UpdateDebugText(playerDebugText);
+            PlayerController.Instance.UpdateDebugText(playerDebugText);
         }
 
-        if (cameraDebugText)
+        if (cameraDebugText && CameraController.Instance)
         {
-            CameraController.Instance?.UpdateDebugText(cameraDebugText);
+            CameraController.Instance.UpdateDebugText(cameraDebugText);
         }
 
         if (fpsText)

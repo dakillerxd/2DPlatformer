@@ -229,22 +229,15 @@ public class PlayerController : MonoBehaviour {
 
     private void Start()
     {
-        
+        CheckpointManager.Instance?.SetSpawnPoint(transform.position);
         isFacingRight = true;
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
         ToggleAllCosmetics();
-        CheckpointManager.Instance?.SetSpawnPoint(transform.position);
-        
-        
-        if (GameManager.Instance.debugMode) {
-            RespawnFromSpawnPoint();
-            
-        } else {
-            RespawnFromCheckpoint();
-        }
+        Restart();
     }
     
     private void Update() {
+        
         if (!CanPlay()) { return; }
         
         CheckForInput();
@@ -257,7 +250,9 @@ public class PlayerController : MonoBehaviour {
     
     
     private void FixedUpdate() {
+        
         if (!CanPlay()) { return; }
+        
         CollisionChecks();
         HandleGravity();
         HandleMovement();
@@ -1040,9 +1035,9 @@ public class PlayerController : MonoBehaviour {
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
             CheckpointManager.Instance.PlayCheckpointAnimation();
-        } else { RespawnFromSpawnPoint();}
+        } else { RespawnFromStartTeleporter();}
     }
-    [Button] private void RespawnFromSpawnPoint() {
+    [Button] private void RespawnFromStartTeleporter() {
 
         _deaths = 0;
         if (CheckpointManager.Instance.startTeleporter) {
@@ -1051,18 +1046,35 @@ public class PlayerController : MonoBehaviour {
             StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
             StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         } else {
-            Respawn(CheckpointManager.Instance.playerSpawnPoint);
+            RespawnFromSpawnPoint();
         }
-        
     }
+
+    [Button] private void RespawnFromSpawnPoint() {
+        
+        _deaths = 0;
+        Respawn(CheckpointManager.Instance.playerSpawnPoint);
+    }
+    
+    
     private void Respawn(Vector2 position) {
         
         SetPlayerState(PlayerState.Frozen);
         Teleport(position, false);
         PlayAnimationTrigger("TeleportOut");
         onPlayerDeath.Invoke();
-        
     }
+    
+    private void Restart()
+    {
+        if (GameManager.Instance.debugMode) {
+            RespawnFromSpawnPoint();
+        } else {
+            RespawnFromCheckpoint();
+        }
+
+    }
+    
     public void Teleport(Vector2 position, bool keepMomentum) {
         
         CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
@@ -1202,7 +1214,10 @@ public class PlayerController : MonoBehaviour {
             _dropDownInput = _verticalInput <= -1 && InputManager.JumpWasPressed;
             
             // Check for restart input
-            if (InputManager.RestartWasPressed) { RespawnFromCheckpoint(); }
+            if (InputManager.RestartWasPressed)
+            {
+                Restart();
+            }
 
         } else { // Set inputs to 0 if the player cannot move
 
@@ -1210,8 +1225,6 @@ public class PlayerController : MonoBehaviour {
             _verticalInput = 0;
         }
     }
-    
-    
     
     public void Push(Vector2 pushForce) {
         

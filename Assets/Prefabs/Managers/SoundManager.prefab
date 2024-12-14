@@ -183,8 +183,8 @@ MonoBehaviour:
     funnyModeClips: []
     source: {fileID: 0}
   - name: Lava Boiling
-    volume: 0.486
-    pitch: 1
+    volume: 0.25
+    pitch: 0.8
     stereoPan: 0
     spatialBlend: 1
     reverbZoneMix: 1
@@ -224,6 +224,17 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 3e7373476a18e5a4386a085b1cb1d435, type: 3}
+    funnyModeClips: []
+    source: {fileID: 0}
+  - name: CameraWhoosh
+    volume: 0.2
+    pitch: 0.9
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 0
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: 9367b61da1d0e184d85865eabfe0c5af, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
   music:

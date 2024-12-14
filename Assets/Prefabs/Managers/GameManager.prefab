@@ -53,21 +53,21 @@ MonoBehaviour:
   quitGameKey: 282
   restartSceneKey: 283
   toggleDebugMode: 284
-  toggleFunnyMode: 285
+  toggleFunnyMode: 0
   finishGame: 286
   unlocks:
   - unlockName: Curly Mustache
     unlockState: 0
     unlockedAtCollectible: 2
-    received: 0
+    unlockReceived: 0
   - unlockName: Propeller Hat
     unlockState: 0
     unlockedAtCollectible: 4
-    received: 0
+    unlockReceived: 0
   - unlockName: Googly Eye
     unlockState: 0
     unlockedAtCollectible: 6
-    received: 0
+    unlockReceived: 0
   collectibles:
   - connectedLevel:
       m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
@@ -100,7 +100,7 @@ MonoBehaviour:
     countsTowardsUnlocks: 1
     collected: 0
   - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 97a1817de399a2c42be083103ae2a00a, type: 3}
+      m_SceneAsset: {fileID: 102900000, guid: aa971e4ec77bba3418be408940dc17f3, type: 3}
       m_SceneName: Level7
     countsTowardsUnlocks: 0
     collected: 0

@@ -3682,7 +3682,7 @@ ParticleSystem:
     serializedVersion: 4
     type: 1
     collisionMode: 1
-    colliderForce: 1
+    colliderForce: 0
     multiplyColliderForceByParticleSize: 0
     multiplyColliderForceByParticleSpeed: 0
     multiplyColliderForceByCollisionAngle: 1
@@ -3852,7 +3852,7 @@ ParticleSystem:
     radiusScale: 1
     collidesWith:
       serializedVersion: 2
-      m_Bits: 193
+      m_Bits: 449
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4905,6 +4905,14 @@ PrefabInstance:
     - target: {fileID: 4122002283411253978, guid: d2f28dc107e3ef74a90a70ee16b9c718, type: 3}
       propertyPath: playOnAwake
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4122002283411253978, guid: d2f28dc107e3ef74a90a70ee16b9c718, type: 3}
+      propertyPath: CollisionModule.colliderForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4122002283411253978, guid: d2f28dc107e3ef74a90a70ee16b9c718, type: 3}
+      propertyPath: CollisionModule.collidesWith.m_Bits
+      value: 193
       objectReference: {fileID: 0}
     - target: {fileID: 4122002283411253978, guid: d2f28dc107e3ef74a90a70ee16b9c718, type: 3}
       propertyPath: SubModule.subEmitters.Array.data[0].properties

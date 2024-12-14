@@ -53,11 +53,12 @@ public class OptionsMenu : MonoBehaviour
             if (SceneManager.GetActiveScene().name == "MainMenu") {
             
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+                buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
                 buttonOptionsBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
             
             } else {
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => UIManager.Instance.ShowPanelMain());
+                buttonOptionsBack.onClick.AddListener(() => UIManager.Instance?.ShowPanelMain());
             }
         }
         

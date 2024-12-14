@@ -9,6 +9,7 @@ public class AbilityItem : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private PlayerAbilities ability;
+    [SerializeField] private bool shakeCameraOnTrigger = true;
     [SerializeField] private UnityEvent[] eventsAfterTrigger;
     private bool _triggered;
     
@@ -25,17 +26,21 @@ public class AbilityItem : MonoBehaviour
     private  void OnTriggerEnter2D(Collider2D collision)
     {
         if (_triggered) return;
-        if (collision.CompareTag("Player"))
+        if (!collision.CompareTag("Player")) return;
+        
+        
+        _triggered = true;
+        PlayerController player = collision.GetComponentInParent<PlayerController>();
+        player.ReceiveAbility(ability);
+            
+            
+        if (shakeCameraOnTrigger) CameraController.Instance?.ShakeCamera(2f, 5f, 2, 2);
+            
+        foreach (var e in eventsAfterTrigger)
         {
-            _triggered = true;
-            PlayerController.Instance.ReceiveAbility(ability);
-            CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
-            foreach (var e in eventsAfterTrigger)
-            {
-                e.Invoke();
-            }
-            Destroy(gameObject);
+            e.Invoke();
         }
+        Destroy(gameObject);
     }
 
 

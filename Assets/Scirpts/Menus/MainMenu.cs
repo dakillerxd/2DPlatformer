@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -28,8 +29,15 @@ public class MainMenu : MonoBehaviour
         SetupButtons();
         CameraController.Instance?.SetTarget(mainMenuPosition.transform);
     }
-    
-    
+
+    private void Update()
+    {
+        if (InputManager.CancelWasPressed)
+        {
+            CameraController.Instance?.SetTarget(mainMenuPosition.transform);
+        }
+    }
+
 
     private void SetupButtons()
     {
@@ -77,18 +85,21 @@ public class MainMenu : MonoBehaviour
         if (buttonLevelSelect != null)
         {
             buttonLevelSelect.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonLevelSelect.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
             buttonLevelSelect.onClick.AddListener(() => CameraController.Instance?.SetTarget(levelSelectMenuPosition.transform));
         }
         
         if (buttonCollectibles != null)
         {
             buttonCollectibles.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonCollectibles.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
             buttonCollectibles.onClick.AddListener(() => CameraController.Instance?.SetTarget(collectiblesMenuPosition.transform));
         }
 
         if (buttonOptions != null)
         {
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
             buttonOptions.onClick.AddListener(() => CameraController.Instance?.SetTarget(optionsMenuPosition.transform));
 
         }
@@ -96,6 +107,7 @@ public class MainMenu : MonoBehaviour
         if (buttonCredits != null)
         {
             buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
             buttonCredits.onClick.AddListener(() => CameraController.Instance?.SetTarget(creditsMenuPosition.transform));
 
         }

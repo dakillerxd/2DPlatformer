@@ -108,7 +108,8 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
     
     [Button] private void AddCheckpoint() 
     {
-        GameObject newCheckpoint = Instantiate(checkpointPrefab, transform.position, Quaternion.identity,transform);
+        Vector3 newCheckpointPosition = checkpointList.Count > 0 ? checkpointList[^1].transform.position : transform.position;
+        GameObject newCheckpoint = Instantiate(checkpointPrefab, newCheckpointPosition, Quaternion.identity,transform);
         checkpointList.Add(newCheckpoint.GetComponent<Checkpoint>());
         newCheckpoint.name = "Checkpoint " + checkpointList.Count;
         RenameCheckpoints();

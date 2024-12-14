@@ -6,7 +6,7 @@ public class InputManager : MonoBehaviour
     public static InputManager Instance { get; private set; }
 
     [Header("Input Action Assets")]
-    private PlayerInput playerInput;
+    private PlayerInput _playerInput;
 
     [Header("Player")] 
     public static Vector2 Movement;
@@ -22,7 +22,11 @@ public class InputManager : MonoBehaviour
     
     [Header("UI")] 
     public static bool TogglePauseWasPressed;
+    public static bool ClickWasPressed;
+    public static bool CancelWasPressed;
     private InputAction togglePauseAction;
+    private InputAction clickAction;
+    private InputAction cancelAction;
 
     
 
@@ -40,33 +44,43 @@ public class InputManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         
 
-        if (playerInput == null)
+        if (_playerInput == null)
         {
-            playerInput = GetComponent<PlayerInput>();
-            if (playerInput == null)
+            _playerInput = GetComponent<PlayerInput>();
+            if (_playerInput == null)
             {
                 Debug.LogError("PlayerInput component not found on InputManager GameObject!");
                 return;
             }
         }
 
-        moveAction = playerInput.actions["Move"];
-        jumpAction = playerInput.actions["Jump"];
-        dashAction = playerInput.actions["Dash"];
-        togglePauseAction = playerInput.actions["TogglePause"];
-        restartAction = playerInput.actions["Restart"];
+        // Player
+        moveAction = _playerInput.actions["Move"];
+        jumpAction = _playerInput.actions["Jump"];
+        dashAction = _playerInput.actions["Dash"];
+        restartAction = _playerInput.actions["Restart"];
+        
+        // UI
+        togglePauseAction = _playerInput.actions["TogglePause"];
+        clickAction = _playerInput.actions["Click"];
+        cancelAction = _playerInput.actions["Cancel"];
         
     }
 
 
     private void Update() {
         
+        // Player
         Movement = moveAction.ReadValue<Vector2>();
         JumpWasPressed = jumpAction.WasPressedThisFrame();
         JumpIsHeld = jumpAction.IsPressed();
         JumpWasReleased = jumpAction.WasReleasedThisFrame();
         DashWasPressed = dashAction.WasPressedThisFrame();
         TogglePauseWasPressed = togglePauseAction.WasPressedThisFrame();
+        
+        // UI
         RestartWasPressed = restartAction.WasPressedThisFrame();
+        ClickWasPressed = clickAction.WasPressedThisFrame();
+        CancelWasPressed = cancelAction.WasPressedThisFrame();
     }
 }

@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
 
         
         // Set highest level
-        SaveManager.Instance?.SaveInt("HighestLevel", 6);
+        SaveManager.Instance?.SaveInt("HighestLevel", SceneManager.sceneCountInBuildSettings - 3);
         SaveManager.Instance?.SaveString("SavedLevel", "Level1");
         SaveManager.Instance?.SaveInt("TotalCollectibles", collectibles.Length);
         
@@ -269,7 +269,6 @@ public class GameManager : MonoBehaviour
     }
     
     #endregion Unlocks
-
     
     #region Collectibles // -----------------------------------------------
     
@@ -353,7 +352,6 @@ public class GameManager : MonoBehaviour
     }
     
     #endregion Collectibles
-
     
 }
 

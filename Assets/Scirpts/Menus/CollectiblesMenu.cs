@@ -39,6 +39,7 @@ public class CollectiblesMenu : MonoBehaviour
         if (buttonLevelSelectBack != null) {
             
             buttonLevelSelectBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonLevelSelectBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("CameraWhoosh"));
             buttonLevelSelectBack.onClick.AddListener(() => CameraController.Instance?.SetTarget(mainMenuPosition.transform));
         }
         

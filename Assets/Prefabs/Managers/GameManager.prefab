@@ -55,6 +55,7 @@ MonoBehaviour:
   toggleDebugMode: 284
   toggleFunnyMode: 0
   finishGame: 286
+  deleteSave: 287
   unlocks:
   - unlockName: Curly Mustache
     unlockState: 0
@@ -102,7 +103,7 @@ MonoBehaviour:
   - connectedLevel:
       m_SceneAsset: {fileID: 102900000, guid: aa971e4ec77bba3418be408940dc17f3, type: 3}
       m_SceneName: Level7
-    countsTowardsUnlocks: 0
+    countsTowardsUnlocks: 1
     collected: 0
   - connectedLevel:
       m_SceneAsset: {fileID: 102900000, guid: ca4a4456747d3474e9e5324203c0978e, type: 3}

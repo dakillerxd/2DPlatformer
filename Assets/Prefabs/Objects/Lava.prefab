@@ -318,8 +318,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: -0.00024998188, y: -0.00009995699, z: 0}
-    m_Extent: {x: 1.10045, y: 1.1008999, z: 0}
+    m_Center: {x: -0.00024998188, y: -0.10009998, z: 0}
+    m_Extent: {x: 1.10045, y: 1.0009, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.07
@@ -332,8 +332,8 @@ MonoBehaviour:
   m_ShapePath:
   - {x: -0.5, y: -0.5, z: 0}
   - {x: 0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: 0.5, z: 0}
-  - {x: -0.5, y: 0.5, z: 0}
+  - {x: 0.5, y: 0.3, z: 0}
+  - {x: -0.5, y: 0.3, z: 0}
 --- !u!1001 &322887164574493952
 PrefabInstance:
   m_ObjectHideFlags: 0

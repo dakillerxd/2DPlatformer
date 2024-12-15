@@ -55,7 +55,8 @@ MonoBehaviour:
     loop: 0
     clips:
     - {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
-    funnyModeClips: []
+    funnyModeClips:
+    - {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
     source: {fileID: 0}
   - name: Player Air Jump
     volume: 1
@@ -135,9 +136,20 @@ MonoBehaviour:
     reverbZoneMix: 1
     loop: 0
     clips:
-    - {fileID: 8300000, guid: c8f7c6b93bd85084fa537eef9b42937b, type: 3}
+    - {fileID: 8300000, guid: 71dad0a9460168a4e954d12bcc68f17f, type: 3}
     funnyModeClips:
     - {fileID: 8300000, guid: 4d9ae772a2e52ec4593c7e0743aeb228, type: 3}
+    source: {fileID: 0}
+  - name: Player Heal
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: dbcabb8de5454904f81a244d99c97de5, type: 3}
+    funnyModeClips: []
     source: {fileID: 0}
   - name: Player Land
     volume: 1
@@ -150,17 +162,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e354fe03bf37e8d46ac9ea1c81aeafcc, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
-  - name: Player Spawn?
-    volume: 1
-    pitch: 1
-    stereoPan: 0
-    spatialBlend: 0
-    reverbZoneMix: 1
-    loop: 0
-    clips: []
-    funnyModeClips: []
-    source: {fileID: 0}
-  - name: Player Pushed?
+  - name: Player Spawn
     volume: 1
     pitch: 1
     stereoPan: 0
@@ -168,10 +170,10 @@ MonoBehaviour:
     reverbZoneMix: 1
     loop: 0
     clips:
-    - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
+    - {fileID: 8300000, guid: f94f944ab071810428bbb83b21ba3d4c, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
-  - name: Teleport
+  - name: Teleporter In
     volume: 1
     pitch: 1
     stereoPan: 0
@@ -228,13 +230,13 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: CameraWhoosh
     volume: 0.1
-    pitch: 1.1
+    pitch: 1.3
     stereoPan: 0
     spatialBlend: 0
     reverbZoneMix: 0
     loop: 0
     clips:
-    - {fileID: 8300000, guid: 00cff35b0bd4b7d40a14dfdee07aed45, type: 3}
+    - {fileID: 8300000, guid: 9367b61da1d0e184d85865eabfe0c5af, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
   - name: WallMoving
@@ -246,6 +248,17 @@ MonoBehaviour:
     loop: 1
     clips:
     - {fileID: 8300000, guid: 47abfe0afe0e72447baf4cb846025ba1, type: 3}
+    funnyModeClips: []
+    source: {fileID: 0}
+  - name: Player Pushed?
+    volume: 1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 1
+    loop: 0
+    clips:
+    - {fileID: 8300000, guid: 2596d31c05e5d9b4eae195ff9dfe7ffe, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
   music:

@@ -32,14 +32,14 @@ public class LevelSelectionMenu : MonoBehaviour
             buttonShowcaseLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonShowcaseLevel.onClick.AddListener(() => SaveManager.Instance.SaveInt("SavedCheckpoint", 0));
             buttonShowcaseLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-            buttonShowcaseLevel.onClick.AddListener(() => SceneManager.LoadScene("Showcase Level"));
+            buttonShowcaseLevel.onClick.AddListener(() => SceneManager.LoadScene("ShowcaseLevel"));
         }
         
         if (buttonTestLevel != null)
         {
             buttonTestLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonTestLevel.onClick.AddListener(() => GameManager.Instance.SetGameState(GameStates.GamePlay));
-            buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("Test Level"));
+            buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("TestLevel"));
         }
         
 

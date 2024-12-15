@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerDebugText;
     [SerializeField] private TextMeshProUGUI cameraDebugText;
     public TextMeshProUGUI fpsText;
+    [EndTab]
     
     [Tab("UI Gameplay")] // ----------------------------------------------------------------------
     [Header("Level Title")]
@@ -36,6 +37,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject wallSlide;
     [SerializeField] private GameObject wallJump;
     [SerializeField] private GameObject dash;
+    [EndTab]
 
     [Tab("UI Pause")] // ----------------------------------------------------------------------
     [SerializeField] private GameObject panelMain;
@@ -46,6 +48,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonQuit;
     [SerializeField] private Button buttonOptionsBack;
     [SerializeField] private  TMP_Text pauseCollectiblesText;
+    [EndTab]
     
     [Tab("UI Game Over")] // ----------------------------------------------------------------------
     [SerializeField] private  TMP_Text gameOverCollectiblesText;
@@ -54,7 +57,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private List<string> loseMessages = new List<string> { "1!", "2", };
     [SerializeField] private List<string> winMessages;
     [SerializeField] private List<string> perfectWinMessages;
-
+    [EndTab]
+    
+    
+    [Tab("Other")] // ----------------------------------------------------------------------
+    [SerializeField] private Animator animator;
+    [EndTab]
     
 
     private void Awake() {
@@ -70,8 +78,6 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         InitializeUI();
-
-
     }
     
     private  void Update()
@@ -93,10 +99,19 @@ public class UIManager : MonoBehaviour
     {
         ToggleDebugUI(GameManager.Instance.debugMode);
         UpdateUI();
-        
-        if (nextScene.name == "MainMenu") return;
-        UpdateAbilitiesUI();
-        StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+
+        if (nextScene.name == "MainMenu")
+        {
+            // VFXManager.Instance?.PlayAnimationTrigger(animator, "EnterScene");
+            
+        } else if (nextScene.name == "ShowcaseLevel") {
+            UpdateAbilitiesUI();
+            StartLevelTitleEffect(1, "Showcase Level");
+        } else {
+            UpdateAbilitiesUI();
+            StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+        }
+
 
     }
 

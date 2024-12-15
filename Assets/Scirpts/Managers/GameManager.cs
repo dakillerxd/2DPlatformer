@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode toggleDebugMode = KeyCode.F3;
     [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F4;
     [SerializeField] private KeyCode finishGame = KeyCode.F5;
+    [SerializeField] private KeyCode deleteSave = KeyCode.F6;
     
     // public Level[] levels;
     public Unlock[] unlocks;
@@ -85,6 +86,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(toggleDebugMode)) { ToggleDebugMode(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (Input.GetKeyUp(finishGame)) { FinishGame(); SoundManager.Instance?.PlaySoundFX("Toggle");}
+        if (Input.GetKeyUp(deleteSave)) { DeleteSave(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
         
     }
@@ -265,6 +267,7 @@ public class GameManager : MonoBehaviour
         foreach (Unlock unlock in unlocks)
         {
             unlock.unlockReceived = false;
+            unlock.unlockState = false;
         }
     }
     

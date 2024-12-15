@@ -44,7 +44,7 @@ public class CollectibleItem : MonoBehaviour
         if (_collected) return;
         if (!collision.CompareTag("Player")) return;
         
-        CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
+        // CameraController.Instance?.ShakeCamera(2f, 5f,2,2);
         SoundManager.Instance?.PlaySoundFX("Player Receive Collectible");
         GameManager.Instance?.CollectCollectible(SceneManager.GetActiveScene().name);
         foreach (var e in eventsAfterTrigger)

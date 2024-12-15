@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using VInspector;
 
 public class Checkpoint : MonoBehaviour
@@ -12,6 +13,15 @@ public class Checkpoint : MonoBehaviour
     [SerializeField] private UnityEvent[] eventsOnActivate;
     [SerializeField] private UnityEvent[] eventsOnDeactivate;
     private bool _isActive;
+    
+    [Header("Player Abilities")]
+    [SerializeField] private bool receiveAbilityOnUse;
+    [EnableIf(nameof(receiveAbilityOnUse))]
+    [SerializeField] private bool doubleJump;
+    [SerializeField] private bool wallSlide;
+    [SerializeField] private bool wallJump;
+    [SerializeField] private bool dash;
+    [EndIf]
     
     [Header("References")]
     [SerializeField] private SpriteRenderer[] spriteRenderers;
@@ -59,6 +69,17 @@ public class Checkpoint : MonoBehaviour
         }
         VFXManager.Instance?.SpawnParticleEffect(deactivateVfx, transform, transform.rotation, transform);
         CheckpointManager.Instance?.DeactivateCheckpoint(this);
+    }
+    
+    public void PlayCheckpointEffects()
+    {
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "Spawn");
+        
+        if (!receiveAbilityOnUse) return;
+        if (doubleJump) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.DoubleJump, false);
+        if (wallSlide) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.WallSlide, false);
+        if (wallJump) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.WallJump, false);
+        if (dash) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.Dash, false);
     }
     
     private void SeCheckpointColor(Color color) 

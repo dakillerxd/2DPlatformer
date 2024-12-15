@@ -38,6 +38,13 @@ public enum PlayerAbilities {
     Dash,
 }
 
+public enum TeleportType
+{
+    NextScene,
+    SelectedScene,
+    ConnectedTeleporter
+}
+
 
 [System.Serializable]
 public class Sound

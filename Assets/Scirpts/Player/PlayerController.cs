@@ -234,6 +234,7 @@ public class PlayerController : MonoBehaviour {
     {
         CheckpointManager.Instance?.SetSpawnPoint(transform.position);
         isFacingRight = true;
+        _currentHealth = maxHealth;
         FlipPlayer(lookRightOnStart ? "Right" : "Left");
         ToggleAllCosmetics();
         Restart();
@@ -1037,23 +1038,21 @@ public class PlayerController : MonoBehaviour {
         _deaths += 1;
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
-            CheckpointManager.Instance.PlayCheckpointAnimation();
-        } else { RespawnFromStartTeleporter();}
+            CheckpointManager.Instance.UseCheckpoint();
+        } else { RespawnFromTeleporter();}
     }
-    [Button] private void RespawnFromStartTeleporter() {
+    [Button] public void RespawnFromTeleporter() {
 
         _deaths = 0;
         if (CheckpointManager.Instance.startTeleporter) {
             Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
-            CheckpointManager.Instance.PlayTeleporterAnimation(); 
-            StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
-            StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
+            CheckpointManager.Instance.UseTeleporter();
         } else {
             RespawnFromSpawnPoint();
         }
     }
 
-    [Button] private void RespawnFromSpawnPoint() {
+    [Button] public void RespawnFromSpawnPoint() {
         
         _deaths = 0;
         Respawn(CheckpointManager.Instance.playerSpawnPoint);
@@ -1065,6 +1064,7 @@ public class PlayerController : MonoBehaviour {
         SetPlayerState(PlayerState.Frozen);
         Teleport(position, false);
         PlayAnimationTrigger("TeleportOut");
+        SoundManager.Instance?.PlaySoundFX("Player Spawn");
         onPlayerDeath.Invoke();
     }
     
@@ -1080,11 +1080,12 @@ public class PlayerController : MonoBehaviour {
     
     public void Teleport(Vector2 position, bool keepMomentum) {
         
-        CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
         transform.position = position;
-        VFXManager.Instance?.SpawnParticleEffect(spawnVfx, transform.position, spawnVfx.transform.rotation);
         shadowCaster2D.castsShadows = true;
         SetSpriteColor(_defaultColor);
+        CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
+        VFXManager.Instance?.SpawnParticleEffect(spawnVfx, transform.position, spawnVfx.transform.rotation);
+
 
         if (!keepMomentum)
         {
@@ -1109,7 +1110,6 @@ public class PlayerController : MonoBehaviour {
         // Set dead state
         SetPlayerState(PlayerState.Frozen);
         shadowCaster2D.castsShadows = false;
-        // SetAnimationBool("Death", true);
         SetSpriteColor(deadColor);
         VFXManager.Instance?.StopVfxEffect(bleedVfx,true);
         VFXManager.Instance?.SpawnParticleEffect(deathVfx, transform.position, Quaternion.identity);
@@ -1150,6 +1150,7 @@ public class PlayerController : MonoBehaviour {
         if (_currentHealth == maxHealth) return;
         VFXManager.Instance?.StopVfxEffect(bleedVfx, true);
         VFXManager.Instance?.SpawnParticleEffect(healVfx, transform.position, Quaternion.identity);
+        SoundManager.Instance?.PlaySoundFX("Player Heal");
         _currentHealth = maxHealth;
     }
     
@@ -1342,9 +1343,7 @@ public class PlayerController : MonoBehaviour {
                 _invincibilityTime = 0f;
                 _stunLockTime = 0f;
                 HealToFullHealth();
-                SoundManager.Instance?.PlaySoundFX("Player Spawn");
                 CameraController.Instance?.StopCameraShake();
-                // SetAnimationBool("Death", false);
                 break;
             case PlayerState.Frozen:
                 rigidBody.simulated = true;
@@ -1353,7 +1352,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void ReceiveAbility(PlayerAbilities ability)
+    public void ReceiveAbility(PlayerAbilities ability, bool playEffects = true)
     {
         switch (ability)
         {
@@ -1371,12 +1370,12 @@ public class PlayerController : MonoBehaviour {
                 break;
         }
         
+        if (!playEffects) return;
         // SetPlayerState(PlayerState.Frozen);
         // PlayAnimation("ReceiveAbility");
         HealToFullHealth();
         VFXManager.Instance?.SpawnParticleEffect(healVfx, transform.position, Quaternion.identity);
         SoundManager.Instance?.PlaySoundFX("Player Receive Ability");
-        
     }
 
     public void ToggleAllCosmetics()

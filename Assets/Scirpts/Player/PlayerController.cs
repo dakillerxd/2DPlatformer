@@ -753,21 +753,18 @@ public class PlayerController : MonoBehaviour {
     
     private void CheckFallSpeed() {
 
-        fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // If falling remember fall speed
-        
+        fallSpeed = (rigidBody.linearVelocityY < 0) ? rigidBody.linearVelocityY : 0; // remember fall speed
         isFalling = rigidBody.linearVelocityY < -0.1; // Check if falling
-        
         isFastFalling = rigidBody.linearVelocityY < -fastFallSpeed; // Check if fast falling
-        if (isFastFalling) {
+
+        
+        atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed; // If at max fall speed play effects
+        if (atMaxFallSpeed)
+        {
+            VFXManager.Instance?.PlayVfxEffect(peakFallSpeedVfx, false);
             CameraController.Instance?.ShakeCamera(0.1f, fallShakeMagnitude, 1f, 1f);
-            VFXManager.Instance?.ToggleMotionBlur(true);
-        }else {
-            VFXManager.Instance?.ToggleMotionBlur(false);
         }
         
-        
-        atMaxFallSpeed = rigidBody.linearVelocityY < -maxFallSpeed;
-        if (atMaxFallSpeed) { VFXManager.Instance?.PlayVfxEffect(peakFallSpeedVfx, false); }
         if (rigidBody.linearVelocityY < -maxFallSpeed) { // Check if at max fall speed
             rigidBody.linearVelocityY = -maxFallSpeed; // Cap fall speed
         }

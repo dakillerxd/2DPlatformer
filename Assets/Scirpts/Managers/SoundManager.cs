@@ -167,20 +167,24 @@ public class SoundManager : MonoBehaviour
         ));
     }
 
-    public void FadeSoundOut(string name, float fadeTime = 1f)
+    public void FadeSoundOut(string name, AudioSource audioSource = null, float fadeTime = 1f)
     {
         Sound soundFx = soundEffects.Find(sound => sound.name == name);
-        if (soundFx == null || !soundFx.source.isPlaying)
+        if (soundFx == null)
         {
-            // #if UNITY_EDITOR
-            // Debug.Log($"SoundFX: {name} not found or not playing!");
-            // #endif
+            return;
+        }
+
+        // Get the target audio source
+        AudioSource targetSource = audioSource ?? soundFx.source;
+        if (!targetSource.isPlaying)
+        {
             return;
         }
 
         StartCoroutine(FadeVolume(
-            soundFx.source,
-            soundFx.source.volume,
+            targetSource,
+            targetSource.volume,
             0f,
             fadeTime,
             true  // Stop the sound after fade

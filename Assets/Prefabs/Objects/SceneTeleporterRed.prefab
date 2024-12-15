@@ -284,7 +284,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4122002283411253978, guid: 13fffabe38743af4394bc643b82937f7, type: 3}
       propertyPath: CollisionModule.collidesWith.m_Bits
-      value: 448
+      value: 449
       objectReference: {fileID: 0}
     - target: {fileID: 4122002283411253978, guid: 13fffabe38743af4394bc643b82937f7, type: 3}
       propertyPath: InitialModule.gravityModifier.scalar

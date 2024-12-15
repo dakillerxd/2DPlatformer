@@ -107,7 +107,7 @@ public class Teleporter : MonoBehaviour
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
         VFXManager.Instance?.PlayAnimationTrigger(animator, "Teleport");
         SoundManager.Instance?.PlaySoundFX("Teleporter In");
-        CameraController.Instance?.ShakeCamera(2f, 5f, 3, 3);
+        CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);
 
         
         // Start pulling

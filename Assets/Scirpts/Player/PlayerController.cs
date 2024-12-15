@@ -1122,7 +1122,7 @@ public class PlayerController : MonoBehaviour {
     private IEnumerator SetDeadStateFor(float duration = 0) {
 
         yield return new WaitForSeconds(duration);
-        RespawnFromCheckpoint();
+        Restart();
         
     }
 
@@ -1342,7 +1342,7 @@ public class PlayerController : MonoBehaviour {
                 _canCoyoteJump = false;
                 _invincibilityTime = 0f;
                 _stunLockTime = 0f;
-                HealToFullHealth();
+                _currentHealth = maxHealth;
                 CameraController.Instance?.StopCameraShake();
                 break;
             case PlayerState.Frozen:

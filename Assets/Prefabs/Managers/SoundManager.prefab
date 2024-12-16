@@ -54,9 +54,9 @@ MonoBehaviour:
     reverbZoneMix: 1
     loop: 0
     clips:
-    - {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
+    - {fileID: 8300000, guid: 9e958df7bc919a54a8b4a0dc2f5cb80d, type: 3}
     funnyModeClips:
-    - {fileID: 8300000, guid: 885ee5eb2263d354c9593e98f0625efc, type: 3}
+    - {fileID: 8300000, guid: 6d9e8c6f584af72499e102035ef4fcd6, type: 3}
     source: {fileID: 0}
   - name: Player Air Jump
     volume: 1

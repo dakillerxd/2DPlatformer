@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4768939878819942212, guid: ae25f2371cde7bd4d9361ff8c04f349f, type: 3}
       propertyPath: m_Name
-      value: BadLiquidBackground Variant
+      value: LavaBackground
       objectReference: {fileID: 0}
     - target: {fileID: 6769943508520664697, guid: ae25f2371cde7bd4d9361ff8c04f349f, type: 3}
       propertyPath: m_IsActive

@@ -24410,8 +24410,12 @@ MonoBehaviour:
   sceneToLoad:
     m_SceneAsset: {fileID: 0}
     m_SceneName: Level1
-  destinationPoint: {fileID: 0}
-  sameSceneTeleportDelay: 0
+  connectedTeleporter: {fileID: 0}
+  receiveAbilityOnUse: 0
+  doubleJump: 0
+  wallSlide: 0
+  wallJump: 0
+  dash: 0
   animator: {fileID: 3965280894130747936}
 --- !u!1 &4882779443881044937
 GameObject:
@@ -24472,7 +24476,7 @@ MonoBehaviour:
   m_AlphaBlendOnOverlap: 0
   m_OverlapOperation: 0
   m_NormalMapDistance: 3
-  m_NormalMapQuality: 2
+  m_NormalMapQuality: 0
   m_UseNormalMap: 0
   m_ShadowsEnabled: 1
   m_ShadowIntensity: 0.4

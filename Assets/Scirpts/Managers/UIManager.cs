@@ -102,7 +102,7 @@ public class UIManager : MonoBehaviour
 
         if (nextScene.name == "MainMenu")
         {
-            // VFXManager.Instance?.PlayAnimationTrigger(animator, "EnterScene");
+            // VFXManager.Instance?.PlayAnimationTrigger(animator, "EnterScene1");
             
         } else if (nextScene.name == "ShowcaseLevel") {
             UpdateAbilitiesUI();

@@ -78,12 +78,14 @@ public class BackgroundBehavior : MonoBehaviour
     private Vector2[] _childStartPositions2D;
     private float _startPosX;
     private float _startPosY;
+    private float _startPosZ;
     
     private void Start()
     {
         _mainCamera = Camera.main;
         _startPosX = transform.position.x;
         _startPosY = transform.position.y;
+        _startPosZ = transform.position.z;
 
         if (backgroundType == BackgroundType.ParallaxLayer)
         {
@@ -111,7 +113,8 @@ public class BackgroundBehavior : MonoBehaviour
                 break;
 
             case BackgroundType.FollowCamera:
-                transform.position = _mainCamera.transform.position + cameraOffset;
+                if (_mainCamera == null) return;
+                transform.position = new Vector3(_mainCamera.transform.position.x + cameraOffset.x, _mainCamera.transform.position.y + cameraOffset.y,_startPosZ);
                 break;
 
             case BackgroundType.ParallaxLayer:

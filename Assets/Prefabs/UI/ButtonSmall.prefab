@@ -8,6 +8,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePathHash
+      value: 821949845
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePath.Array.data[0].x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePath.Array.data[1].x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePath.Array.data[2].x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePath.Array.data[3].x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShapePath.Array.data[3].y
+      value: -29.000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028472814931518231, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.y
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 2729007137975245274, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
       propertyPath: m_fontSize
       value: 35
@@ -18,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4630772646296596848, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
       propertyPath: m_Name
-      value: ButtonSmall Variant
+      value: ButtonSmall
       objectReference: {fileID: 0}
     - target: {fileID: 4995072033234997596, guid: 2efd50afe73a69849b7d5a5a04fe34cf, type: 3}
       propertyPath: m_Pivot.x

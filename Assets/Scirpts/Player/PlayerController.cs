@@ -1052,6 +1052,7 @@ public class PlayerController : MonoBehaviour {
     [Button] public void RespawnFromSpawnPoint() {
         
         _deaths = 0;
+        StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(true, 0.5f));
         Respawn(CheckpointManager.Instance.playerSpawnPoint);
     }
     
@@ -1118,6 +1119,7 @@ public class PlayerController : MonoBehaviour {
 
     private IEnumerator SetDeadStateFor(float duration = 0) {
 
+        StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(false, 1f));
         yield return new WaitForSeconds(duration);
         Restart();
         

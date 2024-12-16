@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Volume))]
 public class VFXManager : MonoBehaviour
@@ -14,9 +12,11 @@ public class VFXManager : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private Volume globalVolume;
-    private  MotionBlur _motionBlur;
+    private MotionBlur _motionBlur;
     private ChromaticAberration _chromaticAberration;
     private LensDistortion _lensDistortion;
+    private Vignette _vignette;
+    private ColorAdjustments _colorAdjustments;
     
 
     private void Awake() {
@@ -34,6 +34,8 @@ public class VFXManager : MonoBehaviour
         globalVolume.profile.TryGet<MotionBlur>(out _motionBlur);
         globalVolume.profile.TryGet<ChromaticAberration>(out _chromaticAberration);
         globalVolume.profile.TryGet<LensDistortion>(out _lensDistortion);
+        globalVolume.profile.TryGet<Vignette>(out _vignette);
+        globalVolume.profile.TryGet<ColorAdjustments>(out _colorAdjustments);
     }
 
     private void OnEnable()
@@ -51,10 +53,12 @@ public class VFXManager : MonoBehaviour
         
         ToggleChromaticAberration(false);
         ToggleLensDistortion(false);
+        ToggleVignette(false);
+        
         
         if (nextScene.name == "MainMenu") {
-            
             ToggleMotionBlur(true, 0.3f);
+            StartCoroutine(LerpColorAdjustments(true, 1f));
         } else {
             ToggleMotionBlur(false);
         }
@@ -109,6 +113,18 @@ public class VFXManager : MonoBehaviour
 
 #region Global Volume
 
+    public void ToggleColorAdjustments(bool state, Color color)
+    {
+        _colorAdjustments.active = state;
+        _colorAdjustments.colorFilter.value = color;
+    }
+
+    public void ToggleVignette(bool state, float intensity = 0)
+    {
+        _vignette.active = state;
+        _vignette.intensity.value = intensity;
+    } 
+
     public void ToggleMotionBlur(bool state, float intensity = 0)
     {
         _motionBlur.active = state;
@@ -126,7 +142,26 @@ public class VFXManager : MonoBehaviour
         _lensDistortion.active = state;
         _lensDistortion.intensity.value = intensity;
     }
-        
+    
+    
+    
+    public IEnumerator LerpVignette(bool lerpIn, float time)
+    {
+        float startIntensity = lerpIn ? 0 : 1;
+        float endIntensity = lerpIn ? 1 : 0;
+        float elapsedTime = 0;
+        _vignette.active = true;
+
+        while (elapsedTime < time)
+        {
+            _vignette.intensity.value = Mathf.Lerp(startIntensity, endIntensity, elapsedTime / time);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        _vignette.intensity.value = endIntensity;
+        if (!lerpIn) {_vignette.active = false;}
+    }
 
     public IEnumerator LerpChromaticAberration(bool lerpIn, float time)
     {
@@ -162,6 +197,24 @@ public class VFXManager : MonoBehaviour
 
         _lensDistortion.intensity.value = endIntensity;
         if (!lerpIn) {_lensDistortion.active = false;}
+    }
+
+    public IEnumerator LerpColorAdjustments(bool fadeIn, float time)
+    {
+        Color startColor = fadeIn ? Color.black : Color.white;
+        Color endColor = fadeIn ? Color.white : Color.black;
+        float elapsedTime = 0;
+        _colorAdjustments.active = true;
+        
+        while (elapsedTime < time)
+        {
+            _colorAdjustments.colorFilter.value = Color.Lerp(startColor, endColor, elapsedTime / time);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        _colorAdjustments.colorFilter.value = endColor;
+        if (fadeIn) {_colorAdjustments.active = false;}
     }
 
 #endregion Global Volume

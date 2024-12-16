@@ -30,11 +30,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3116993853801456294, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_LocalScale.x
-      value: 124.00311
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3116993853801456294, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_LocalScale.y
-      value: 28.500229
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3116993853801456294, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_LocalPosition.x
@@ -78,7 +78,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4947297197838703049, guid: 18c256386be7d1f47b36188821c48176, type: 3}
       propertyPath: m_Name
-      value: Background Variant
+      value: Blue Background
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

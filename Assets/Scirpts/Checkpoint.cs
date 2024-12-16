@@ -74,6 +74,7 @@ public class Checkpoint : MonoBehaviour
     public void PlayCheckpointEffects()
     {
         VFXManager.Instance?.PlayAnimationTrigger(animator, "Spawn");
+        StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(true, 0.5f));
         
         if (!receiveAbilityOnUse) return;
         if (doubleJump) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.DoubleJump, false);

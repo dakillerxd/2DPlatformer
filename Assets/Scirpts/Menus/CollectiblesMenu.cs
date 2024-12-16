@@ -17,6 +17,8 @@ public class CollectiblesMenu : MonoBehaviour
     [Header("Unlocks")]
     [SerializeField] private TextMeshProUGUI unlocksHeaderText;
     [SerializeField] private TextMeshProUGUI unlocksText;
+    [Space(10f)]
+    [SerializeField] GameObject playerGfx;
     [SerializeField] private Toggle googlyEyesToggle;
     [SerializeField] private Toggle propellerHatToggle;
     [SerializeField] private Toggle curlyMustacheToggle;

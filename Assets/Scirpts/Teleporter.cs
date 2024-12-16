@@ -77,6 +77,7 @@ public class Teleporter : MonoBehaviour
     {
         
         VFXManager.Instance?.PlayAnimationTrigger(animator, "Spawn");
+        StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(true, 0.2f));
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(false, 1.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(false, 1.5f));
         

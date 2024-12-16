@@ -101,7 +101,7 @@ public class SaveManager : MonoBehaviour
     // Save current game session
     public void SaveGame(int checkpoint = 0)
     {
-        if (SceneManager.GetActiveScene().name == "Showcase Level" || SceneManager.GetActiveScene().name == "Test Level") return;
+        if (SceneManager.GetActiveScene().name == "ShowcaseLevel" || SceneManager.GetActiveScene().name == "TestLevel") return;
 
         if (LoadInt("HighestLevel") <= SceneManager.GetActiveScene().buildIndex) // Save level index
         {

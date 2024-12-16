@@ -37,14 +37,19 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
             Instance = this;
         }
         
+        
+        
         // Load saved checkpoint
-        if (SceneManager.GetActiveScene().name != "Showcase Level" || SceneManager.GetActiveScene().name != "Test Level")
+        if (SceneManager.GetActiveScene().name != "ShowcaseLevel" || SceneManager.GetActiveScene().name != "TestLevel") // If in a gameplay scene
         {
-            activeCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint") switch
+            if (SaveManager.Instance.LoadString("SavedLevel") == SceneManager.GetActiveScene().name) // If the active scene is the one that was saved last time
             {
-                0 => null,
-                _ => checkpointList[SaveManager.Instance.LoadInt("SavedCheckpoint") - 1]
-            };
+                activeCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint") switch // If there was a checkpoint
+                {
+                    0 => null,
+                    _ => checkpointList[SaveManager.Instance.LoadInt("SavedCheckpoint") - 1]
+                };
+            }
         }
         
         // Save level information
@@ -86,8 +91,6 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         activeCheckpoint.DeactivateCheckpoint();
         activeCheckpoint = null;
     }
-    
-    
     
     public void UseTeleporter()
     {

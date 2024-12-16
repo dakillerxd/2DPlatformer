@@ -18,17 +18,7 @@ public class Spike : MonoBehaviour
         player.DamageHealth(damage, true, gameObject.name);
         StartCoroutine(ResetTrigger());
     }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (!collision.gameObject.CompareTag("Player") || _triggered) return;
-        _triggered = true;
-        Vector2 spikeNormal = collision.GetContact(0).normal;
-        var player = collision.gameObject.GetComponent<PlayerController>();
-        player.Push(-spikeNormal * pushForce);
-        player.DamageHealth(damage, true, gameObject.name);
-        StartCoroutine(ResetTrigger());
-    }
+    
 
     private IEnumerator ResetTrigger()
     {

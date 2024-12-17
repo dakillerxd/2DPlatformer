@@ -13,6 +13,7 @@ using UnityEditor.SceneManagement;
 using UnityEditor.IMGUI.Controls;
 using static VFolders.Libs.VUtils;
 using static VFolders.Libs.VGUI;
+// using static VTools.VDebug;
 using static VFolders.VFoldersPalette;
 
 
@@ -100,7 +101,7 @@ namespace VFolders
 
                         if (!clicked) return;
 
-                        colorPickerWindow = OpenColorPicker((c) => { palette.RecordUndo(); palette.Dirty(); palette.colors[i] = c; }, palette.colors[i], true, false);
+                        colorPickerWindow = EditorUtils.OpenColorPicker((c) => { palette.RecordUndo(); palette.Dirty(); palette.colors[i] = c; }, palette.colors[i], true, false);
 
                         colorPickerWindow.MoveTo(EditorGUIUtility.GUIToScreenPoint(cellRect.Move(-3, 50).position));
 
@@ -137,12 +138,12 @@ namespace VFolders
 
                         var colorRaw = palette.colors[i];
 
-                        var color = Lerp(Greyscale(.2f), colorRaw, brightness);
+                        var color = MathUtil.Lerp(Greyscale(.2f), colorRaw, brightness);
 
                         Color.RGBToHSV(color, out float h, out float s, out float v);
                         color = Color.HSVToRGB(h, s * saturation, v);
 
-                        color = Lerp(color, colorRaw, .5f).SetAlpha(1);
+                        color = MathUtil.Lerp(color, colorRaw, .5f).SetAlpha(1);
 
                         if (!palette.colorsEnabled)
                             color *= disabledRowTint;
@@ -661,7 +662,7 @@ namespace VFolders
                 var lerpSpeed = draggingRow ? 12 : 12321;
 
                 for (int i = 0; i < rowGaps.Count; i++)
-                    rowGaps[i] = Lerp(rowGaps[i], draggingRow && i == insertDraggedRowAtIndex ? 1 : 0, lerpSpeed, editorDeltaTime);
+                    rowGaps[i] = MathUtil.Lerp(rowGaps[i], draggingRow && i == insertDraggedRowAtIndex ? 1 : 0, lerpSpeed, editorDeltaTime);
 
                 for (int i = 0; i < rowGaps.Count; i++)
                     if (rowGaps[i].Approx(0))
@@ -678,7 +679,7 @@ namespace VFolders
 
                 var lerpSpeed = 12;
 
-                Lerp(ref crossIconAnimationT, 1, lerpSpeed, editorDeltaTime);
+                MathUtil.Lerp(ref crossIconAnimationT, 1, lerpSpeed, editorDeltaTime);
 
             }
             void startCrossIconAnimation()
@@ -717,7 +718,7 @@ namespace VFolders
                     yOfSourceRow = draggedRowY;
 
 
-                crossIconY = Lerp(yOfSourceRow, yOfFirstEnabled, crossIconAnimationT);
+                crossIconY = MathUtil.Lerp(yOfSourceRow, yOfFirstEnabled, crossIconAnimationT);
 
                 if (indexOfFirstEnabled == indexOfSourceRow)
                     crossIconAnimationT = 1;

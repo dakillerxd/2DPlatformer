@@ -12,6 +12,7 @@ using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using static VFolders.Libs.VUtils;
 using static VFolders.Libs.VGUI;
+// using static VTools.VDebug;
 
 
 namespace VFolders
@@ -87,7 +88,7 @@ namespace VFolders
 
 
                 // color = HSLToRGB(t, .61f, .57f);
-                color = HSLToRGB(t, .61f, .57f);
+                color = ColorUtils.HSLToRGB(t, .61f, .57f);
 
 
                 if (colorIndex == 0)
@@ -120,7 +121,7 @@ namespace VFolders
                 if (colorIndex < greyColorsCount) return;
                 if (isDarkTheme) return;
 
-                color = HSLToRGB((colorIndex - greyColorsCount.ToFloat()) / rainbowColorsCount, .99f, .75f);
+                color = ColorUtils.HSLToRGB((colorIndex - greyColorsCount.ToFloat()) / rainbowColorsCount, .99f, .75f);
 
                 if (colorIndex == 0)
                     color *= 1.1f;

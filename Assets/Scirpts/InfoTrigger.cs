@@ -1,14 +1,18 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using TMPro;
 using VInspector;
 
+
 public class InfoTrigger : MonoBehaviour
 {
-    [Header("Settings")]
+    [Header("Trigger")]
     [SerializeField] private bool hideTriggerOnStart = true;
-    [SerializeField] private bool useDelay; 
-    [EnableIf(nameof(useDelay))][SerializeField] [Min(0f)] private float fadeInDelay = 1;[EndIf]
+    [SerializeField] private bool useDelay;
+    [EnableIf(nameof(useDelay))]
+    [SerializeField] [Min(0f)] private float fadeInDelay = 1f;
+    [EndIf]
     [SerializeField] [Min(0f)] private float fadeInTime = 2f;
     [SerializeField] [Min(0f)] private float fadeOutTime = 2f;
     [SerializeField] private bool fadeOutOnExit = true;
@@ -16,12 +20,23 @@ public class InfoTrigger : MonoBehaviour
     [SerializeField] private bool destroyAfterFadeOut;
     [EndIf]
 
+    [Header("Text Settings")]
+    [SerializeField] private TextType textType = TextType.None;
+    [EnableIf(nameof(IsCustomText))]
+    [SerializeField] private string customText;
+    [EndIf]
+    [EnableIf(nameof(IsInfoText))]
+    [SerializeField] private string infoId;
+    [EndIf]
+
+    private bool IsCustomText => textType == TextType.Custom;
+    private bool IsInfoText => textType == TextType.Info;
+
     private readonly Color _invisibleColor = new Color(1f, 1f, 1f, 0f);
     private Color _startColor;
     private Coroutine _fadeCoroutine;
     private bool _isFirstEntry = true;
     private bool _isPlayerInTrigger;
-    private Collider2D _triggerCollider;
 
     [Header("References")]
     [SerializeField] private SpriteRenderer triggerSprite;
@@ -30,10 +45,38 @@ public class InfoTrigger : MonoBehaviour
     private void Start()
     {
         if (hideTriggerOnStart) { triggerSprite.enabled = false; }
+        
         _startColor = infoText.color;
         infoText.color = _invisibleColor;
+        
+        SetupText();
         _isPlayerInTrigger = false;
-        _triggerCollider = GetComponent<Collider2D>();
+    }
+    
+    private void SetupText()
+    {
+        if (!infoText) return;
+        
+        switch (textType)
+        {
+            case TextType.Custom:
+                infoText.text = customText;
+                break;
+            case TextType.Info:
+                infoText.text = GameManager.Instance?.GetInfoText(infoId);
+                
+                if (GameManager.Instance == null)
+                {
+                    var infoStorage = FindFirstObjectByType<GameManager>();
+                    infoText.text = infoStorage.GetInfoText(infoId);
+                }
+                break;
+        }
+    }
+
+    private void OnValidate()
+    {
+        SetupText();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -43,14 +86,12 @@ public class InfoTrigger : MonoBehaviour
         if (_isPlayerInTrigger) return;
         _isPlayerInTrigger = true;
 
-        // Stop any existing fade coroutine
         if (_fadeCoroutine != null)
         {
             StopCoroutine(_fadeCoroutine);
             _fadeCoroutine = null;
         }
 
-        // Handle first entry with optional delay
         if (_isFirstEntry)
         {
             _isFirstEntry = false;
@@ -93,17 +134,23 @@ public class InfoTrigger : MonoBehaviour
     private IEnumerator FadeText(bool fadeIn, float fadeTime)
     {
         Color startColor = infoText.color;
-        Color targetColor = fadeIn ? _startColor : _invisibleColor;
+        Color targetColor = fadeIn ? this._startColor : _invisibleColor;
+        
         float elapsedTime = 0f;
-
+        
         while (elapsedTime < fadeTime)
         {
             infoText.color = Color.Lerp(startColor, targetColor, elapsedTime / fadeTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        
         infoText.color = targetColor;
         _fadeCoroutine = null;
-        if (destroyAfterFadeOut && !fadeIn) Destroy(gameObject);
+        
+        if (destroyAfterFadeOut && !fadeIn)
+        {
+            Destroy(gameObject);
+        }
     }
 }

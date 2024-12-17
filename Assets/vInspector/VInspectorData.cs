@@ -14,7 +14,7 @@ using Type = System.Type;
 using static VInspector.VInspectorState;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-
+// using static VTools.VDebug;
 
 
 namespace VInspector
@@ -37,13 +37,13 @@ namespace VInspector
             {
                 get
                 {
-                    if (_obj == null && !isSceneGameObject)
-                        _obj = globalId.GetObject();
+                    if (isSceneGameObject && _obj == null)
+                    {
+                        VInspector.unloadedSceneBookmarksGuids.Add(globalId.guid);
+                        return null;
+                    }
 
-                    return _obj;
-
-                    // updating scene objects here using globalId.GetObject() could cause performance issues on large scenes
-                    // so instead they are batch updated in VInspector.LoadBookmarkObjectsForScene()
+                    return _obj ??= globalId.GetObject();
 
                 }
             }
@@ -99,8 +99,6 @@ namespace VInspector
             }
 
 
-            // [System.NonSerialized]
-            public float width => VInspectorNavbar.expandedBookmarkWidth;
 
 
 

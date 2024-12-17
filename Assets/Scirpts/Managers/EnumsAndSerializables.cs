@@ -1,3 +1,4 @@
+using System;
 using CustomAttribute;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -43,6 +44,13 @@ public enum TeleportType
     NextScene,
     SelectedScene,
     ConnectedTeleporter
+}
+
+public enum TextType
+{
+    None,
+    Custom,
+    Info
 }
 
 

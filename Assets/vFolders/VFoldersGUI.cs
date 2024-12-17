@@ -14,6 +14,7 @@ using UnityEditor.IMGUI.Controls;
 using Type = System.Type;
 using static VFolders.Libs.VUtils;
 using static VFolders.Libs.VGUI;
+// using static VTools.VDebug;
 using static VFolders.VFolders;
 using static VFolders.VFoldersData;
 using static VFolders.VFoldersCache;
@@ -237,7 +238,10 @@ namespace VFolders
                         color *= isDarkTheme ? 1.2f : .8f;
 
                     if (palette?.colorGradientsEnabled == false)
-                        color = Lerp(color, Greyscale(.2f), isDarkTheme ? .25f : .03f);
+                        color = MathUtil.Lerp(color, Greyscale(.2f), isDarkTheme ? .25f : .03f);
+
+                    if (folderInfo.hasColorByRecursion)
+                        color = MathUtil.Lerp(color, Greyscale(isDarkTheme ? .24f : .8f), .45f);
 
 
 

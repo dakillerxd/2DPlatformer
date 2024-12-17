@@ -544,7 +544,7 @@ public class PlayerController : MonoBehaviour {
                 rigidBody.linearVelocityY *=  variableJumpMultiplier;
                 PlayAnimationTrigger("Idle");
                 _isJumpCut = true;
-                // SoundManager.Instance?.StopSoundFx("Player Jump");
+                SoundManager.Instance?.FadeSoundOut("Player Jump",fadeTime: 0.2f);
             }
             _jumpInputHeld = false;
             _variableJumpHeldDuration = 0;

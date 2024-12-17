@@ -16,7 +16,7 @@ using static VInspector.VInspectorState;
 using static VInspector.VInspectorData;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-
+// using static VTools.VDebug;
 
 
 namespace VInspector
@@ -889,6 +889,8 @@ namespace VInspector
 
             var editorIndex = tracker.activeEditors.ToList().IndexOfFirst(r => r.target == component);
 
+            if (!editorIndex.IsInRangeOf(tracker.activeEditors)) return false;
+
             return tracker.GetVisible(editorIndex) == 1;
 
         }
@@ -930,6 +932,8 @@ namespace VInspector
             var tracker = inspectorWindow.GetMemberValue<ActiveEditorTracker>("m_Tracker");
 
             var editorIndex = tracker.activeEditors.ToList().IndexOfFirst(r => r.target == component);
+
+            if (!editorIndex.IsInRangeOf(tracker.activeEditors)) return;
 
             tracker.SetVisible(editorIndex, newExpandedState ? 1 : 0);
 
@@ -1016,7 +1020,6 @@ namespace VInspector
         static Dictionary<Component, VInspectorComponentHeader> componentHeaders_byComponent = new();
 
         static Dictionary<Editor, int> componentOrderHashes_byEditor = new();
-
 
 
 
@@ -1195,23 +1198,44 @@ namespace VInspector
 
 
 
-        static void LoadBookmarkObjectsForScene(Scene scene) // on scene loaded
+        static void LoadSceneBookmarkObjects() // update
         {
             if (!data) return;
 
 
-            var bookmarksFromThisScene = data.bookmarks.Where(r => r.globalId.guid == scene.path.ToGuid()).ToList();
+            var scenesToLoadFor = unloadedSceneBookmarksGuids.Select(r => EditorSceneManager.GetSceneByPath(r.ToPath()))
+                                                             .Where(r => r.isLoaded);
+            if (!scenesToLoadFor.Any()) return;
 
-            var objectsForTheseBookmarks = bookmarksFromThisScene.Select(r => !Application.isPlaying ? r.globalId
-                                                                                                     : r.globalId.UnpackForPrefab()).GetObjects();
 
-            for (int i = 0; i < bookmarksFromThisScene.Count; i++)
-                bookmarksFromThisScene[i]._obj = objectsForTheseBookmarks[i];
 
-            for (int i = 0; i < bookmarksFromThisScene.Count; i++)
-                bookmarksFromThisScene[i]._name = bookmarksFromThisScene[i]._obj?.name ?? "";
+            foreach (var scene in scenesToLoadFor)
+            {
+                var bookmarksFromThisScene = data.bookmarks.Where(r => r.globalId.guid == scene.path.ToGuid()).ToList();
+
+                var objectsForTheseBookmarks = bookmarksFromThisScene.Select(r => !Application.isPlaying ? r.globalId
+                                                                                                         : r.globalId.UnpackForPrefab()).GetObjects();
+
+                for (int i = 0; i < bookmarksFromThisScene.Count; i++)
+                    bookmarksFromThisScene[i]._obj = objectsForTheseBookmarks[i];
+
+                for (int i = 0; i < bookmarksFromThisScene.Count; i++)
+                    bookmarksFromThisScene[i]._name = bookmarksFromThisScene[i]._obj?.name ?? "";
+
+            }
+
+            unloadedSceneBookmarksGuids.Clear();
+
+
+            foreach (var inspector in allInspectors)
+                inspector.Repaint();
 
         }
+
+        public static HashSet<string> unloadedSceneBookmarksGuids = new();
+
+
+
 
         static void StashBookmarkObjects() // on playmode enter before awake
         {
@@ -1232,32 +1256,6 @@ namespace VInspector
 
         static Dictionary<Bookmark, Object> stashedBookmarkObjects_byBookmark = new();
 
-
-
-        static void OnSceneOpened_inEditMode(Scene scene, OpenSceneMode _)
-        {
-            LoadBookmarkObjectsForScene(scene);
-
-        }
-        static void OnSceneLoaded_inPlaymode(Scene scene, LoadSceneMode loadMode)
-        {
-            if ((int)loadMode == 4) return; // playmode enter
-
-            LoadBookmarkObjectsForScene(scene);
-
-        }
-        static void OnProjectLoaded()
-        {
-            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
-                LoadBookmarkObjectsForScene(EditorSceneManager.GetSceneAt(i));
-
-        }
-        static void OnPluginReenabled()
-        {
-            for (int i = 0; i < EditorSceneManager.sceneCount; i++)
-                LoadBookmarkObjectsForScene(EditorSceneManager.GetSceneAt(i));
-
-        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnPlaymodeEnter_beforeAwake()
@@ -1448,18 +1446,8 @@ namespace VInspector
                 Undo.undoRedoPerformed += OnUndoRedo;
 
 
-
-
-
-                UnityEditor.SceneManagement.EditorSceneManager.sceneOpened -= OnSceneOpened_inEditMode;
-                UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += OnSceneOpened_inEditMode;
-
-                UnityEditor.SceneManagement.EditorSceneManager.sceneLoaded -= OnSceneLoaded_inPlaymode;
-                UnityEditor.SceneManagement.EditorSceneManager.sceneLoaded += OnSceneLoaded_inPlaymode;
-
-                var projectWasLoaded = typeof(EditorApplication).GetFieldValue<UnityEngine.Events.UnityAction>("projectWasLoaded");
-                typeof(EditorApplication).SetFieldValue("projectWasLoaded", (projectWasLoaded - OnProjectLoaded) + OnProjectLoaded);
-
+                EditorApplication.update -= LoadSceneBookmarkObjects;
+                EditorApplication.update += LoadSceneBookmarkObjects;
 
 
 
@@ -1506,13 +1494,20 @@ namespace VInspector
                 // this addresses reports of data loss when trying to load it on a new machine
 
             }
-            void callOnPluginReenabled()
+            void removeDeletedBookmarks()
             {
-                if (!EditorPrefs.HasKey("vInspector-pluginWasReenabled")) return;
+                if (!data) return;
 
-                OnPluginReenabled();
 
-                EditorPrefs.DeleteKey("vInspector-pluginWasReenabled");
+                var toRemove = data.bookmarks.Where(r => r.isDeleted);
+
+                if (!toRemove.Any()) return;
+
+
+                foreach (var r in toRemove.ToList())
+                    data.bookmarks.Remove(r);
+
+                data.Dirty();
 
             }
             void migrateHeaderButtonSettings()
@@ -1553,7 +1548,7 @@ namespace VInspector
             subscribe();
             loadData();
             loadDataDelayed();
-            callOnPluginReenabled();
+            removeDeletedBookmarks();
             migrateHeaderButtonSettings();
             migrateItemsToBookmarks();
 
@@ -1581,7 +1576,7 @@ namespace VInspector
 
 
 
-        const string version = "2.0.10";
+        const string version = "2.0.11";
 
 
     }

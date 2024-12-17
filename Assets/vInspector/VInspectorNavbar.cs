@@ -9,8 +9,10 @@ using System.Linq;
 using Type = System.Type;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-using static VInspector.VInspectorData;
+// using static VTools.VDebug;
 using static VInspector.VInspector;
+using static VInspector.VInspectorData;
+
 
 
 namespace VInspector
@@ -243,7 +245,7 @@ namespace VInspector
 
 
 
-        public void BookmarksGUI()
+        void BookmarksGUI()
         {
             void bookmark(Vector2 centerPosition, Bookmark bookmark)
             {
@@ -251,7 +253,7 @@ namespace VInspector
                 if (curEvent.isLayout) return;
 
 
-                var bookmarkRect = Rect.zero.SetSize(bookmark.width, bookmarksRect.height).SetMidPos(centerPosition);
+                var bookmarkRect = Rect.zero.SetSize(bookmarkWidth, bookmarksRect.height).SetMidPos(centerPosition);
 
 
                 void shadow()
@@ -259,7 +261,7 @@ namespace VInspector
                     if (!draggingBookmark) return;
                     if (draggedBookmark != bookmark) return;
 
-                    bookmarkRect.SetSizeFromMid(bookmark.width - 4, expandedBookmarkWidth - 4).DrawBlurred(Greyscale(0, .3f), 15);
+                    bookmarkRect.SetSizeFromMid(bookmarkWidth - 4, bookmarkWidth - 4).DrawBlurred(Greyscale(0, .3f), 15);
 
                 }
                 void background()
@@ -269,7 +271,7 @@ namespace VInspector
 
                     var backgroundColor = Greyscale(isDarkTheme ? .35f : .7f);
 
-                    var backgroundRect = bookmarkRect.SetSizeFromMid(bookmarkRect.width - 2, expandedBookmarkWidth - 2);
+                    var backgroundRect = bookmarkRect.SetSizeFromMid(bookmarkRect.width - 2, bookmarkWidth - 2);
 
                     backgroundRect.DrawRounded(backgroundColor, 4);
 
@@ -277,8 +279,6 @@ namespace VInspector
                 }
                 void icon()
                 {
-                    var iconRect = bookmarkRect.SetSizeFromMid(16);
-
                     Texture iconTexture = null;
                     float opacity = 1f;
 
@@ -360,7 +360,7 @@ namespace VInspector
 
                         SetGUIColor(Greyscale(1, opacity));
 
-                        GUI.DrawTexture(iconRect, iconTexture);
+                        GUI.DrawTexture(bookmarkRect.SetSizeFromMid(iconSize), iconTexture);
 
                         ResetGUIColor();
 
@@ -471,7 +471,7 @@ namespace VInspector
                     if ((curEvent.mousePosition - mouseDownPosiion).magnitude > 2) return;
                     if (!bookmark.isLoadable) return;
 
-                    Selection.activeObject = bookmark.obj;
+                    bookmark.obj.SelectInInspector(frameInHierarchy: false, frameInProject: false);
 
                     lastClickedBookmark = bookmark;
 
@@ -525,6 +525,9 @@ namespace VInspector
 
                     }
 
+
+                    EditorGUIUtility.PingObject(bookmark.obj);
+
                     frameSceneGO();
                     loadSceneAndSelect();
                     openPrefab();
@@ -546,15 +549,14 @@ namespace VInspector
 
             }
 
-            void normalBookmark(int i)
+            void normalBookmark(int i, float centerX)
             {
                 if (data.bookmarks[i] == droppedBookmark && animatingDroppedBookmark) return;
 
-                var centerX = GetBookmarkCenterX(i);
                 var centerY = bookmarksRect.height / 2;
 
 
-                var minX = centerX - data.bookmarks[i].width / 2;
+                var minX = centerX - bookmarkWidth / 2;
 
                 if (minX < bookmarksRect.x) return;
 
@@ -566,8 +568,21 @@ namespace VInspector
             }
             void normalBookmarks()
             {
+                var curCenterX = bookmarksRect.xMax - bookmarkWidth / 2;
+
                 for (int i = 0; i < data.bookmarks.Count; i++)
-                    normalBookmark(i);
+                {
+                    curCenterX -= gaps[i];
+
+                    if (!data.bookmarks[i].obj) continue;
+
+
+                    normalBookmark(i, curCenterX);
+
+
+                    curCenterX -= bookmarkWidth;
+
+                }
 
             }
             void draggedBookmark_()
@@ -602,37 +617,43 @@ namespace VInspector
 
         }
 
-        float GetBookmarkCenterX(int i, bool includeGaps = true)
-        {
-            return bookmarksRect.xMax
-                 - data.bookmarks[i].width / 2
-                 - data.bookmarks.Take(i).Sum(r => r.width)
-                 - (includeGaps ? gaps.Take(i + 1).Sum() : 0);
+        float bookmarkWidth => 24;
+        float iconSize => 16;
 
-        }
+        float lastBookmarkX;
+
+        static bool repaintNeededAfterUndoRedo;
+
+
+
         int GetBookmarkIndex(float mouseX)
         {
             var curBookmarkWidthSum = 0f;
 
             for (int i = 0; i < data.bookmarks.Count; i++)
             {
-                curBookmarkWidthSum += data.bookmarks[i].width;
+                if (!data.bookmarks[i].obj) continue;
+
+                curBookmarkWidthSum += bookmarkWidth;
 
                 if (bookmarksRect.xMax - curBookmarkWidthSum < mouseX + .5f)
                     return i;
             }
 
-            return data.bookmarks.Count;
+            return data.bookmarks.IndexOfLast(r => r.obj) + 1;
 
         }
 
-        public static float expandedBookmarkWidth = 24;
+        float GetBookmarkCenterX(int i, bool includeGaps = true)
+        {
+            return bookmarksRect.xMax
+                 - bookmarkWidth / 2
+                 - data.bookmarks.Take(i).Sum(r => r.obj ? bookmarkWidth : 0)
+                 - (includeGaps ? gaps.Take(i + 1).Sum() : 0);
 
-        public float lastBookmarkX;
+        }
 
-        public static bool repaintNeededAfterUndoRedo;
 
-        Material assetPreviewMaterial;
 
 
 
@@ -742,7 +763,7 @@ namespace VInspector
                 draggedBookmark = data.bookmarks[i];
                 draggedBookmarkHoldOffset = new Vector2(GetBookmarkCenterX(i) - mouseDownPosiion.x, bookmarksRect.center.y - mouseDownPosiion.y);
 
-                gaps[i] = draggedBookmark.width;
+                gaps[i] = bookmarkWidth;
 
 
                 data.RecordUndo();
@@ -765,7 +786,6 @@ namespace VInspector
                 accept();
 
                 data.Dirty();
-                data.Save();
 
             }
             void acceptFromInside()
@@ -793,7 +813,7 @@ namespace VInspector
 
                 data.bookmarks.AddAt(draggedBookmark, insertDraggedBookmarkAtIndex);
 
-                gaps[insertDraggedBookmarkAtIndex] -= draggedBookmark.width;
+                gaps[insertDraggedBookmarkAtIndex] -= bookmarkWidth;
                 gaps.AddAt(0, insertDraggedBookmarkAtIndex);
 
                 droppedBookmark = draggedBookmark;
@@ -842,7 +862,8 @@ namespace VInspector
 
                 DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
 
-                EditorGUIUtility.hotControl = EditorGUIUtility.GetControlID(FocusType.Passive);
+                if (draggingBookmarkFromInside) // otherwise it breaks vTabs dragndrop
+                    EditorGUIUtility.hotControl = EditorGUIUtility.GetControlID(FocusType.Passive);
 
 
 
@@ -892,7 +913,7 @@ namespace VInspector
 
                 for (int i = 0; i < gaps.Count; i++)
                     if (makeSpaceForDraggedBookmark && i == insertDraggedBookmarkAtIndex)
-                        gaps[i] = MathUtil.Lerp(gaps[i], draggedBookmark.width, lerpSpeed, editorDeltaTime);
+                        gaps[i] = MathUtil.Lerp(gaps[i], bookmarkWidth, lerpSpeed, editorDeltaTime);
                     else
                         gaps[i] = MathUtil.Lerp(gaps[i], 0, lerpSpeed, editorDeltaTime);
 

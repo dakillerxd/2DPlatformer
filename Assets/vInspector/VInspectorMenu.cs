@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-
+// using static VTools.VDebug;
 
 namespace VInspector
 {
@@ -152,7 +152,7 @@ namespace VInspector
 
 
 
-        [MenuItem(disablePlugin, false, 100001)] static void dadsadsdsdasadasdasdsadadsas() { pluginDisabled = !pluginDisabled; if (!pluginDisabled) EditorPrefsCached.SetBool("vInspector-pluginWasReenabled", true); attributesDisabled = pluginDisabled; }
+        [MenuItem(disablePlugin, false, 100001)] static void dadsadsdsdasadasdasdsadadsas() { pluginDisabled = !pluginDisabled; attributesDisabled = pluginDisabled; }
         [MenuItem(disablePlugin, true, 100001)] static bool dadsaddssdsdaasadsadadsdasadsas() { Menu.SetChecked(disablePlugin, pluginDisabled); return true; }
 
 

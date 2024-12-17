@@ -52,7 +52,11 @@ public class WaypointMovement : MonoBehaviour {
     }
     
     
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
+
+
+        
         MoveBetweenWaypoints();
     }
     
@@ -72,6 +76,7 @@ public class WaypointMovement : MonoBehaviour {
     {
         return enableMovement;
     }
+    
     
 
     [Button] private void ResetPosition()

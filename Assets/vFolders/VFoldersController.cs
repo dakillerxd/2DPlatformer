@@ -14,6 +14,7 @@ using UnityEditor.IMGUI.Controls;
 using Type = System.Type;
 using static VFolders.Libs.VUtils;
 using static VFolders.Libs.VGUI;
+// using static VTools.VDebug;
 using static VFolders.VFolders;
 using static VFolders.VFoldersData;
 using static VFolders.VFoldersCache;
@@ -75,9 +76,9 @@ namespace VFolders
 
             var lerpSpeed = 10;
 
-            var lerpedScrollPos = SmoothDamp(currentScrollPos, targetScrollPos, lerpSpeed, ref scrollPosDerivative, editorDeltaTime);
+            var lerpedScrollPos = MathUtil.SmoothDamp(currentScrollPos, targetScrollPos, lerpSpeed, ref scrollPosDerivative, editorDeltaTime);
 
-            SetScrollPos_withoutAnimation(lerpedScrollPos);
+            SetScrollPos(lerpedScrollPos);
 
             window.Repaint();
 
@@ -85,7 +86,7 @@ namespace VFolders
 
             if (lerpedScrollPos.DistanceTo(targetScrollPos) > .4f) return;
 
-            SetScrollPos_withoutAnimation(targetScrollPos);
+            SetScrollPos(targetScrollPos);
 
             animatingScroll = false;
 
@@ -110,7 +111,7 @@ namespace VFolders
 
             var lerpSpeed = 1.2f;
 
-            SmoothDamp(ref highlightAmount, 0, lerpSpeed, ref highlightDerivative, editorDeltaTime);
+            MathUtil.SmoothDamp(ref highlightAmount, 0, lerpSpeed, ref highlightDerivative, editorDeltaTime);
 
             window.Repaint();
 
@@ -204,9 +205,8 @@ namespace VFolders
 
         }
 
-        public void CollapseEverything()
+        public void CollapseAll()
         {
-
 
             var idsToCollapse_roots = expandedIds.Where(id => EditorUtility.InstanceIDToObject(id).GetPath() is string path &&
                                                                    path.HasParentPath() &&
@@ -223,14 +223,17 @@ namespace VFolders
             expandQueue_toCollapseAfterAnimation = idsToCollapse_children.ToList();
 
             expandQueue_toAnimate = idsToCollapse_roots.Select(id => new ExpandQueueEntry { id = id, expand = false })
-                                                            .OrderBy(row => GetRowIndex(row.id)).ToList();
+                                                       .OrderBy(row => GetRowIndex(row.id)).ToList();
+
+
+            StartScrollAnimation(targetScrollPos: 0);
 
 
             window.Repaint();
 
         }
 
-        public void CollapseEverythingExcept(TreeViewItem targetItem)
+        public void Isolate(TreeViewItem targetItem)
         {
 
             List<TreeViewItem> getParents(TreeViewItem item)
@@ -277,7 +280,7 @@ namespace VFolders
 
 
 
-        public void SetExpandedIds_withAnimation(List<int> targetExpandedIds)
+        public void StartExpandAnimation(List<int> targetExpandedIds)
         {
 
             var toExpand = targetExpandedIds.Except(expandedIds).ToHashSet();
@@ -360,11 +363,11 @@ namespace VFolders
                                 .OrderBy(r => GetRowIndex(r.id)).ToList();
 
         }
-        public void SetExpandedIds_withoutAnimation(List<int> targetExpandedIds)
+
+        public void SetExpandedIds(List<int> targetExpandedIds)
         {
             treeViewControllerData.InvokeMethod("SetExpandedIDs", targetExpandedIds.ToArray());
         }
-
         public void SetExpanded_withAnimation(int instanceId, bool expanded)
         {
             treeViewController.InvokeMethod("ChangeFoldingForSingleItem", instanceId, expanded);
@@ -376,7 +379,7 @@ namespace VFolders
 
 
 
-        public void SetScrollPos_withAnimation(float targetScrollPos)
+        public void StartScrollAnimation(float targetScrollPos)
         {
             if (targetScrollPos.DistanceTo(currentScrollPos) < .05f) return;
 
@@ -385,10 +388,12 @@ namespace VFolders
             animatingScroll = true;
 
         }
-        public void SetScrollPos_withoutAnimation(float targetScrollPos)
+
+        public void SetScrollPos(float targetScrollPos)
         {
             treeViewController.GetPropertyValue<TreeViewState>("state").scrollPos = Vector2.up * targetScrollPos;
         }
+
 
 
 
@@ -447,7 +452,7 @@ namespace VFolders
             if (targetScrollPos < 25)
                 targetScrollPos = 0;
 
-            SetScrollPos_withAnimation(targetScrollPos);
+            StartScrollAnimation(targetScrollPos);
 
 
 

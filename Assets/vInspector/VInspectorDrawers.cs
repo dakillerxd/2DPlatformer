@@ -13,7 +13,7 @@ using Attribute = System.Attribute;
 using static VInspector.VInspectorState;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-
+// using static VTools.VDebug;
 
 
 namespace VInspector
@@ -73,7 +73,7 @@ namespace VInspector
                 }
                 void count()
                 {
-                    kvpsProp.arraySize = EditorGUI.DelayedIntField(headerRect.SetWidthFromRight(48 + EditorGUI.indentLevel * 15), kvpsProp.arraySize);
+                    kvpsProp_byProp[prop].arraySize = EditorGUI.DelayedIntField(headerRect.SetWidthFromRight(48 + EditorGUI.indentLevel * 15), kvpsProp_byProp[prop].arraySize);
                 }
                 void repeatedKeysWarning()
                 {
@@ -83,10 +83,10 @@ namespace VInspector
                     var hasRepeatedKeys = false;
                     var hasNullKeys = false;
 
-                    for (int i = 0; i < kvpsProp.arraySize; i++)
+                    for (int i = 0; i < kvpsProp_byProp[prop].arraySize; i++)
                     {
-                        hasRepeatedKeys |= kvpsProp.GetArrayElementAtIndex(i).FindPropertyRelative("isKeyRepeated").boolValue;
-                        hasNullKeys |= kvpsProp.GetArrayElementAtIndex(i).FindPropertyRelative("isKeyNull").boolValue;
+                        hasRepeatedKeys |= kvpsProp_byProp[prop].GetArrayElementAtIndex(i).FindPropertyRelative("isKeyRepeated").boolValue;
+                        hasNullKeys |= kvpsProp_byProp[prop].GetArrayElementAtIndex(i).FindPropertyRelative("isKeyNull").boolValue;
                     }
 
                     if (!hasRepeatedKeys && !hasNullKeys) return;
@@ -125,7 +125,7 @@ namespace VInspector
 
                 SetupList(prop);
 
-                list.DoList(indentedRect.AddHeightFromBottom(-EditorGUIUtility.singleLineHeight - 3));
+                lists_byProp[prop].DoList(indentedRect.AddHeightFromBottom(-EditorGUIUtility.singleLineHeight - 3));
             }
 
 
@@ -145,15 +145,15 @@ namespace VInspector
             if (prop.isExpanded)
             {
                 SetupList(prop);
-                height += list.GetHeight() + 3;
+                height += lists_byProp[prop].GetHeight() + 3;
             }
 
             return height;
         }
 
-        float GetListElementHeight(int index)
+        float GetListElementHeight(int index, SerializedProperty prop)
         {
-            var kvpProp = kvpsProp.GetArrayElementAtIndex(index);
+            var kvpProp = kvpsProp_byProp[prop].GetArrayElementAtIndex(index);
             var keyProp = kvpProp.FindPropertyRelative("Key");
             var valueProp = kvpProp.FindPropertyRelative("Value");
 
@@ -173,13 +173,13 @@ namespace VInspector
 
         }
 
-        void DrawListElement(Rect rect, int index, bool isActive, bool isFocused)
+        void DrawListElement(Rect rect, int index, bool isActive, bool isFocused, SerializedProperty prop)
         {
             Rect keyRect;
             Rect valueRect;
             Rect dividerRect;
 
-            var kvpProp = kvpsProp.GetArrayElementAtIndex(index);
+            var kvpProp = kvpsProp_byProp[prop].GetArrayElementAtIndex(index);
             var keyProp = kvpProp.FindPropertyRelative("Key");
             var valueProp = kvpProp.FindPropertyRelative("Value");
 
@@ -296,32 +296,37 @@ namespace VInspector
 
         public void SetupList(SerializedProperty prop)
         {
-            if (list != null) return;
+            if (lists_byProp.ContainsKey(prop)) return;
 
             SetupProps(prop);
 
-            this.list = new ReorderableList(kvpsProp.serializedObject, kvpsProp, true, false, true, true);
-            this.list.drawElementCallback = DrawListElement;
-            this.list.elementHeightCallback = GetListElementHeight;
-            this.list.drawNoneElementCallback = DrawDictionaryIsEmpty;
+            lists_byProp[prop] = new ReorderableList(kvpsProp_byProp[prop].serializedObject, kvpsProp_byProp[prop], true, false, true, true);
+            lists_byProp[prop].drawElementCallback = (q, w, e, r) => DrawListElement(q, w, e, r, prop);
+            lists_byProp[prop].elementHeightCallback = (q) => GetListElementHeight(q, prop);
+            lists_byProp[prop].drawNoneElementCallback = DrawDictionaryIsEmpty;
 
         }
-        ReorderableList list;
+
+        Dictionary<SerializedProperty, ReorderableList> lists_byProp = new();
+        // ReorderableList list;
+
         bool isDividerDragged;
 
 
         public void SetupProps(SerializedProperty prop)
         {
-            if (this.prop != null) return;
+            if (kvpsProp_byProp.ContainsKey(prop)) return;
 
-            this.prop = prop;
-            this.kvpsProp = prop.FindPropertyRelative("serializedKvps");
+            kvpsProp_byProp[prop] = prop.FindPropertyRelative("serializedKvps");
+
             this.dividerPosProp = prop.FindPropertyRelative("dividerPos");
 
 
         }
-        SerializedProperty prop;
-        SerializedProperty kvpsProp;
+
+        Dictionary<SerializedProperty, SerializedProperty> kvpsProp_byProp = new();
+        // SerializedProperty kvpsProp;
+
         SerializedProperty dividerPosProp;
 
     }

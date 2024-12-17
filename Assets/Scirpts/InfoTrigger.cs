@@ -21,26 +21,23 @@ public class InfoTrigger : MonoBehaviour
     [EndIf]
 
     [Header("Text Settings")]
-    [SerializeField] private TextType textType = TextType.None;
-    [EnableIf(nameof(IsCustomText))]
-    [SerializeField] private string customText;
-    [EndIf]
+    [SerializeField] private TextType textType = TextType.Custom;
     [EnableIf(nameof(IsInfoText))]
     [SerializeField] private string infoId;
     [EndIf]
+    
 
-    private bool IsCustomText => textType == TextType.Custom;
+    [Header("References")]
+    [SerializeField] private SpriteRenderer triggerSprite;
+    [SerializeField] private TextMeshPro infoText;
+    
+    
     private bool IsInfoText => textType == TextType.Info;
-
     private readonly Color _invisibleColor = new Color(1f, 1f, 1f, 0f);
     private Color _startColor;
     private Coroutine _fadeCoroutine;
     private bool _isFirstEntry = true;
     private bool _isPlayerInTrigger;
-
-    [Header("References")]
-    [SerializeField] private SpriteRenderer triggerSprite;
-    [SerializeField] private TextMeshPro infoText;
 
     private void Start()
     {
@@ -49,35 +46,26 @@ public class InfoTrigger : MonoBehaviour
         _startColor = infoText.color;
         infoText.color = _invisibleColor;
         
-        SetupText();
         _isPlayerInTrigger = false;
+
+        SetupText();
     }
     
     private void SetupText()
     {
-        if (!infoText) return;
+        if (!infoText || !IsInfoText) return;
         
-        switch (textType)
+        infoText.text = GameManager.Instance?.GetInfoText(infoId);
+    }
+    
+    
+    #if UNITY_EDITOR
+        private void OnValidate()
         {
-            case TextType.Custom:
-                infoText.text = customText;
-                break;
-            case TextType.Info:
-                infoText.text = GameManager.Instance?.GetInfoText(infoId);
-                
-                if (GameManager.Instance == null)
-                {
-                    var infoStorage = FindFirstObjectByType<GameManager>();
-                    infoText.text = infoStorage.GetInfoText(infoId);
-                }
-                break;
-        }
-    }
-
-    private void OnValidate()
-    {
-        SetupText();
-    }
+            if (!IsInfoText) return;
+            infoText.text = FindFirstObjectByType<GameManager>().GetInfoText(infoId);
+        }     
+    #endif
 
     private void OnTriggerEnter2D(Collider2D other)
     {

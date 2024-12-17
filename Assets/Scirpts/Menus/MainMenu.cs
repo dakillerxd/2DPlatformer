@@ -32,9 +32,10 @@ public class MainMenu : MonoBehaviour
 
     private void Update()
     {
-        if (InputManager.CancelWasPressed)
+        if (InputManager.CancelWasPressed && CameraController.Instance?.target != mainMenuPosition.transform) 
         {
             CameraController.Instance?.SetTarget(mainMenuPosition.transform);
+            SoundManager.Instance?.PlaySoundFX("CameraWhoosh");
         }
     }
 

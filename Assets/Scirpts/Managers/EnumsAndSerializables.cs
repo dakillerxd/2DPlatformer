@@ -48,7 +48,6 @@ public enum TeleportType
 
 public enum TextType
 {
-    None,
     Custom,
     Info
 }

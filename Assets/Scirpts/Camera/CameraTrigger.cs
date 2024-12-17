@@ -15,11 +15,6 @@ public class CameraTrigger : MonoBehaviour
     [EndIf] 
     
     [Header("Movement")] 
-    [SerializeField] public bool limitCameraToBoundary;
-    [EnableIf(nameof(limitCameraToBoundary))]
-    [SerializeField] public bool resetBoundaryOnExit = true;
-    [EndIf]
-    
     [SerializeField] public bool setCameraStateOnEnter;
     [EnableIf(nameof(setCameraStateOnEnter))]
     [SerializeField] public CameraState cameraStateOnEnter;
@@ -66,20 +61,7 @@ public class CameraTrigger : MonoBehaviour
         CameraController.Instance.RemoveActiveTrigger(this);
     }
 
-    public Vector4 GetBoundaries()
-    {
-        if (useColliderAsBoundary)
-        {
-            return new Vector4(
-                boxCollider2D.bounds.min.x,
-                boxCollider2D.bounds.max.x,
-                boxCollider2D.bounds.min.y,
-                boxCollider2D.bounds.max.y
-            );
-        }
-    
-        return new Vector4(boundaryMinX, boundaryMaxX, boundaryMinY, boundaryMaxY);
-    }
+
 
 #region Debug
 #if UNITY_EDITOR
@@ -220,16 +202,9 @@ public class CameraTrigger : MonoBehaviour
         }
 
         // Draw Boundary information
-        if (limitCameraToBoundary)
-        {
-            string boundaryInfo = useColliderAsBoundary ? "Using Collider Bounds" : "Custom Bounds";
-            if (resetBoundaryOnExit)
-            {
-                boundaryInfo += " (Reset on Exit)";
-            }
-            DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount), 
-                $"Boundary: {boundaryInfo}", style);
-        }
+        string boundaryInfo = useColliderAsBoundary ? "Using Collider Bounds" : "Custom Bounds";
+        DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount), 
+            $"{boundaryInfo}", style);
     }
 
     private void DrawTriggerLabel(Vector3 position, string text, GUIStyle style)

@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     private Camera _camera;
     [EndTab]
     
-    private Dictionary<string, string> infoTexts = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> _infoTexts = new Dictionary<string, string>();
     
     private void Awake() {
         
@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        SetUpTutorialTexts();
         
     }
     
@@ -70,10 +71,13 @@ public class GameManager : MonoBehaviour
         SceneManager.activeSceneChanged -= OnActiveSceneChanged;
     }
 
-    private void OnValidate()
-    {
-        SetUpTutorialTexts();
-    }
+    #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            SetUpTutorialTexts();
+        } 
+    #endif
+
 
     private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
@@ -371,23 +375,24 @@ public class GameManager : MonoBehaviour
 
     private void SetUpTutorialTexts()
     {
-        infoTexts.Clear();
+        _infoTexts.Clear();
         
         AddInfoText("move", "Use <sprite=46> / <sprite=40><sprite=104> to move"); // Use <sprite=46> / <sprite=40><sprite=104> to move
         AddInfoText("jump", "Press <sprite=66> / <sprite=210> to jump"); // Press <sprite=66> / <sprite=210> to jump
-        AddInfoText("doubleJump", "press <sprite=66> / <sprite=210> mid-air  \n \nto double jump");
+        AddInfoText("fastDrop", "press <sprite=44> / <sprite=206> \n to fall faster");
+        AddInfoText("doubleJump", "press jump mid-air  \n to double jump"); // press <sprite=66> / <sprite=210> mid-air  \n \nto double jump
         AddInfoText("fastSlide", "press <sprite=44> / <sprite=206> to slide faster");
         AddInfoText("dropDown", "press down + jump to drop");
     }
 
     private void AddInfoText(string id, string text)
     {
-        infoTexts[id] = text;
+        _infoTexts[id] = text;
     }
 
     public string GetInfoText(string id)
     {
-        return infoTexts.GetValueOrDefault(id, "Text not found");
+        return _infoTexts.GetValueOrDefault(id, "Text not found");
     }
     
 

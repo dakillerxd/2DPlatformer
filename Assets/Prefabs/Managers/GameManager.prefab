@@ -50,9 +50,9 @@ MonoBehaviour:
   gameDifficulty: 0
   funnyMode: 0
   debugMode: 0
-  quitGameKey: 282
+  quitGameKey: 0
   restartSceneKey: 283
-  toggleDebugMode: 284
+  toggleDebugMode: 282
   toggleFunnyMode: 0
   finishGame: 286
   deleteSave: 287

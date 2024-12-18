@@ -59,6 +59,13 @@ public class CameraController : MonoBehaviour
     private Camera _camera;
     private float _cameraHeight;
     private float _cameraWidth;
+    
+    
+    [Header("Debug")]
+    private Vector3 _cachedPosition;
+    private StringBuilder _debugText = new StringBuilder(256);
+    private float _debugUpdateTimer;
+    private const float DEBUG_UPDATE_INTERVAL = 0.1f;
 
     private void Awake() {
         if (Instance != null && Instance != this) {
@@ -123,41 +130,25 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private void HandleActiveTriggers()
-    {
-        // Reset offset and zoom at the start
+    private void HandleActiveTriggers() {
+        // Reset values
         _targetTriggerOffset = Vector3.zero;
         _triggerZoomOffset = 0f;
 
         if (_activeTriggers.Count == 0) return;
 
-        // Get the most recent trigger for state settings
+        // Get latest trigger for state
         CameraTrigger currentTrigger = _activeTriggers[^1];
-
-        // Handle camera state from most recent trigger
-        if (currentTrigger.setCameraStateOnEnter)
-        {
+        if (currentTrigger.setCameraStateOnEnter) {
             cameraState = currentTrigger.cameraStateOnEnter;
         }
 
-        // Only accumulate zoom offsets from triggers that have setCameraZoom enabled
-        foreach (var trigger in _activeTriggers)
+        // Single loop instead of multiple loops
+        foreach (CameraTrigger trigger in _activeTriggers)
         {
-            if (trigger.setCameraZoom)
-            {
-                _triggerZoomOffset += trigger.zoomOffset;
-            }
+            if (trigger.setCameraZoom) _triggerZoomOffset += trigger.zoomOffset;
+            if (trigger.setCameraOffset) _targetTriggerOffset += trigger.offset;
         }
-
-        // Only accumulate offsets from triggers that have setCameraOffset enabled
-        foreach (var trigger in _activeTriggers)
-        {
-            if (trigger.setCameraOffset)  // Only add offset if setCameraOffset is true
-            {
-                _targetTriggerOffset += trigger.offset;
-            }
-        }
-        
     }
     
 
@@ -171,7 +162,7 @@ public class CameraController : MonoBehaviour
         }
     #endif
 
-#endregion
+#endregion Triggers
 
 #region States
 
@@ -179,7 +170,7 @@ public class CameraController : MonoBehaviour
         cameraState = newState;
     }
     
-#endregion
+#endregion States
     
 #region Target
 
@@ -245,7 +236,8 @@ public class CameraController : MonoBehaviour
                 break;
         }
         
-        transform.position = new Vector3(smoothedX, smoothedY, transform.position.z);
+        _cachedPosition.Set(smoothedX, smoothedY, transform.position.z);
+        transform.position = _cachedPosition;
     }
         
     private Vector3 CalculateTargetPosition() {
@@ -279,7 +271,7 @@ public class CameraController : MonoBehaviour
     }
 
 
-#endregion
+#endregion Offset
 
 #region Zoom
 
@@ -307,7 +299,6 @@ public class CameraController : MonoBehaviour
 
 #endregion
 
-    
 #region Shake
 
     private IEnumerator Shake(float duration, float magnitude, float xShakeRange, float yShakeRange)
@@ -339,93 +330,78 @@ public class CameraController : MonoBehaviour
         _isShaking = false;
         _shakeOffset = Vector3.zero;
     }
-#endregion
+#endregion Shake
     
 #region Debugging
-
-    private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
+    
     public void UpdateDebugText(TextMeshProUGUI textObject) {
-        _debugStringBuilder.Clear();
+        if (!textObject || !textObject.isActiveAndEnabled) return;
         
-        // Core Stats Section
-        AppendHeader("Camera");
-        AppendStat("State", cameraState.ToString());
-        AppendStat("Target", target ? target.name : "None");
-        AppendStat("Position", $"X: {transform.position.x:F1} Y: {transform.position.y:F1}");
-        AppendStat("Zoom", $"Current: {_camera.orthographicSize:F1} Base: {defaultZoom:F1}");
-        
-        // Offset Section
-        AppendHeader("Offset");
-        Vector2 targetOffset = target ? _targetDynamicOffset : Vector2.zero;
-        AppendStat("Dynamic", $"X: {targetOffset.x:F1} Y: {targetOffset.y:F1}");
-        AppendStat("Trigger", $"X: {_targetTriggerOffset.x:F1} Y: {_targetTriggerOffset.y:F1}");
-        AppendStat("Total", $"X: {(targetOffset.x + _targetTriggerOffset.x):F1} Y: {(targetOffset.y + _targetTriggerOffset.y):F1}");
-        
-        // Zoom Section
-        AppendHeader("Zoom");
-        AppendStatGroup(new Dictionary<string, (float value, float? max)> {
-            { "Dynamic", (_targetDynamicZoom, null) },
-            { "Trigger", (_triggerZoomOffset, null) },
-            { "Total", (_camera.orthographicSize, maxZoom) }
-        });
-        
-
-        
-        // Effects Section
-        AppendHeader("Effects");
-        AppendStatGroup(new Dictionary<string, bool> {
-            { "Shaking", _isShaking }
-        });
-        if (_isShaking) {
-            AppendStat("Shake Offset", $"X: {_shakeOffset.x:F1} Y: {_shakeOffset.y:F1}");
-        }
-        
-        // Active Triggers Section
-        if (_activeTriggers.Count > 0) {
-            AppendHeader($"Active Triggers ({_activeTriggers.Count})");
-            for (int i = 0; i < _activeTriggers.Count; i++) {
-                var trigger = _activeTriggers[i];
-                var properties = new List<string>();
+        _debugUpdateTimer -= Time.deltaTime;
+        if (_debugUpdateTimer <= 0) {
+            _debugUpdateTimer = DEBUG_UPDATE_INTERVAL;
+            
+            _debugText.Clear()
+                .AppendLine("\n<color=#00FF00>Camera</color>")
+                .AppendLine($"State: {cameraState}")
+                .AppendLine($"Target: {(target ? target.name : "None")}")
+                .AppendLine($"Position: X: {transform.position.x:F1} Y: {transform.position.y:F1}")
+                .AppendLine($"Zoom: Current: {_camera.orthographicSize:F1} Base: {defaultZoom:F1}")
                 
-                if (trigger.setCameraStateOnEnter) 
-                    properties.Add(trigger.cameraStateOnEnter.ToString());
-                if (trigger.setCameraZoom) 
-                    properties.Add($"Zoom: {trigger.zoomOffset:+0.0;-0.0;0}");
-                if (trigger.setCameraOffset) 
-                    properties.Add($"Offset: ({trigger.offset.x:F1}, {trigger.offset.y:F1})");
+                .AppendLine("\n<color=#00FF00>Offset</color>")
+                .AppendLine($"Dynamic: X: {_targetDynamicOffset.x:F1} Y: {_targetDynamicOffset.y:F1}")
+                .AppendLine($"Trigger: X: {_targetTriggerOffset.x:F1} Y: {_targetTriggerOffset.y:F1}")
+                .AppendLine($"Total: X: {(_targetDynamicOffset.x + _targetTriggerOffset.x):F1} Y: {(_targetDynamicOffset.y + _targetTriggerOffset.y):F1}")
+                
+                .AppendLine("\n<color=#00FF00>Zoom</color>")
+                .AppendLine($"Dynamic: {_targetDynamicZoom:F1}")
+                .AppendLine($"Trigger: {_triggerZoomOffset:F1}")
+                .AppendLine($"Total: {_camera.orthographicSize:F1}/{maxZoom:F1}");
+
+
+
+            // Add Triggers section with detailed info
+            if (_activeTriggers.Count > 0) {
+                _debugText.AppendLine($"\n<color=#00FF00>Active Triggers ({_activeTriggers.Count})</color>");
+                
+                for (int i = 0; i < _activeTriggers.Count; i++) {
+                    var trigger = _activeTriggers[i];
+                    _debugText.Append($"{i + 1}. Trigger [");
                     
-                string propertyString = properties.Count > 0 ? $" [{string.Join(", ", properties)}]" : "";
-                _debugStringBuilder.AppendLine($"{i + 1}. Trigger{propertyString}");
+                    bool needsComma = false;
+                    
+                    if (trigger.setCameraStateOnEnter) {
+                        _debugText.Append(trigger.cameraStateOnEnter);
+                        needsComma = true;
+                    }
+                    
+                    if (trigger.setCameraZoom) {
+                        if (needsComma) _debugText.Append(", ");
+                        _debugText.Append($"Zoom: {trigger.zoomOffset:+0.0;-0.0;0}");
+                        needsComma = true;
+                    }
+                    
+                    if (trigger.setCameraOffset) {
+                        if (needsComma) _debugText.Append(", ");
+                        _debugText.Append($"Offset: ({trigger.offset.x:F1}, {trigger.offset.y:F1})");
+                    }
+                    
+                    _debugText.AppendLine("]");
+                }
             }
-        }
-
-        textObject.text = _debugStringBuilder.ToString();
-    }
-
-    private void AppendHeader(string header) {
-        _debugStringBuilder.AppendLine($"\n<color=#00FF00>{header}</color>");
-    }
-
-    private void AppendStat(string label, string value) {
-        _debugStringBuilder.AppendLine($"{label}: {value}");
-    }
-
-    private void AppendStatGroup(Dictionary<string, bool> states) {
-        foreach (var (label, state) in states) {
-            if (state) {
-                _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}");
-            } else {
-                _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}");
+            
+            // Add Effects section if shaking
+            if (_isShaking) {
+                _debugText.AppendLine("\n<color=#00FF00>Effects</color>")
+                    .AppendLine($"<color=#00FF00>[+]</color> Shaking")
+                    .AppendLine($"Shake Offset: X: {_shakeOffset.x:F1} Y: {_shakeOffset.y:F1}");
             }
+                
+            textObject.text = _debugText.ToString();
         }
     }
 
-    private void AppendStatGroup(Dictionary<string, (float value, float? max)> states) {
-        foreach (var (label, info) in states) {
-            string maxText = info.max.HasValue ? $"/{info.max:F1}" : "";
-            _debugStringBuilder.AppendLine($"{label}: {info.value:F1}{maxText}");
-        }
-    }
+
     
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected() 
@@ -437,42 +413,33 @@ public class CameraController : MonoBehaviour
             float offsetMaxX = target.position.x + maxHorizontalOffset;
             float offsetMinY = target.position.y + minVerticalOffset;
             float offsetMaxY = target.position.y + maxVerticalOffset;
-
-            bool drawHorizontalOffsets = true;
-            bool drawVerticalOffsets = true;
             
 
             // Draw vertical lines for horizontal offset boundaries
-            if (drawHorizontalOffsets)
-            {
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMinY, 0),
-                    new Vector3(offsetMinX, offsetMaxY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(offsetMaxX, offsetMaxY, 0),
-                    new Vector3(offsetMaxX, offsetMinY, 0),
-                    Color.blue);
-            }
+            Debug.DrawLine(
+                new Vector3(offsetMinX, offsetMinY, 0),
+                new Vector3(offsetMinX, offsetMaxY, 0),
+                Color.blue);
+            Debug.DrawLine(
+                new Vector3(offsetMaxX, offsetMaxY, 0),
+                new Vector3(offsetMaxX, offsetMinY, 0),
+                Color.blue);
 
             // Draw horizontal lines for vertical offset boundaries
-            if (drawVerticalOffsets)
-            {
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMinY, 0),
-                    new Vector3(offsetMaxX, offsetMinY, 0),
-                    Color.blue);
-                Debug.DrawLine(
-                    new Vector3(offsetMinX, offsetMaxY, 0),
-                    new Vector3(offsetMaxX, offsetMaxY, 0),
-                    Color.blue);
-            }
+            Debug.DrawLine(
+                new Vector3(offsetMinX, offsetMinY, 0),
+                new Vector3(offsetMaxX, offsetMinY, 0),
+                Color.blue);
+            Debug.DrawLine(
+                new Vector3(offsetMinX, offsetMaxY, 0),
+                new Vector3(offsetMaxX, offsetMaxY, 0),
+                Color.blue);
         }
         
     }
     
 #endif
-#endregion
+#endregion Debugging
 
 
 }

@@ -303,7 +303,7 @@ MonoBehaviour:
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 44
-    m_Scale: 1.5
+    m_Scale: 1.3
     m_Name: Keyboard&Mouse_98
   - m_ElementType: 2
     m_Unicode: 65534
@@ -313,7 +313,7 @@ MonoBehaviour:
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 46
-    m_Scale: 1.5
+    m_Scale: 1.3
     m_Name: Keyboard&Mouse_105
   - m_ElementType: 2
     m_Unicode: 65534
@@ -413,7 +413,7 @@ MonoBehaviour:
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 66
-    m_Scale: 1.5
+    m_Scale: 1.3
     m_Name: Keyboard&Mouse_134
   - m_ElementType: 2
     m_Unicode: 65534
@@ -1133,7 +1133,7 @@ MonoBehaviour:
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 210
-    m_Scale: 1.5
+    m_Scale: 1
     m_Name: Keyboard&Mouse_292
   - m_ElementType: 2
     m_Unicode: 65534
@@ -4651,7 +4651,7 @@ MonoBehaviour:
       m_Width: 50
       m_Height: 30
       m_HorizontalBearingX: 0
-      m_HorizontalBearingY: 23.3
+      m_HorizontalBearingY: 27.7
       m_HorizontalAdvance: 55
     m_GlyphRect:
       m_X: 317

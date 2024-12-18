@@ -371,14 +371,14 @@ public class GameManager : MonoBehaviour
     
     #endregion Collectibles
 
-    #region Tutorial Text
+    #region Tutorial Text // -----------------------------------------------
 
     private void SetUpTutorialTexts()
     {
         _infoTexts.Clear();
         
         AddInfoText("move", "Use <sprite=46> / <sprite=40><sprite=104> to move"); // Use <sprite=46> / <sprite=40><sprite=104> to move
-        AddInfoText("jump", "Press <sprite=66> / <sprite=210> to jump"); // Press <sprite=66> / <sprite=210> to jump
+        AddInfoText("jump", "Press <sprite=66> / <sprite=232> / <sprite=210> to jump"); // Press <sprite=66> / <sprite=210> to jump
         AddInfoText("fastDrop", "press <sprite=44> / <sprite=206> \n to fall faster");
         AddInfoText("doubleJump", "press jump mid-air  \n to double jump"); // press <sprite=66> / <sprite=210> mid-air  \n \nto double jump
         AddInfoText("fastSlide", "press <sprite=44> / <sprite=206> to slide faster");

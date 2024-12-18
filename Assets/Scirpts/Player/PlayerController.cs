@@ -42,6 +42,10 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float movingRigidbodyVelocityDecayRate = 4f; // 0 Keep momentum
     private float _moveSpeed;
     private bool _wasLastRunningState;
+    private Vector2 _cachedVelocity;
+    private Vector2 _cachedPosition;
+    private Vector3 _cachedVector3;
+
     
     [Header("Jump")]
     [SerializeField] private float jumpForce = 5f;
@@ -70,7 +74,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] [Range(0, 3f)] private float ledgeCheckHorizontalDistance = 0.5f;
     [SerializeField] [Range(0, 3f)] private float ledgeCheckVerticalDistance = 2f;
     [SerializeField] [Range(0, 3f)] private float groundCheckVerticalDistance = 2f;
-    private bool _isTouchingWall;
+    private LayerMask _combinedGroundMask;
     private bool _isTouchingWallOnRight;
     private bool _isTouchingWallOnLeft;
     private bool _onGroundObject;
@@ -78,6 +82,7 @@ public class PlayerController : MonoBehaviour {
     private SoftObject _softObject;
     private Rigidbody2D _movingRigidbody;
     private float _movingRigidbodyLastVelocityX;
+    private Vector2 _tempCheckSize;
 
     
     [Header("Climb Steps")]
@@ -116,6 +121,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private bool wallJumpResetsJumps;
     [SerializeField] private float wallJumpVerticalForce = 5f;
     [SerializeField] private float wallJumpHorizontalForce = 4f;
+    private int _wallJumpCombo;
 
     [Header("Dash")]
     [SerializeField] public bool dashAbility = true;
@@ -198,11 +204,7 @@ public class PlayerController : MonoBehaviour {
     private bool _dashRequested;
     private bool _runInput;
     private bool _dropDownInput;
-    
-    [Header("Other")] 
-    private string _logText;
     [EndTab]
-    
     
     [Tab("Camera")] // ----------------------------------------------------------------------
     [Header("Offset")]
@@ -220,6 +222,15 @@ public class PlayerController : MonoBehaviour {
     [EndTab]
     
     
+    
+    [Header("Debug")]  // ---------------------------------------------------------------------
+    private string _logText;
+    private StringBuilder _debugText = new StringBuilder(256);
+    private float _debugUpdateTimer;
+    private const float DEBUG_UPDATE_INTERVAL = 0.1f;
+    
+    
+    
     private void Awake() {
 
         if (Instance != null && Instance != this) 
@@ -227,7 +238,9 @@ public class PlayerController : MonoBehaviour {
             Destroy(gameObject);
             return;
         }
+        
         Instance = this;
+        _combinedGroundMask = groundLayer | platformLayer;
     }
 
     private void Start()
@@ -279,27 +292,33 @@ public class PlayerController : MonoBehaviour {
     
     
     
-    private  void HandleMovement() {
-        
-        // Set variables
+    private void HandleMovement() {
+
         float targetMovingRigidBodyVelocity = CalculateMovingRigidBodyMomentum();
         float baseMoveSpeed = rigidBody.linearVelocity.x - targetMovingRigidBodyVelocity;
-        
-        // Acceleration and friction
+    
+
         _moveSpeed = Mathf.Lerp(baseMoveSpeed, CalculateTargetMoveSpeed(), CalculateAcceleration() * Time.fixedDeltaTime);
-        if (_horizontalInput == 0) { _moveSpeed = Mathf.Lerp(_moveSpeed, 0, CalculateFriction() * Time.fixedDeltaTime); }
-        
-        // Move
-        rigidBody.linearVelocityX = _moveSpeed + targetMovingRigidBodyVelocity;
+        if (_horizontalInput == 0) { 
+            _moveSpeed = Mathf.Lerp(_moveSpeed, 0, CalculateFriction() * Time.fixedDeltaTime); 
+        }
+    
+        // Apply movement using cached vector
+        _cachedVelocity.Set(_moveSpeed + targetMovingRigidBodyVelocity, rigidBody.linearVelocity.y);
+        rigidBody.linearVelocity = _cachedVelocity;
+    
+        // Update states
         isMoving = Mathf.Abs(_moveSpeed) > movementThreshold;
-        
-        
-        // Handle run
         isRunning = isGrounded && Mathf.Abs(_moveSpeed) > runningThreshold;
-        if (isRunning) { wasRunning = true; }
-        if (Mathf.Abs(_moveSpeed) < runningThreshold) { wasRunning = false; }
-        
-        
+    
+        if (isRunning) { 
+            wasRunning = true;
+        }
+        if (Mathf.Abs(_moveSpeed) < runningThreshold) { 
+            wasRunning = false; 
+        }
+    
+        // Handle running state changes
         if (isRunning != _wasLastRunningState) {
             if (isRunning) { 
                 VFXManager.Instance?.ToggleMotionBlur(true);
@@ -316,7 +335,7 @@ public class PlayerController : MonoBehaviour {
                 VFXManager.Instance?.StopVfxEffect(peakMoveSpeedVfx, false);
                 PlayAnimationTrigger("StopRunning");
             }
-            
+        
             _wasLastRunningState = isRunning;
         }
     }
@@ -362,21 +381,18 @@ public class PlayerController : MonoBehaviour {
         
     }
     
-    private float CalculateMovingRigidBodyMomentum()
-    {
-        if (!_movingRigidbody) { return 0f; } // If there is no ground object return
-        if (_onGroundObject) { return _movingRigidbody.linearVelocityX; } // If on the ground object just get his velocity
-        
-        
-        // If we're very close to 0, just return 0 to prevent tiny floating point values
+    private float CalculateMovingRigidBodyMomentum() {
+        if (!_movingRigidbody) return 0f;
+        if (_onGroundObject) return _movingRigidbody.linearVelocityX;
+    
         if (Mathf.Abs(_movingRigidbodyLastVelocityX) < 0.01f) {
             _movingRigidbodyLastVelocityX = 0;
             return 0f;
         }
-        
-        float targetMovingRigidBodyVelocity = Mathf.Lerp(_movingRigidbodyLastVelocityX, 0f, movingRigidbodyVelocityDecayRate * Time.fixedDeltaTime);
-        _movingRigidbodyLastVelocityX = targetMovingRigidBodyVelocity;
-        return targetMovingRigidBodyVelocity ;
+    
+        float targetVelocity = Mathf.Lerp(_movingRigidbodyLastVelocityX, 0f, movingRigidbodyVelocityDecayRate * Time.fixedDeltaTime);
+        _movingRigidbodyLastVelocityX = targetVelocity;
+        return targetVelocity;
     }
     
     
@@ -676,6 +692,10 @@ public class PlayerController : MonoBehaviour {
     
     private void HandleWallJump () {
 
+        if (isGrounded) {
+            _wallJumpCombo = 0;
+        }
+        
         if (!wallJumpAbility || isGrounded) return;
 
         if (_jumpInputDownRequested) {
@@ -692,8 +712,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
         
-        
-        if (!wallJumpResetsJumps) return;
+        if (!wallJumpResetsJumps ) return;
         if  (_isTouchingWallOnLeft || _isTouchingWallOnRight) { // Reset jumps
             _remainingAirJumps = maxAirJumps;
             _variableJumpHeldDuration = 0;
@@ -719,7 +738,10 @@ public class PlayerController : MonoBehaviour {
         _jumpInputDownRequested = false;
         _variableJumpHeldDuration = 0;
         isJumping = true;
-        TurnStunLocked();
+        
+        
+        if (_wallJumpCombo > 0) TurnStunLocked(0.1f * _wallJumpCombo); // Stop the player from wall climbing
+        _wallJumpCombo += 1;
     }
 
     #endregion Abilitis functions
@@ -742,13 +764,13 @@ public class PlayerController : MonoBehaviour {
           }
     }
     private void HandleAirGravity() {
-
-        float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
-        float appliedGravity = gravityForce * gravityMultiplier;
-        float fallSpeed = rigidBody.linearVelocityY - (appliedGravity * Time.fixedDeltaTime);
         
-        rigidBody.linearVelocityY = fallSpeed;
-
+        float gravityMultiplier = rigidBody.linearVelocityY > 0 ? 1f : fallMultiplier;
+        float appliedGravity = gravityForce * gravityMultiplier * Time.fixedDeltaTime;
+        
+        _cachedVelocity.Set(rigidBody.linearVelocity.x, 
+            Mathf.Max(rigidBody.linearVelocityY - appliedGravity, -maxFallSpeed));
+        rigidBody.linearVelocity = _cachedVelocity;
     }
     
     private void CheckFallSpeed() {
@@ -782,7 +804,7 @@ public class PlayerController : MonoBehaviour {
             //     rigidBody.linearVelocityY = -1 * (fallSpeed/fastFallBopDiminisher); // Bop the player
             PlayAnimationTrigger("LandMaxFall");
             if (canTakeFallDamage) DamageHealth(maxFallDamage, false, "Ground");
-            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
+            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1.8f, 1.8f);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landMaxSpeedVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
             SoundManager.Instance?.PlaySoundFX("Player Land",0.8f);
@@ -790,7 +812,7 @@ public class PlayerController : MonoBehaviour {
         else if (fallSpeed < -fastFallSpeed)
         {
             PlayAnimationTrigger("LandHighFall");
-            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1, 2);
+            CameraController.Instance?.ShakeCamera(0.2f, 1f * (fallSpeed/fastFallBopDiminisher), 1.5f, 1.5f);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(0.16f, -0.16f, 0), Quaternion.identity);
             VFXManager.Instance?.SpawnParticleEffect(landVfx, transform.position + new Vector3(-0.16f, -0.16f, 0), Quaternion.AngleAxis(180, Vector3.up));
             SoundManager.Instance?.PlaySoundFX("Player Land",0.85f );
@@ -825,129 +847,46 @@ public class PlayerController : MonoBehaviour {
     
     #region Collision functions //------------------------------------
 
-    // private void CollisionChecks() { // Old
-    //
-    //     // Check if touching
-    //     LayerMask combinedGroundMask = groundLayer | platformLayer;
-    //     _isTouchingWall = collBody.IsTouchingLayers(combinedGroundMask);
-    //     
-    //     
-    //     Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, 0.02f, 0);
-    //     Vector2 checkCenter = collFeet.bounds.center;
-    //     
-    //
-    //
-    //     
-    //     // Debug visualization
-    //     Vector2 halfSize = checkSize * 0.5f;
-    //     Vector2 topLeft = checkCenter + new Vector2(-halfSize.x, halfSize.y);
-    //     Vector2 topRight = checkCenter + new Vector2(halfSize.x, halfSize.y);
-    //     Vector2 bottomLeft = checkCenter + new Vector2(-halfSize.x, -halfSize.y);
-    //     Vector2 bottomRight = checkCenter + new Vector2(halfSize.x, -halfSize.y);
-    //     Color color = Color.red;
-    //     Debug.DrawLine(topLeft, topRight, color);
-    //     Debug.DrawLine(topRight, bottomRight, color);
-    //     Debug.DrawLine(bottomRight, bottomLeft, color);
-    //     Debug.DrawLine(bottomLeft, topLeft, color);
-    //     
-    //     
-    //     // Check if on ground
-    //     isGrounded =  Physics2D.OverlapBox(checkCenter, checkSize, 0f, combinedGroundMask);
-    //     isOnPlatform = Physics2D.OverlapBox(checkCenter, checkSize, 0f, platformLayer);
-    //     
-    //     if (isGrounded) {
-    //         
-    //         // Check for ledge on the right
-    //         RaycastHit2D hitRight = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
-    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
-    //         ledgeOnRight = !hitRight;
-    //         
-    //         // Check for ledge on the left
-    //         RaycastHit2D hitLeft = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask );
-    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (ledgeCheckVerticalDistance), Color.red);
-    //         ledgeOnLeft = !hitLeft;
-    //         
-    //         
-    //     } else { // if the player is in the air check there is ground below him
-    //         
-    //         // Check collision with ground
-    //         RaycastHit2D hit = Physics2D.Raycast(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down, groundCheckVerticalDistance, combinedGroundMask );
-    //         Debug.DrawRay(new Vector3(collFeet.bounds.center.x, collFeet.bounds.center.y, collFeet.bounds.center.z), Vector2.down * (groundCheckVerticalDistance), Color.red);
-    //         _isGroundBelow = hit;
-    //     }
-    //     
-    //     // Check if touching a wall
-    //     if (_isTouchingWall) {
-    //
-    //         // Check collision with walls on the right
-    //         RaycastHit2D hitRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask );
-    //         Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
-    //         _isTouchingWallOnRight = hitRight;
-    //
-    //         // Check collision with walls on the left
-    //         RaycastHit2D hitLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
-    //         Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), Color.red);
-    //         _isTouchingWallOnLeft = hitLeft;
-    //     }
-    // }
-    
     private void CollisionChecks() {
-        
-        LayerMask combinedGroundMask = groundLayer | platformLayer;
-        
-        // Ground box size
-        Vector2 checkSize = collFeet.bounds.size + new Vector3(-0.04f, -0.3f, 0);
+        // Cache common values
         Vector2 checkCenter = collFeet.bounds.center;
         Vector2 bottomPoint = checkCenter - new Vector2(0, collFeet.bounds.size.y / 2);
         
-        // Debug visualization
-        Vector2 halfSize = checkSize * 0.5f;
-        Vector2 topLeft = bottomPoint + new Vector2(-halfSize.x, halfSize.y);
-        Vector2 topRight = bottomPoint + new Vector2(halfSize.x, halfSize.y);
-        Vector2 bottomLeft = bottomPoint + new Vector2(-halfSize.x, -halfSize.y);
-        Vector2 bottomRight = bottomPoint + new Vector2(halfSize.x, -halfSize.y);
-        Color color = Color.red;
-        Debug.DrawLine(topLeft, topRight, color);
-        Debug.DrawLine(topRight, bottomRight, color);
-        Debug.DrawLine(bottomRight, bottomLeft, color);
-        Debug.DrawLine(bottomLeft, topLeft, color);
+        // Calculate check box size
+        _tempCheckSize.Set(collFeet.bounds.size.x - 0.04f, collFeet.bounds.size.y - 0.3f);
         
-        // Check if on ground
-        isGrounded = Physics2D.OverlapBox(bottomPoint, checkSize, 0f, combinedGroundMask);
-        isOnPlatform = Physics2D.OverlapBox(bottomPoint, checkSize, 0f, platformLayer);
-        
-        if (isGrounded) {
-            // Check for ledge on the right
-            RaycastHit2D hitGroundRight = Physics2D.Raycast(new Vector3(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask);
-            Debug.DrawRay(new Vector3(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down * (ledgeCheckVerticalDistance), color);
-            ledgeOnRight = !hitGroundRight;
-            
-            // Check for ledge on the left
-            RaycastHit2D hitGroundLeft = Physics2D.Raycast(new Vector3(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down, ledgeCheckVerticalDistance, combinedGroundMask);
-            Debug.DrawRay(new Vector3(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y, 0), Vector2.down * (ledgeCheckVerticalDistance), color);
-            ledgeOnLeft = !hitGroundLeft;
-            
-        } else { // if the player is in the air check there is ground below him
-            // Check collision with ground
-            RaycastHit2D hitGround = Physics2D.Raycast(new Vector3(bottomPoint.x, bottomPoint.y, 0), Vector2.down, groundCheckVerticalDistance, combinedGroundMask);
-            Debug.DrawRay(new Vector3(bottomPoint.x, bottomPoint.y, 0), Vector2.down * (groundCheckVerticalDistance), color);
-            _isGroundBelow = hitGround;
+        // Ground checks
+        isGrounded = Physics2D.OverlapBox(bottomPoint, _tempCheckSize, 0f, _combinedGroundMask);
+        isOnPlatform = Physics2D.OverlapBox(bottomPoint, _tempCheckSize, 0f, platformLayer);
+
+        // Ground ray check when in air
+        if (!isGrounded) {
+            _isGroundBelow = Physics2D.Raycast(bottomPoint, Vector2.down, groundCheckVerticalDistance, _combinedGroundMask);
         }
-        
-        
-        // Check if touching a wall
-        // On the right
-        RaycastHit2D hitWallRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
-        Debug.DrawRay(collBody.bounds.center, Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), color);
-        _isTouchingWallOnRight = hitWallRight;
 
-        // On the left
-        RaycastHit2D hitWallLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, collBody.bounds.extents.x + wallCheckDistance, combinedGroundMask);
-        Debug.DrawRay(collBody.bounds.center, Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), color);
-        _isTouchingWallOnLeft = hitWallLeft;
+        // Wall checks
+        _isTouchingWallOnRight = Physics2D.Raycast(collBody.bounds.center, Vector2.right, 
+            collBody.bounds.extents.x + wallCheckDistance, _combinedGroundMask);
+        _isTouchingWallOnLeft = Physics2D.Raycast(collBody.bounds.center, Vector2.left, 
+            collBody.bounds.extents.x + wallCheckDistance, _combinedGroundMask);
 
-        _isTouchingWall = _isTouchingWallOnLeft || _isTouchingWallOnRight;
-        
+        // Ledge checks when grounded
+        if (isGrounded) {
+            Vector2 rightLedgePos = new Vector2(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y);
+            Vector2 leftLedgePos = new Vector2(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y);
+
+            RaycastHit2D hitGroundRight = Physics2D.Raycast(rightLedgePos, Vector2.down, 
+                ledgeCheckVerticalDistance, _combinedGroundMask);
+            RaycastHit2D hitGroundLeft = Physics2D.Raycast(leftLedgePos, Vector2.down, 
+                ledgeCheckVerticalDistance, _combinedGroundMask);
+
+            ledgeOnRight = !hitGroundRight;
+            ledgeOnLeft = !hitGroundLeft;
+        }
+
+        #if UNITY_EDITOR
+        DrawCollisionChecks(bottomPoint);
+        #endif
     }
     
     private void OnCollisionEnter2D(Collision2D collision) {
@@ -1030,7 +969,7 @@ public class PlayerController : MonoBehaviour {
     
     #region Health/Checkpoint functions //------------------------------------
     
-    [Button] public void RespawnFromCheckpoint() {
+    [Button] private void RespawnFromCheckpoint() {
 
         _deaths += 1;
         if (CheckpointManager.Instance.activeCheckpoint) {
@@ -1049,7 +988,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    [Button] public void RespawnFromSpawnPoint() {
+    [Button] private void RespawnFromSpawnPoint() {
         
         _deaths = 0;
         StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(true, 0.5f));
@@ -1078,7 +1017,8 @@ public class PlayerController : MonoBehaviour {
     
     public void Teleport(Vector2 position, bool keepMomentum) {
         
-        transform.position = position;
+        _cachedPosition.Set(position.x, position.y);
+        transform.position = _cachedPosition;
         shadowCaster2D.castsShadows = true;
         SetSpriteColor(_defaultColor);
         CameraController.Instance.transform.position = new Vector3(position.x, position.y, CameraController.Instance.transform.position.z);
@@ -1483,103 +1423,144 @@ public class PlayerController : MonoBehaviour {
     
     #region Debugging functions //------------------------------------
 
-        private readonly StringBuilder _debugStringBuilder = new StringBuilder(256);
-        public void UpdateDebugText(TextMeshProUGUI textObject) {
-            _debugStringBuilder.Clear();
+    public void UpdateDebugText(TextMeshProUGUI textObject) {
+        if (!textObject || !textObject.isActiveAndEnabled) return;
+        
+        _debugUpdateTimer -= Time.deltaTime;
+        if (_debugUpdateTimer <= 0) {
+            _debugUpdateTimer = DEBUG_UPDATE_INTERVAL;
             
-            // Core Stats Section
-            AppendHeader("Player");
-            AppendStat("HP", $"{_currentHealth}/{maxHealth}");
-            AppendStat("Deaths", _deaths.ToString());
-            AppendStat("Velocity", $"X: {rigidBody.linearVelocityX:F1} Y: {rigidBody.linearVelocityY:F1}");
-            AppendStat("Speed", $"Move: {_moveSpeed:F1} Fall: {fallSpeed:F1}");
+            _debugText.Clear()
+                .AppendLine("\n<color=#00FF00>Player</color>")
+                .AppendLine($"HP: {_currentHealth}/{maxHealth}")
+                .AppendLine($"Deaths: {_deaths}")
+                .AppendLine($"Velocity: X: {rigidBody.linearVelocity.x:F1} Y: {rigidBody.linearVelocity.y:F1}")
+                .AppendLine($"Speed: Move: {_moveSpeed:F1} Fall: {fallSpeed:F1}");
+
             if (doubleJumpAbility) {
-                AppendStat("Air Jumps", $"{_remainingAirJumps}/{maxAirJumps}");
+                _debugText.AppendLine($"Air Jumps: {_remainingAirJumps}/{maxAirJumps}");
             }
+            
             if (dashAbility) {
-                AppendStat("Dashes", $"{_remainingDashes}/{maxDashes}, {_dashCooldownTimer:F1}s/{dashCooldownDuration:F1}s");
+                _debugText.AppendLine($"Dashes: {_remainingDashes}/{maxDashes}, {_dashCooldownTimer:F1}s/{dashCooldownDuration:F1}s");
             }
 
-            
-            // Movement State Section
-            AppendHeader("Movement");
-            AppendStatGroup(new Dictionary<string, bool> {
-                { "Running", isRunning },
-                { "Was Running", wasRunning },
-                { "Jumping", isJumping },
-                { "Wall Sliding", isWallSliding },
-                { "Dashing", isDashing},
-                { "Fast Dropping", isFastDropping },
-                { "Fast Falling", isFastFalling },
-                { "Max Fall Speed", atMaxFallSpeed }
-            });
-            
-            // Player State Section
-            AppendHeader("Status");
-            AppendStatGroup(new Dictionary<string, (bool state, float? timer)> {
-                { "Facing Right", (isFacingRight, null) },
-                { "Invincible", (isInvincible, _invincibilityTime) },
-                { "Stun Locked", (isStunLocked, _stunLockTime) },
-                { "Coyote Jump", (_canCoyoteJump, _coyoteJumpTime) }
-            });
-            
-            // Collision State Section
-            AppendHeader("Collisions");
-            AppendStatGroup(new Dictionary<string, bool> {
-                { "Grounded", isGrounded },
-                { "On Platform", isOnPlatform },
-                { "Wall Right", _isTouchingWallOnRight },
-                { "Wall Left", _isTouchingWallOnLeft },
-                { "Ledge Right", ledgeOnRight },
-                { "Ledge Left", ledgeOnLeft }
-            });
-            
-            // Ground Object Info
+            _debugText.AppendLine("\n<color=#00FF00>Movement</color>");
+            AppendState("Running", isRunning);
+            AppendState("Was Running", wasRunning);
+            AppendState("Jumping", isJumping);
+            AppendState("Wall Sliding", isWallSliding);
+            AppendState("Dashing", isDashing);
+            AppendState("Fast Dropping", isFastDropping);
+            AppendState("Fast Falling", isFastFalling);
+            AppendState("Max Fall Speed", atMaxFallSpeed);
+
+            _debugText.AppendLine("\n<color=#00FF00>Status</color>");
+            AppendStateWithTimer("Facing Right", isFacingRight, null);
+            AppendStateWithTimer("Invincible", isInvincible, _invincibilityTime);
+            AppendStateWithTimer("Stun Locked", isStunLocked, _stunLockTime);
+            AppendStateWithTimer("Coyote Jump", _canCoyoteJump, _coyoteJumpTime);
+
+            _debugText.AppendLine("\n<color=#00FF00>Collisions</color>");
+            AppendState("Grounded", isGrounded);
+            AppendState("On Platform", isOnPlatform);
+            AppendState("Wall Right", _isTouchingWallOnRight);
+            AppendState("Wall Left", _isTouchingWallOnLeft);
+            AppendState("Ledge Right", ledgeOnRight);
+            AppendState("Ledge Left", ledgeOnLeft);
+
             if (_movingRigidbody != null) {
-                AppendStat("Ground Object", $"{_movingRigidbody.gameObject.name} Vel: {_movingRigidbody.linearVelocityX:F1} Last: {_movingRigidbodyLastVelocityX:F1}");
+                _debugText.AppendLine($"Ground Object: {_movingRigidbody.gameObject.name} Vel: {_movingRigidbody.linearVelocityX:F1} Last: {_movingRigidbodyLastVelocityX:F1}");
             }
+
             if (_softObject != null) {
-                AppendStat("Soft Object", $"{_softObject.gameObject.name}");
+                _debugText.AppendLine($"Soft Object: {_softObject.gameObject.name}");
             }
-            
-            // Log Section
+
             if (!string.IsNullOrEmpty(_logText)) {
-                AppendHeader("Log");
-                _debugStringBuilder.AppendLine(_logText);
+                _debugText.AppendLine("\n<color=#00FF00>Log</color>")
+                    .AppendLine(_logText);
             }
-            
-            textObject.text = _debugStringBuilder.ToString();
+
+            textObject.text = _debugText.ToString();
+        }
+    }
+
+    private void AppendState(string label, bool state) {
+        _debugText.AppendLine(state ? $"<color=#00FF00>[+]</color> {label}" : $"<color=#FF0000>[-]</color> {label}");
+    }
+
+    private void AppendStateWithTimer(string label, bool state, float? timer) {
+        _debugText.Append(state ? "<color=#00FF00>[+]</color> " : "<color=#FF0000>[-]</color> ")
+            .Append(label);
+        
+        if (timer.HasValue) {
+            _debugText.Append($" ({timer.Value:F1}s)");
+        }
+        
+        _debugText.AppendLine();
+    }
+        
+        
+    #if UNITY_EDITOR
+    private void DrawCollisionChecks(Vector2 bottomPoint) {
+        // Draw ground check box
+        Color groundColor = isGrounded ? Color.green : Color.red;
+        DrawDebugBox(bottomPoint, _tempCheckSize, groundColor);
+        
+        // Draw ground detection ray when in air
+        if (!isGrounded) {
+            Debug.DrawRay(
+                bottomPoint, 
+                Vector2.down * groundCheckVerticalDistance, 
+                _isGroundBelow ? Color.yellow : Color.red
+            );
         }
 
-        private void AppendHeader(string header) {
-            _debugStringBuilder.AppendLine($"\n<color=#00FF00>{header}</color>");
-            // _debugStringBuilder.AppendLine("---------------");
-        }
+        // Draw wall check rays
+        Debug.DrawRay(
+            collBody.bounds.center, 
+            Vector2.right * (collBody.bounds.extents.x + wallCheckDistance), 
+            _isTouchingWallOnRight ? Color.green : Color.red
+        );
+        Debug.DrawRay(
+            collBody.bounds.center, 
+            Vector2.left * (collBody.bounds.extents.x + wallCheckDistance), 
+            _isTouchingWallOnLeft ? Color.green : Color.red
+        );
 
-        private void AppendStat(string label, string value) {
-            _debugStringBuilder.AppendLine($"{label}: {value}");
-        }
+        // Draw ledge check rays when grounded
+        if (isGrounded) {
+            Vector2 rightLedgePos = new Vector2(bottomPoint.x + collFeet.bounds.extents.x + ledgeCheckHorizontalDistance, bottomPoint.y);
+            Vector2 leftLedgePos = new Vector2(bottomPoint.x - collFeet.bounds.extents.x - ledgeCheckHorizontalDistance, bottomPoint.y);
 
-        private void AppendStatGroup(Dictionary<string, bool> states) {
-            foreach (var (label, state) in states) {
-                if (state) {
-                    _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}");
-                } else {
-                    _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}");
-                }
-            }
+            Debug.DrawRay(
+                rightLedgePos, 
+                Vector2.down * ledgeCheckVerticalDistance, 
+                ledgeOnRight ? Color.yellow : Color.blue
+            );
+            Debug.DrawRay(
+                leftLedgePos, 
+                Vector2.down * ledgeCheckVerticalDistance, 
+                ledgeOnLeft ? Color.yellow : Color.blue
+            );
         }
+    }
 
-        private void AppendStatGroup(Dictionary<string, (bool state, float? timer)> states) {
-            foreach (var (label, info) in states) {
-                string timerText = info.timer.HasValue ? $" ({info.timer:F1}s)" : "";
-                if (info.state) {
-                    _debugStringBuilder.AppendLine($"<color=#00FF00>[+]</color> {label}{timerText}");
-                } else {
-                    _debugStringBuilder.AppendLine($"<color=#FF0000>[-]</color> {label}{timerText}");
-                }
-            }
-        }
+    private void DrawDebugBox(Vector2 position, Vector2 size, Color color) {
+        Vector2 halfSize = size * 0.5f;
+        Vector2 topLeft = position + new Vector2(-halfSize.x, halfSize.y);
+        Vector2 topRight = position + new Vector2(halfSize.x, halfSize.y);
+        Vector2 bottomLeft = position + new Vector2(-halfSize.x, -halfSize.y);
+        Vector2 bottomRight = position + new Vector2(halfSize.x, -halfSize.y);
+
+        Debug.DrawLine(topLeft, topRight, color);
+        Debug.DrawLine(topRight, bottomRight, color);
+        Debug.DrawLine(bottomRight, bottomLeft, color);
+        Debug.DrawLine(bottomLeft, topLeft, color);
+    }
+    #endif
+    
     #endregion Debugging functions
     
 }

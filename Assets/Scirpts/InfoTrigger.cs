@@ -64,7 +64,7 @@ public class InfoTrigger : MonoBehaviour
         {
             if (!IsInfoText) return;
             infoText.text = FindFirstObjectByType<GameManager>().GetInfoText(infoId);
-        }     
+        }
     #endif
 
     private void OnTriggerEnter2D(Collider2D other)

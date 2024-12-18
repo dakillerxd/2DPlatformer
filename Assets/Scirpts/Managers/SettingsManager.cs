@@ -101,10 +101,7 @@ public class SettingsManager : MonoBehaviour
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
             SaveManager.Instance.SaveInt("ResolutionIndex", index);
         }
-        else
-        {
-            Debug.LogWarning($"Invalid resolution index: {index}");
-        }
+
     }
 
     public void SetVSync(int vSyncCount)

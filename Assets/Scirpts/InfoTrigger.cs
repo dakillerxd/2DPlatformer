@@ -20,7 +20,7 @@ public class InfoTrigger : MonoBehaviour
     [SerializeField] private bool destroyAfterFadeOut;
     [EndIf]
 
-    [Header("Text Settings")]
+    [Header("Text")]
     [SerializeField] private TextType textType = TextType.Custom;
     [EnableIf(nameof(IsInfoText))]
     [SerializeField] private string infoId;
@@ -122,7 +122,7 @@ public class InfoTrigger : MonoBehaviour
     private IEnumerator FadeText(bool fadeIn, float fadeTime)
     {
         Color startColor = infoText.color;
-        Color targetColor = fadeIn ? this._startColor : _invisibleColor;
+        Color targetColor = fadeIn ? _startColor : _invisibleColor;
         
         float elapsedTime = 0f;
         

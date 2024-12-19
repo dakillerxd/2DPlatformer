@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Events;
@@ -16,23 +17,26 @@ public class FakeObject : MonoBehaviour
     [Header("References")]
     [SerializeField] private SpriteRenderer[] spriteRenderers;
 
+    
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        foreach (var e in eventsAfterTrigger)
-        {
+        
+        foreach (var e in eventsAfterTrigger) {
             e.Invoke();
+            
         }
-        if (destroyOnTrigger)
-        {
+        
+        
+        if (destroyOnTrigger) {
+            
             Destroy(gameObject);
-        }
-        else
-        {
-            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-            {
-                spriteRenderer.color = invincibilityColor;
-            }
+            
+        } else {
+            
+            StopAllCoroutines();
+            StartCoroutine(FadeColor(false, 0.5f));
         }
         
     }
@@ -43,12 +47,24 @@ public class FakeObject : MonoBehaviour
         
             if (!destroyOnTrigger)
             {
-                foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-                {
-                    spriteRenderer.color = _defaultColor;
-                }
+                StopAllCoroutines();
+                StartCoroutine(FadeColor(true, 3f));
             }
+    }
 
+
+    private IEnumerator FadeColor(bool fadeIn, float time)
+    {
+        float elapsedTime = 0;
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+            {
+                spriteRenderer.color = Color.Lerp(spriteRenderer.color, fadeIn ? _defaultColor : invincibilityColor, elapsedTime / time);
+            }
+            yield return null;
+        }
         
     }
     

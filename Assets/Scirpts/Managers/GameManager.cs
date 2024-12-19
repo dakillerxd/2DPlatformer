@@ -16,10 +16,10 @@ public class GameManager : MonoBehaviour
     public GameDifficulty gameDifficulty = GameDifficulty.None;
     public bool funnyMode; 
     public bool debugMode;
-    [SerializeField] private KeyCode quitGameKey = KeyCode.F1;
-    [SerializeField] private KeyCode restartSceneKey = KeyCode.F2;
-    [SerializeField] private KeyCode toggleDebugMode = KeyCode.F3;
-    [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F4;
+    [SerializeField] private KeyCode quitGameKey;
+    [SerializeField] private KeyCode toggleFunnyMode;
+    [SerializeField] private KeyCode toggleDebugMode = KeyCode.F1;
+    [SerializeField] private KeyCode restartSceneKey = KeyCode.F4;
     [SerializeField] private KeyCode finishGame = KeyCode.F5;
     [SerializeField] private KeyCode deleteSave = KeyCode.F6;
     

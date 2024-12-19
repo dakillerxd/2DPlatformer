@@ -202,7 +202,7 @@ public class CameraTrigger : MonoBehaviour
         }
 
         // Draw Boundary information
-        string boundaryInfo = useColliderAsBoundary ? "Using Collider Bounds" : "Custom Bounds";
+        string boundaryInfo = useColliderAsBoundary ? "" : "Custom Bounds";
         DrawTriggerLabel(labelBasePosition + Vector3.up * (labelSpacing * labelCount), 
             $"{boundaryInfo}", style);
     }

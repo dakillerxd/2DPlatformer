@@ -573,7 +573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7b183be139c1f3438a78ff038864509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypointScript: {fileID: 8128294100542856461}
+  platformScript: {fileID: 8128294100542856461}
   spriteRenderer: {fileID: 533857746198682590}
 --- !u!1 &8037527792713345071
 GameObject:
@@ -621,10 +621,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19d66bc89af35aa46b686bbc3cdb0f83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resetPositionOnPlayerDeath: 0
+  resetPositionOnTriggerEnter: 0
+  disableOnPlayerDeath: 0
   enableMovement: 1
   loopBetweenPoints: 1
-  resetPositionOnPlayerDeath: 0
-  disableOnPlayerDeath: 0
   maxSpeed: 2
   accelerationPercent: 100
   decelerationPercent: 100

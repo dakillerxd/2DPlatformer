@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8928154913662448529}
   - component: {fileID: 5060159489429807464}
   - component: {fileID: 4700166654127858081}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Vfx_PlayerWallSliding
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4774,6 +4774,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

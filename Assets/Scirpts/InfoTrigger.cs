@@ -31,7 +31,6 @@ public class InfoTrigger : MonoBehaviour
     [SerializeField] private SpriteRenderer triggerSprite;
     [SerializeField] private TextMeshPro infoText;
     
-    
     private bool IsInfoText => textType == TextType.Info;
     private readonly Color _invisibleColor = new Color(1f, 1f, 1f, 0f);
     private Color _startColor;
@@ -51,21 +50,26 @@ public class InfoTrigger : MonoBehaviour
         SetupText();
     }
     
+    [OnValueChanged(nameof(infoId))]
     private void SetupText()
     {
         if (!infoText || !IsInfoText) return;
         
         infoText.text = GameManager.Instance?.GetInfoText(infoId);
+        
+        #if UNITY_EDITOR
+        infoText.text = FindFirstObjectByType<GameManager>().GetInfoText(infoId);
+        #endif
     }
-    
-    
-    #if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (!IsInfoText) return;
-            infoText.text = FindFirstObjectByType<GameManager>().GetInfoText(infoId);
-        }
-    #endif
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        SetupText();
+    }
+#endif
+
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {

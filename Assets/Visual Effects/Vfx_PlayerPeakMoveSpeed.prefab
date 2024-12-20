@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2489592728956220137}
   - component: {fileID: 1432060674752734184}
   - component: {fileID: 7188421775135392495}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Vfx_PlayerPeakMoveSpeed
   m_TagString: Untagged
   m_Icon: {fileID: 0}

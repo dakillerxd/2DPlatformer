@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6087888743773736702}
   - component: {fileID: 6672236650000332810}
   - component: {fileID: 7269967453529092861}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Particle System 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4890,6 +4890,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4957,7 +4960,7 @@ GameObject:
   - component: {fileID: 5810593304749069595}
   - component: {fileID: 4468245373301233434}
   - component: {fileID: 1040478376295261514}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Vfx_PlayerDash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9953,6 +9956,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

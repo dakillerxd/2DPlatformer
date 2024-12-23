@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1920848302338869080, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: ccb32186bb2b7cd4ca787a4bd334769d, type: 3}
     - target: {fileID: 4556262988579442526, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
       propertyPath: m_Size.x
       value: 4
@@ -76,12 +80,82 @@ PrefabInstance:
       propertyPath: timeUntilBroken
       value: 0.9
       objectReference: {fileID: 0}
+    - target: {fileID: 7216740614465976608, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_PreviousTrimEdge
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7216740614465976608, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_PreviousShadowShape2DSource
+      value: 
+      objectReference: {fileID: 4243559094338541284}
+    - target: {fileID: 7216740614465976608, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7216740614465976608, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.y
+      value: 0.125
+      objectReference: {fileID: 0}
     - target: {fileID: 7350465568038566533, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
       propertyPath: m_Name
       value: Wall Crumbling Variant 8 blocks
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowCastingSource
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: 'managedReferences[-2]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowShape2DProvider
+      value: 7353054908945006677
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowShape2DComponent
+      value: 
+      objectReference: {fileID: 2267288451461603042}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowMesh.m_InitialTrim
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_PreviousShadowCastingSource
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_PreviousShadowShape2DSource
+      value: 
+      objectReference: {fileID: 2267288451461603042}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: m_ShadowMesh.m_LocalBounds.m_Extent.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: 'managedReferences[7353054908945006676]'
+      value: Unity.RenderPipelines.Universal.2D.Runtime UnityEngine.Rendering.Universal.ShadowShape2DProvider_SpriteRenderer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8464665785700622243, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+      propertyPath: 'managedReferences[7353054908945006677]'
+      value: Unity.RenderPipelines.Universal.2D.Runtime UnityEngine.Rendering.Universal.ShadowShape2DProvider_SpriteRenderer
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+--- !u!212 &2267288451461603042 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 1920848302338869080, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+  m_PrefabInstance: {fileID: 423126773826640314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &4243559094338541284 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 4556262988579442526, guid: 05d22b945d8fae5459965ff9cdf8862f, type: 3}
+  m_PrefabInstance: {fileID: 423126773826640314}
+  m_PrefabAsset: {fileID: 0}

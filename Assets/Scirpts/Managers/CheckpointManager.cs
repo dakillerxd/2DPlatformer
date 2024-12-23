@@ -97,6 +97,8 @@ public class CheckpointManager : MonoBehaviour, ISerializationCallbackReceiver
         if (!startTeleporter) return;
 
         startTeleporter.PlayTeleporterEffects();
+        SetStartTeleporter(startTeleporter);
+        DeactivateLastCheckpoint();
     }
 
     public void UseCheckpoint()

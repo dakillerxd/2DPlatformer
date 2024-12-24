@@ -134,6 +134,7 @@ public class OptionsMenu : MonoBehaviour
             masterVolumeSlider.value = SettingsManager.Instance.masterGameVolume;
             masterVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance.SetMasterVolume(value));
             masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.PlaySoundFX("Player Jump"));
+            masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.RestartPlayingMusic());
             
         }
         
@@ -148,7 +149,7 @@ public class OptionsMenu : MonoBehaviour
         {
             musicVolumeSlider.value = SettingsManager.Instance.musicVolume;
             musicVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance.SetMusicVolume(value));
-            musicVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.PlaySoundFX("Player Jump"));
+            musicVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.RestartPlayingMusic());
         }
     }
     

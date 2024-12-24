@@ -29,8 +29,8 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private ScreenModes defaultScreenMode = ScreenModes.Borderless;
     [SerializeField] private int defaultResolutionIndex = 0;
     [SerializeField] private float defaultMasterGameVolume = 1f;
-    [SerializeField] private float defaultSoundFXVolume = 0.50f;
-    [SerializeField] private float defaultMusicVolume = 0.30f;
+    [SerializeField] private float defaultSoundFXVolume = 0.7f;
+    [SerializeField] private float defaultMusicVolume = 0.5f;
     
     [Header("Events")]
     public UnityEvent onSoundFXVolumeChange = new UnityEvent();

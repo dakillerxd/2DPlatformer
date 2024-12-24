@@ -19,6 +19,7 @@ public class CrumblingObject : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D coll;
+    [SerializeField] private ParticleSystem[] crumbleParticleEffects;
 
     private void Start()
     {
@@ -39,6 +40,12 @@ public class CrumblingObject : MonoBehaviour
         
         if (animator) { animator.SetTrigger("Shake"); }
         _isShaking = true;
+
+        foreach (var particleEffect in crumbleParticleEffects)
+        {
+            particleEffect.Play();
+        }
+        
         
         float time = timeUntilBroken;
         
@@ -65,6 +72,10 @@ public class CrumblingObject : MonoBehaviour
         coll.enabled = false;
         spriteRenderer.color = new Color(1f, 1f, 1f, brokenAlpha);
         if (animator) { animator.SetTrigger("Idle"); }
+        foreach (var particleEffect in crumbleParticleEffects)
+        {
+            particleEffect.Stop();
+        }
         StartCoroutine(CountDownToUnBreak());
     }
 

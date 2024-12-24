@@ -51,9 +51,9 @@ MonoBehaviour:
   funnyMode: 0
   debugMode: 0
   quitGameKey: 0
-  restartSceneKey: 285
-  toggleDebugMode: 282
   toggleFunnyMode: 0
+  toggleDebugMode: 282
+  restartSceneKey: 285
   finishGame: 286
   deleteSave: 287
   unlocks:
@@ -150,8 +150,8 @@ MonoBehaviour:
   defaultScreenMode: 1
   defaultResolutionIndex: 0
   defaultMasterGameVolume: 1
-  defaultSoundFXVolume: 0.5
-  defaultMusicVolume: 0.3
+  defaultSoundFXVolume: 0.7
+  defaultMusicVolume: 0.5
   onSoundFXVolumeChange:
     m_PersistentCalls:
       m_Calls: []

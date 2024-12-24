@@ -262,30 +262,30 @@ MonoBehaviour:
     funnyModeClips: []
     source: {fileID: 0}
   music:
-  - name: MainMenu?
-    volume: 1
+  - name: MainMenu
+    volume: 0.2
     pitch: 1
     stereoPan: 0
     spatialBlend: 0
     reverbZoneMix: 0
     loop: 1
     clips:
-    - {fileID: 8300000, guid: a542617c3df639147bddc74aae7a15a3, type: 3}
-    - {fileID: 8300000, guid: 7b5bff28135e2c34f80f92e04f73d4b4, type: 3}
+    - {fileID: 8300000, guid: e6317b39dd18cfd40a944cf72c9d8ef7, type: 3}
+    - {fileID: 8300000, guid: e5b2e67adb4387e4a9a40e6d52f54b7a, type: 3}
+    funnyModeClips: []
+    source: {fileID: 0}
+  - name: Gameplay
+    volume: 0.1
+    pitch: 1
+    stereoPan: 0
+    spatialBlend: 0
+    reverbZoneMix: 0
+    loop: 1
+    clips:
+    - {fileID: 8300000, guid: 88c027afe4915bd4fa4f9d6ffa9e62a0, type: 3}
     funnyModeClips: []
     source: {fileID: 0}
   - name: Credits
-    volume: 1
-    pitch: 1
-    stereoPan: 0
-    spatialBlend: 0
-    reverbZoneMix: 0
-    loop: 1
-    clips:
-    - {fileID: 8300000, guid: 223d4a8692be39b4993bccd792b271df, type: 3}
-    funnyModeClips: []
-    source: {fileID: 0}
-  - name: Gameplay?
     volume: 1
     pitch: 1
     stereoPan: 0

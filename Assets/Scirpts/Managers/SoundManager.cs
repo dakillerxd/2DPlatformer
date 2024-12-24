@@ -211,7 +211,6 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-
     
     
     public void StopSoundFx(string name) {
@@ -257,6 +256,18 @@ public class SoundManager : MonoBehaviour
             if (music.source.isPlaying)
             {
                 music.source.Stop();
+            }
+        }
+    }
+
+
+    public void RestartPlayingMusic()
+    {
+        foreach (Sound music in music)
+        {
+            if (music.source.isPlaying)
+            {
+                PlayMusic(music.name);
             }
         }
     }

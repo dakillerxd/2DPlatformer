@@ -25,6 +25,7 @@ MonoBehaviour:
     - ef980fd39b7fff940ba09bf15c8738e5
     - ed824f2b7a6644144b8dcbfe13082a73
     - 63954fff7b941304b8f4a7161f188885
+    - 57e64feed222d4e448ee2e429652d2a2
     values:
     - iconNameOrGuid: AnimationClip Icon
       colorIndex: 0
@@ -67,6 +68,10 @@ MonoBehaviour:
       isIconRecursive: 0
       isColorRecursive: 0
     - iconNameOrGuid: Shader Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Cubemap Icon
       colorIndex: 0
       isIconRecursive: 0
       isColorRecursive: 0

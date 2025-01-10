@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class MenuController : MonoBehaviour
 {
@@ -9,13 +10,9 @@ public class MenuController : MonoBehaviour
     
 
     [Header("References")]
-    private MenuCategory _currentCategory;
-    private Vector2 _navigate;
+    protected MenuCategory _currentCategory;
+    
 
-    private void Start()
-    {
-        SelectCategory(menuCategories[0]);
-    }
     private void OnEnable()
     {
         if (selectFirstMenuOnEnable)
@@ -23,7 +20,14 @@ public class MenuController : MonoBehaviour
             SelectFirstCategory();
         }
         
-
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        GameManager.Instance.OnOnGameStateChange += OnGameStateChange;
+    }
+    
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        GameManager.Instance.OnOnGameStateChange -= OnGameStateChange;
     }
 
     private void Update()
@@ -49,6 +53,16 @@ public class MenuController : MonoBehaviour
         {
             _currentCategory.OnNavigate(context);
         }
+    }
+    
+    protected virtual void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        _currentCategory.OnActiveSceneChanged(currentScene, nextScene);
+    }
+
+    protected virtual void OnGameStateChange(GameStates state)
+    {
+        
     }
     
     private void OnToggleMenu()
@@ -86,6 +100,15 @@ public class MenuController : MonoBehaviour
         {
             SelectCategory(menuCategories[0]);
         }
+    }
+
+    public void DisableAllCategories()
+    {
+        foreach (MenuCategory category in menuCategories)
+        {
+            category.gameObject.SetActive(false);
+        }
+        
     }
     
 

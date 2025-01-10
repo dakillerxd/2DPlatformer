@@ -112,7 +112,7 @@ MonoBehaviour:
     collected: 0
   inputManagerPrefab: {fileID: 6668247925252254685, guid: 11d09469762d9de4590abaad657a7eef, type: 3}
   soundManagerPrefab: {fileID: 8169659688527411552, guid: 29762c76c6068794ab6c06aa1576adc5, type: 3}
-  uiManagerPrefab: {fileID: 3659276992571845032, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
+  gameUIManagerPrefab: {fileID: 0}
   vfxManagerPrefab: {fileID: 53827270003700011, guid: cc712b86b54ab2c4b9ab5af92ef15fbc, type: 3}
 --- !u!114 &3787602947778312689
 MonoBehaviour:
@@ -151,7 +151,7 @@ MonoBehaviour:
   defaultResolutionIndex: 0
   defaultMasterGameVolume: 1
   defaultSoundFXVolume: 0.7
-  defaultMusicVolume: 0.5
+  defaultMusicVolume: 0.2
   onSoundFXVolumeChange:
     m_PersistentCalls:
       m_Calls: []

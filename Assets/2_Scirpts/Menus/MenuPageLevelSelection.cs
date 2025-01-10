@@ -1,6 +1,5 @@
 using CustomAttributes;
 using TMPro;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -69,6 +68,9 @@ public class MenuPageLevelSelection : MenuPage
         {
             GameObject buttonObject = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
             Button button = buttonObject.GetComponent<Button>();
+            selectables.Add(button);
+            SetupSelectable(button);
+            StoreOriginalTransforms(button);
             button.interactable = level.BuildIndex <= SaveManager.Instance.LoadInt("HighestLevel");
             button.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             button.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
@@ -76,9 +78,7 @@ public class MenuPageLevelSelection : MenuPage
             button.onClick.AddListener(() => SceneManager.LoadScene(level.SceneName));
             buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = level.SceneName.Replace("Level", "").Trim();
             
-            selectables.Add(button);
-            SetupSelectable(button);
-            StoreOriginalTransforms(button);
+
         }
     }
 

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.TextCore.Text;
 using VInspector;
 
@@ -31,12 +33,17 @@ public class GameManager : MonoBehaviour
     [Tab("References")] // ------------------------------------------
     public InputManager inputManagerPrefab;
     public SoundManager soundManagerPrefab;
-    public UIManager uiManagerPrefab;
+    public GameUIManager gameUIManagerPrefab;
     public VFXManager vfxManagerPrefab;
     private Camera _camera;
     [EndTab]
     
+    public event UnityAction<GameStates> OnOnGameStateChange;
+    public event UnityAction<GameDifficulty> OnOnGameDifficultyChange;
     private readonly Dictionary<string, string> _infoTexts = new Dictionary<string, string>();
+    
+    
+    
     
     private void Awake() {
         
@@ -56,7 +63,7 @@ public class GameManager : MonoBehaviour
         // Check that all managers are instanced
         if (InputManager.Instance == null) { Instantiate(inputManagerPrefab); }
         if (SoundManager.Instance == null) { Instantiate(soundManagerPrefab); }
-        if (UIManager.Instance == null) { Instantiate(uiManagerPrefab); }
+        if (GameUIManager.Instance == null) { Instantiate(gameUIManagerPrefab); }
         if (VFXManager.Instance == null) { Instantiate(vfxManagerPrefab); }
 
     }
@@ -163,18 +170,16 @@ public class GameManager : MonoBehaviour
     private void ToggleFunnyMode()
     {
         funnyMode = !funnyMode;
-        UIManager.Instance?.UpdateUI();
     }
     
     private void ToggleDebugMode() {
         debugMode = !debugMode;
-        UIManager.Instance?.ToggleDebugUI(debugMode);
+        GameUIManager.Instance?.ToggleDebugUI(debugMode);
     }
     
     
     public void SetGameState(GameStates state) {
         gameState = state;
-        UIManager.Instance?.UpdateUI();
         
         switch (state) {
             case GameStates.GamePlay:
@@ -193,6 +198,8 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 1;
                 break;
         }
+
+        OnOnGameStateChange?.Invoke(state);
     }
     
     private void SetGameDifficulty(GameDifficulty gameMode) {
@@ -216,6 +223,8 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("Invalid Game Mode, Setting Normal");
                 break;
         }
+        
+        OnOnGameDifficultyChange?.Invoke(gameMode);
     }
     
     

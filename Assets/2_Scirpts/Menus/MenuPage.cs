@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using PrimeTween;
 using VInspector;
+using UnityEngine.SceneManagement;
 
 public class MenuPage : MonoBehaviour
 {
@@ -13,16 +14,6 @@ public class MenuPage : MonoBehaviour
     [SerializeField] private bool rememberLastSelectableOnDisable = false;
     [SerializeField] protected List<Selectable> selectables = new List<Selectable>();
     
-    
-    [Header("Page Animation Move In")]
-    [SerializeField] private bool moveInAnimation = false;
-    [ShowIf("moveInAnimation")]
-    [SerializeField] private Vector3 moveInFromDirection = new Vector3(0, -700f, 0);
-    [SerializeField] private float moveInDuration = 0.3f;
-    [SerializeField] private float moveInDelay = 0.2f;
-    [SerializeField] private Ease moveInEase = Ease.OutSine;
-    [SerializeField] private List<GameObject> moveInObjects= new List<GameObject>();
-    [EndIf]
     
     [Header("Selectable Animation Scale")]
     [SerializeField] private bool scaleOnSelect = false;
@@ -61,7 +52,6 @@ public class MenuPage : MonoBehaviour
     protected MenuController _menuController;
     protected MenuCategory _menuCategory;
     private bool _canSelect;
-    private readonly Dictionary<GameObject, Vector3> _moveInObjectsOriginalPositions = new Dictionary<GameObject, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalScales = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalRotations = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalPositions = new Dictionary<Selectable, Vector3>();
@@ -80,11 +70,6 @@ public class MenuPage : MonoBehaviour
             StoreOriginalTransforms(selectable);
         }
         
-
-        foreach (GameObject obj in moveInObjects)
-        {
-            _moveInObjectsOriginalPositions[obj] = obj.transform.localPosition;
-        }
     }
 
     private void OnDisable()
@@ -118,17 +103,10 @@ public class MenuPage : MonoBehaviour
     {
         ResetAllSelectables();
         
-        if (moveInAnimation)
-        {
-            PlayMoveInAnimation();
+        StartCoroutine(SetCanSelect(true, 0f));
             
-        } else {
-            
-            StartCoroutine(SetCanSelect(true, 0f));
-            
-            if (selectFirstSelectableOnEnable) {
-                StartCoroutine(SelectFirstAvailableSelectable());
-            }
+        if (selectFirstSelectableOnEnable) {
+            StartCoroutine(SelectFirstAvailableSelectable());
         }
     }
     
@@ -295,6 +273,12 @@ public class MenuPage : MonoBehaviour
         StartCoroutine(SelectFirstAvailableSelectable());
     }
     
+    public virtual void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+
+
+    }
+    
     #endregion Events // ---------------------------------------------------------------------
     
     
@@ -315,32 +299,6 @@ public class MenuPage : MonoBehaviour
     private void PlayShakeAnimation(Transform target)
     {
         Tween.ShakeLocalPosition(target, shakeAxis, shakeDuration, shakeFrequency, easeBetweenShakes: shakeEase);
-    }
-    
-    private void PlayMoveInAnimation()
-    {
-        if (moveInObjects.Count == 0) return;
-        
-        
-        StartCoroutine(SetCanSelect(false, 0f));
-        _currentSelectable = null;
-        _previousSelectable = null;
-        EventSystem.current.SetSelectedGameObject(null);
-        ResetAllSelectables();
-        
-        
-        for (int i = 0; i < moveInObjects.Count; i++)
-        {
-            GameObject currentObject = moveInObjects[i];
-            currentObject.transform.localPosition = moveInFromDirection;
-            Tween.LocalPosition(currentObject.transform, startValue: moveInFromDirection, endValue: _moveInObjectsOriginalPositions[currentObject], moveInDuration, ease: moveInEase, startDelay: i * moveInDelay);
-        }
-        
-        float totalAnimationTime = moveInDuration + (moveInDelay * (moveInObjects.Count - 1));
-        StartCoroutine(SetCanSelect(true, totalAnimationTime));
-        if (selectFirstSelectableOnEnable) { 
-            StartCoroutine(SelectFirstAvailableSelectable(totalAnimationTime + 0.03f)); 
-        }
     }
     
     #endregion Animations // ---------------------------------------------------------------------

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class MenuCategory : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class MenuCategory : MonoBehaviour
     public bool IsAtFirstPage => pages[0].gameObject.activeSelf;
     protected MenuPage _currentPage;
 
+    
+    
     private void OnEnable()
     {
         if (selectFirstPageOnEnable)
@@ -40,13 +43,13 @@ public class MenuCategory : MonoBehaviour
 
     public virtual void SelectPage(MenuPage page)
     {
-        if (page == null || !pages.Contains(page)) return;
+        if (!page || !pages.Contains(page)) return;
 
         _currentPage = page;
         page.gameObject.SetActive(true);
         page.OnPageSelected();
         
-        StartCoroutine(DisableOtherPager(1.5f));
+        // StartCoroutine(DisableOtherPages(1.5f));
     }
 
     public void SelectFirstPage()
@@ -56,9 +59,20 @@ public class MenuCategory : MonoBehaviour
             SelectPage(pages[0]);
         }
     }
+    
+    public void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+
+        _currentPage.OnActiveSceneChanged(currentScene, nextScene);
+    }
+    
+    public virtual void OnGameStateChange(GameStates state)
+    {
+        
+    }
 
 
-    private IEnumerator DisableOtherPager(float delay)
+    private IEnumerator DisableOtherPages(float delay)
     {
         yield return new WaitForSeconds(delay);
         

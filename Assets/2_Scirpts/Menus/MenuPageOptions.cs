@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuPageOptions : MenuPage
 {
-    [Header("Elements")]
+    [Header("Settings")]
     [SerializeField] private TMP_Dropdown vSyncDropdown;
     [SerializeField] private TMP_Dropdown screenModeDropdown;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
@@ -20,15 +20,19 @@ public class MenuPageOptions : MenuPage
     [SerializeField] private TextMeshProUGUI sfxVolumeSliderAmount;
     [SerializeField] private Scrollbar musicVolumeSlider;
     [SerializeField] private TextMeshProUGUI musicVolumeSliderAmount;
+    
+    [Header("Buttons")]
     [SerializeField] private Button buttonOptionsBack;
     [SerializeField] private Button buttonDeleteSave;
     private Resolution[] uniqueResolutions;
     
     private  MenuCategoryMainMenu _menuCategoryMain;
+    private MenuCategoryPause _menuCategoryPause;
     
-    void Start()
+    private void Start()
     {
         _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
+        _menuCategoryPause = GetComponentInParent<MenuCategoryPause>();
         
         SetupButtons();
         SetupResolutionDropdown();
@@ -53,11 +57,11 @@ public class MenuPageOptions : MenuPage
             if (SceneManager.GetActiveScene().name == "MainMenu") {
             
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
+                buttonOptionsBack.onClick.AddListener(() => _menuCategoryMain?.SelectPage(_menuCategoryMain.mainMenuPage));
             
             } else {
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => UIManager.Instance?.ShowPanelMain());
+                buttonOptionsBack.onClick.AddListener(() => _menuCategoryPause?.SelectPage(_menuCategoryPause.pauseMenuPage));
             }
         }
         

@@ -19,14 +19,17 @@ public class InputManager : MonoBehaviour
     private InputAction jumpAction;
     private InputAction dashAction;
     private InputAction restartAction;
-    
+
     [Header("UI")] 
+    public static Vector2 NavigateUI;
     public static bool TogglePauseWasPressed;
     public static bool ClickWasPressed;
     public static bool CancelWasPressed;
     private InputAction togglePauseAction;
     private InputAction clickAction;
     private InputAction cancelAction;
+    private InputAction navigateUIAction;
+    
 
     
 
@@ -61,6 +64,7 @@ public class InputManager : MonoBehaviour
         restartAction = _playerInput.actions["Restart"];
         
         // UI
+        navigateUIAction = _playerInput.actions["Navigate"];
         togglePauseAction = _playerInput.actions["TogglePause"];
         clickAction = _playerInput.actions["Click"];
         cancelAction = _playerInput.actions["Cancel"];
@@ -82,5 +86,6 @@ public class InputManager : MonoBehaviour
         RestartWasPressed = restartAction.WasPressedThisFrame();
         ClickWasPressed = clickAction.WasPressedThisFrame();
         CancelWasPressed = cancelAction.WasPressedThisFrame();
+        NavigateUI = navigateUIAction.ReadValue<Vector2>();
     }
 }

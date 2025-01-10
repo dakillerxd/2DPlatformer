@@ -32,13 +32,6 @@ namespace VInspector
             {
                 position.SetPos(0, 0).Draw(GUIColors.windowBackground);
             }
-            void outline()
-            {
-                if (Application.platform == RuntimePlatform.OSXEditor) return;
-
-                position.SetPos(0, 0).DrawOutline(Greyscale(.1f));
-
-            }
             void header()
             {
                 var headerRect = ExpandWidthLabelRect(18).Resize(-1).AddWidthFromMid(6);
@@ -228,6 +221,13 @@ namespace VInspector
                 EditorGUIUtility.labelWidth = 0;
 
             }
+            void outline()
+            {
+                if (Application.platform == RuntimePlatform.OSXEditor) return;
+
+                position.SetPos(0, 0).DrawOutline(Greyscale(.1f));
+
+            }
 
             void updateHeight_imgui()
             {
@@ -387,7 +387,6 @@ namespace VInspector
 
             background();
             header();
-            outline();
 
 
             horizontalResize();
@@ -396,14 +395,19 @@ namespace VInspector
 
             Space(3);
             body_imgui();
+            outline();
 
             Space(7);
 
             updateHeight_uitk();
             closeOnEscape();
 
+
             if (isDragged)
                 Repaint();
+
+            EditorApplication.delayCall -= Repaint;
+            EditorApplication.delayCall += Repaint;
 
         }
 

@@ -32,7 +32,6 @@ RectTransform:
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 5576356597979955751}
   - {fileID: 2282174210134307363}
   - {fileID: 5170921217741279088}
   - {fileID: 3903170647381060318}
@@ -57,6 +56,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 973260eba51c87543a097d875e58975e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectFirstSelectableOnEnable: 1
+  rememberLastSelectableOnDisable: 0
+  selectables:
+  - {fileID: 7245963070623162339}
+  - {fileID: 1542132612792416845}
+  - {fileID: 4252074891961628084}
+  - {fileID: 7451990644750437811}
+  - {fileID: 6509257196711706278}
+  - {fileID: 3347745528382712431}
+  - {fileID: 1282195713361013105}
+  - {fileID: 6887483392798666426}
+  - {fileID: 3293910376357136061}
+  moveInAnimation: 0
+  moveInFromDirection: {x: 0, y: -700, z: 0}
+  moveInDuration: 0.3
+  moveInDelay: 0.2
+  moveInEase: 3
+  moveInObjects: []
+  scaleOnSelect: 1
+  scaleMultiplier: 1.1
+  scaleDuration: 0.15
+  scaleEase: 31
+  scaleExclusions: []
+  rotateOnSelect: 0
+  rotationStrength: {x: 0, y: 0, z: 15}
+  rotationDuration: 0.15
+  rotationEase: 31
+  rotateExclusions: []
+  shakeOnSelect: 1
+  shakeOnDeselect: 0
+  shakeAxis: {x: 3, y: 3, z: 0}
+  shakeFrequency: 10
+  shakeDuration: 0.5
+  shakeEase: 0
+  shakeExclusions: []
   vSyncDropdown: {fileID: 4252074891961628084}
   screenModeDropdown: {fileID: 7451990644750437811}
   resolutionDropdown: {fileID: 6509257196711706278}
@@ -70,7 +104,6 @@ MonoBehaviour:
   musicVolumeSliderAmount: {fileID: 7731048717003390656}
   buttonOptionsBack: {fileID: 7245963070623162339}
   buttonDeleteSave: {fileID: 1542132612792416845}
-  mainMenuPosition: {fileID: 0}
 --- !u!223 &7223420278354576189
 Canvas:
   m_ObjectHideFlags: 0
@@ -200,37 +233,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
---- !u!1 &4119016748457609948
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5576356597979955751}
-  m_Layer: 0
-  m_Name: CameraPosition (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5576356597979955751
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4119016748457609948}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -25, y: -275, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5506434680227851358}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7791820619223434783
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,10 +317,6 @@ PrefabInstance:
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_NumberOfSteps
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
@@ -499,10 +497,6 @@ PrefabInstance:
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_NumberOfSteps
       value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
@@ -767,10 +761,6 @@ PrefabInstance:
     - target: {fileID: 3915695405150370017, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
@@ -1067,10 +1057,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
       objectReference: {fileID: 4252074891961628084}
@@ -1150,10 +1136,6 @@ PrefabInstance:
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_NumberOfSteps
       value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
@@ -1567,10 +1549,6 @@ PrefabInstance:
       value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5701358204043975929, guid: 27015fc8aad97aa42af4aa5229b7ec00, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp
       value: 
       objectReference: {fileID: 7245963070623162339}
@@ -1764,10 +1742,6 @@ PrefabInstance:
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_NumberOfSteps
       value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2515238091769110803, guid: bac01cb863c3a7145b44e9a903e6c072, type: 3}
       propertyPath: m_Navigation.m_SelectOnUp

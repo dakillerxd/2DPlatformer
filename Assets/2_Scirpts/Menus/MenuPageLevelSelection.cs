@@ -17,26 +17,24 @@ public class MenuPageLevelSelection : MenuPage
     [SerializeField] private GameObject levelsContainer;
     [SerializeField] private SceneField[] levels;
     
-    private  MenuCategoryMainMenu _menuCategoryMain;
     
     
     
     private void Start()
     {
-        _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
-        
         
         SetupButtons();
         SetupLevelButtons();
 
     }
+    
 
     private void SetupButtons()
     {
         if (buttonBack != null)
         {
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonBack.onClick.AddListener(() => _menuCategory.SelectPage(_menuCategoryMain.mainMenuPage));
+            buttonBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
         }
         if (buttonShowcaseLevel != null)
         {

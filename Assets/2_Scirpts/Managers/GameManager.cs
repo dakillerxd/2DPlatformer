@@ -38,8 +38,8 @@ public class GameManager : MonoBehaviour
     private Camera _camera;
     [EndTab]
     
-    public event UnityAction<GameStates> OnOnGameStateChange;
-    public event UnityAction<GameDifficulty> OnOnGameDifficultyChange;
+    public static event UnityAction<GameStates> OnOnGameStateChange;
+    public static event UnityAction<GameDifficulty> OnOnGameDifficultyChange;
     private readonly Dictionary<string, string> _infoTexts = new Dictionary<string, string>();
     
     
@@ -231,6 +231,7 @@ public class GameManager : MonoBehaviour
 
     #endregion GameStates
     
+    
     #region Unlockss // ---------------------------------
 
     private void CheckUnlocks()
@@ -296,6 +297,7 @@ public class GameManager : MonoBehaviour
     }
     
     #endregion Unlocks
+    
     
     #region Collectibles // -----------------------------------------------
     
@@ -380,6 +382,7 @@ public class GameManager : MonoBehaviour
     
     #endregion Collectibles
 
+    
     #region Tutorial Text // -----------------------------------------------
 
     private void SetUpTutorialTexts()

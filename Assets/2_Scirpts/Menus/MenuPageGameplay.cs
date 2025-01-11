@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using PrimeTween;
 
 public class MenuPageGameplay : MenuPage
 {
@@ -20,7 +21,6 @@ public class MenuPageGameplay : MenuPage
 
     private void Start()
     {
-        SetupUI();
         UpdateAbilitiesUI();
     }
     
@@ -36,29 +36,18 @@ public class MenuPageGameplay : MenuPage
         }
     }
 
-    private void SetupUI() {
+
+    
+    private void StartLevelTitleEffect(float duration, string title) {
         
         if (levelTitleText)
         {
-            levelTitleText.CrossFadeAlpha(0, 0, false);
+            levelTitleText.text = title;
+            Tween.Alpha(levelTitleText, startValue: 1, endValue:0, duration, ease: Ease.InOutSine, useUnscaledTime: true);
         }
-    }
-    
-    private void StartLevelTitleEffect(float duration, string title) {
-        if (!levelTitleText) return;
-        StartCoroutine(LevelTitleEffect(duration, title));
-    }
-    
-    private IEnumerator LevelTitleEffect(float duration, string title) {
         
-        if (!levelTitleText) yield break;
-        levelTitleText.CrossFadeAlpha(0, 0, false);
-        levelTitleText.text = title;
-        levelTitleText.CrossFadeAlpha(1, 1, false);
-        yield return new WaitForSeconds(1);
-        levelTitleText.CrossFadeAlpha(0, duration, false);
     }
-
+    
 
 
     public override void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
@@ -69,7 +58,7 @@ public class MenuPageGameplay : MenuPage
             StartLevelTitleEffect(1, "Showcase Level");
         } else {
             UpdateAbilitiesUI();
-            StartLevelTitleEffect(1, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+            StartLevelTitleEffect(2, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
         }
     }
     

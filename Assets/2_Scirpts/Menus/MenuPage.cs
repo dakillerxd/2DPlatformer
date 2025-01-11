@@ -6,12 +6,13 @@ using UnityEngine.EventSystems;
 using PrimeTween;
 using VInspector;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class MenuPage : MonoBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private bool selectFirstSelectableOnEnable = true;
-    [SerializeField] private bool rememberLastSelectableOnDisable = false;
+    [SerializeField] private bool forgetLastSelectableOnDisable = true;
     [SerializeField] protected List<Selectable> selectables = new List<Selectable>();
     
     
@@ -51,6 +52,8 @@ public class MenuPage : MonoBehaviour
     private Selectable _previousSelectable;
     protected MenuController _menuController;
     protected MenuCategory _menuCategory;
+    protected  MenuCategoryMainMenu _menuCategoryMain;
+    protected MenuCategoryPause _menuCategoryPause;
     private bool _canSelect;
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalScales = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalRotations = new Dictionary<Selectable, Vector3>();
@@ -59,25 +62,41 @@ public class MenuPage : MonoBehaviour
   
     private void Awake()
     {
-        if (selectables.Count == 0) return;
-        
         _menuController = GetComponentInParent<MenuController>();
         _menuCategory = GetComponentInParent<MenuCategory>();
+        _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
+        _menuCategoryPause = GetComponentInParent<MenuCategoryPause>();
         
+        if (selectables.Count == 0) return;
         foreach (Selectable selectable in selectables)
         {
             SetupSelectable(selectable);
             StoreOriginalTransforms(selectable);
         }
-        
     }
 
     private void OnDisable()
     {
-        if (rememberLastSelectableOnDisable) return;
-        _currentSelectable = null;
-        _previousSelectable = null;
         _canSelect = false;
+        
+        if (forgetLastSelectableOnDisable)
+        {
+            _currentSelectable = null;
+            _previousSelectable = null;
+        }
+        
+    }
+    
+    public virtual void OnEnable()
+    {
+        ResetAllSelectables();
+
+        _canSelect = true;
+        // StartCoroutine(SetCanSelect(true, 0f)); // bugged the custom selectable interactble state
+            
+        if (selectFirstSelectableOnEnable) {
+            StartCoroutine(SelectFirstAvailableSelectable(0.03f));
+        }
     }
     
 #if UNITY_EDITOR
@@ -99,16 +118,6 @@ public class MenuPage : MonoBehaviour
     #region Page Management // ---------------------------------------------------------------------
     
     
-    public virtual void OnPageSelected()
-    {
-        ResetAllSelectables();
-        
-        StartCoroutine(SetCanSelect(true, 0f));
-            
-        if (selectFirstSelectableOnEnable) {
-            StartCoroutine(SelectFirstAvailableSelectable());
-        }
-    }
     
     protected void StoreOriginalTransforms(Selectable selectable)
     {
@@ -149,27 +158,32 @@ public class MenuPage : MonoBehaviour
         }
     }
 
-    private IEnumerator SelectFirstAvailableSelectable(float delay = 0.03f)
+    private IEnumerator SelectFirstAvailableSelectable(float delay)
     {
-        if (selectables.Count == 0) yield return null;
         yield return new WaitForSeconds(delay); // small delay so the selectables will have time to initialize
         
+        SelectFirstAvailableSelectable();
+    }
+    
+    private void SelectFirstAvailableSelectable()
+    {
+        if (selectables.Count == 0) return;
+        
+        
+        // Try to select previous selectable if it's valid
         if (_previousSelectable && _previousSelectable.isActiveAndEnabled)
         {
             EventSystem.current.SetSelectedGameObject(_previousSelectable.gameObject);
+            return;
         }
-        else
+    
+        // Look for first active selectable starting from index 0
+        for (var i = 0; i < selectables.Count; i++)
         {
-            for (int i = 1; i < selectables.Count; i++)
-            {
-                if (selectables[i].gameObject.activeSelf)
-                {
-                    EventSystem.current.SetSelectedGameObject(selectables[i].gameObject);
-                    break;
-                }
-            }
+            if (!selectables[i].gameObject.activeSelf) continue;
+            EventSystem.current.SetSelectedGameObject(selectables[i].gameObject);
+            return;
         }
-        
     }
     
     
@@ -268,9 +282,9 @@ public class MenuPage : MonoBehaviour
     public void OnNavigate(Vector2 input)
     {
         if (!_canSelect) return;
-        
-        if (EventSystem.current.currentSelectedGameObject != null) return;
-        StartCoroutine(SelectFirstAvailableSelectable());
+
+        if (EventSystem.current.currentSelectedGameObject) return;
+        SelectFirstAvailableSelectable();
     }
     
     public virtual void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
@@ -287,18 +301,18 @@ public class MenuPage : MonoBehaviour
     private void PlayScaleAnimation(Transform target, bool scaleUp)
     {
         Vector3 endScale = scaleUp ? _selectableOriginalScales[_currentSelectable] * scaleMultiplier : _selectableOriginalScales[_currentSelectable];
-        Tween.Scale(target, endScale, scaleDuration, scaleEase);
+        Tween.Scale(target, endScale, scaleDuration, scaleEase, useUnscaledTime: true);
     }
 
     private void PlayRotateAnimation(Transform target, bool rotateToTarget)
     {
         Vector3 endRotation = rotateToTarget ? rotationStrength : _selectableOriginalRotations[_currentSelectable];
-        Tween.LocalRotation(target, endRotation, rotationDuration, rotationEase);
+        Tween.LocalRotation(target, endRotation, rotationDuration, rotationEase, useUnscaledTime: true);
     }
 
     private void PlayShakeAnimation(Transform target)
     {
-        Tween.ShakeLocalPosition(target, shakeAxis, shakeDuration, shakeFrequency, easeBetweenShakes: shakeEase);
+        Tween.ShakeLocalPosition(target, shakeAxis, shakeDuration, shakeFrequency, easeBetweenShakes: shakeEase, useUnscaledTime: true);
     }
     
     #endregion Animations // ---------------------------------------------------------------------

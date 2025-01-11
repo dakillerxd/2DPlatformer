@@ -26,14 +26,10 @@ public class MenuPageOptions : MenuPage
     [SerializeField] private Button buttonDeleteSave;
     private Resolution[] uniqueResolutions;
     
-    private  MenuCategoryMainMenu _menuCategoryMain;
-    private MenuCategoryPause _menuCategoryPause;
+
     
     private void Start()
     {
-        _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
-        _menuCategoryPause = GetComponentInParent<MenuCategoryPause>();
-        
         SetupButtons();
         SetupResolutionDropdown();
         SetupScreenModeDropdown();
@@ -50,6 +46,13 @@ public class MenuPageOptions : MenuPage
         if (musicVolumeSlider) musicVolumeSliderAmount.text = (musicVolumeSlider.value * 100).ToString("F0") + "%";
     }
 
+    public override void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
+    {
+        base.OnActiveSceneChanged(currentScene, nextScene);
+        
+        SetupButtons();
+    }
+
     private void SetupButtons()
     {
         if (buttonOptionsBack)
@@ -57,11 +60,11 @@ public class MenuPageOptions : MenuPage
             if (SceneManager.GetActiveScene().name == "MainMenu") {
             
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => _menuCategoryMain?.SelectPage(_menuCategoryMain.mainMenuPage));
+                buttonOptionsBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
             
             } else {
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => _menuCategoryPause?.SelectPage(_menuCategoryPause.pauseMenuPage));
+                buttonOptionsBack.onClick.AddListener(() => _menuCategoryPause.SelectPage(_menuCategoryPause.pauseMenuPage));
             }
         }
         

@@ -15,11 +15,10 @@ public class MenuPageMain : MenuPage
     [SerializeField] private Button buttonCredits;
     [SerializeField] private Button buttonQuit;
     
-    private  MenuCategoryMainMenu _menuCategoryMain;
+    
     
     private void Start()
     {
-        _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
         SetupButtons();
     }
 

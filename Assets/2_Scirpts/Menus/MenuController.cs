@@ -5,32 +5,30 @@ using UnityEngine.SceneManagement;
 public class MenuController : MonoBehaviour
 {
     [Header("Settings")] 
-    [SerializeField] private bool selectFirstMenuOnEnable = true;
+    [SerializeField] private bool selectFirstCategoryOnEnable = true;
     [SerializeField] private List<MenuCategory> menuCategories = new List<MenuCategory>();
-    
-
-    [Header("References")]
     protected MenuCategory _currentCategory;
     
 
     private void OnEnable()
     {
-        if (selectFirstMenuOnEnable)
+        if (selectFirstCategoryOnEnable)
         {
             SelectFirstCategory();
         }
         
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
-        GameManager.Instance.OnOnGameStateChange += OnGameStateChange;
+        GameManager.OnOnGameStateChange += OnGameStateChange;
+        
     }
     
     private void OnDisable()
     {
         SceneManager.activeSceneChanged -= OnActiveSceneChanged;
-        GameManager.Instance.OnOnGameStateChange -= OnGameStateChange;
+        GameManager.OnOnGameStateChange -= OnGameStateChange;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (!InputManager.Instance) return;
         
@@ -46,9 +44,8 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    private void OnNavigate(Vector2 context)
+    protected void OnNavigate(Vector2 context)
     {
-
         if (_currentCategory)
         {
             _currentCategory.OnNavigate(context);
@@ -81,7 +78,7 @@ public class MenuController : MonoBehaviour
 
     }
 
-    public void SelectCategory(MenuCategory category)
+    protected void SelectCategory(MenuCategory category)
     {
         if (!category || !menuCategories.Contains(category)) return;
 
@@ -94,7 +91,7 @@ public class MenuController : MonoBehaviour
         category.gameObject.SetActive(true);
     }
 
-    public void SelectFirstCategory()
+    protected void SelectFirstCategory()
     {
         if (menuCategories.Count >= 0)
         {
@@ -102,7 +99,7 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    public void DisableAllCategories()
+    protected void DisableAllCategories()
     {
         foreach (MenuCategory category in menuCategories)
         {

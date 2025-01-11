@@ -53,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 973260eba51c87543a097d875e58975e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectFirstSelectableOnEnable: 0
+  selectFirstSelectableOnEnable: 1
   rememberLastSelectableOnDisable: 0
   selectables:
   - {fileID: 7245963070623162339}
@@ -65,12 +65,6 @@ MonoBehaviour:
   - {fileID: 1282195713361013105}
   - {fileID: 6887483392798666426}
   - {fileID: 3293910376357136061}
-  moveInAnimation: 0
-  moveInFromDirection: {x: 0, y: -700, z: 0}
-  moveInDuration: 0.3
-  moveInDelay: 0.2
-  moveInEase: 3
-  moveInObjects: []
   scaleOnSelect: 1
   scaleMultiplier: 1.1
   scaleDuration: 0.15

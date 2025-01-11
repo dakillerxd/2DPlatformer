@@ -14,13 +14,10 @@ public class MenuPagePause : MenuPage
     
     [Header("Collectibles")]
     [SerializeField] private  TMP_Text pauseCollectiblesText;
-
-    private MenuCategoryPause _menuCategoryPause;
+    
 
     private void Start()
     {
-        _menuCategoryPause = GetComponent<MenuCategoryPause>();
-        
         SetupButtons();
         UpdatePauseScreenInfo();
     }
@@ -39,21 +36,21 @@ public class MenuPagePause : MenuPage
     {
         
         
-        if (buttonResume != null)
+        if (buttonResume)
         {
             buttonResume.onClick.RemoveAllListeners();
             buttonResume.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
             buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
         }
 
-        if (buttonOptions != null)
+        if (buttonOptions)
         {
             buttonOptions.onClick.RemoveAllListeners();
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptions.onClick.AddListener(() => _menuCategoryPause?.SelectPage(_menuCategoryPause.optionsMenuPage));
+            buttonOptions.onClick.AddListener(() => _menuCategoryPause.SelectPage(_menuCategoryPause.optionsMenuPage));
         }
         
-        if (buttonMainMenu != null)
+        if (buttonMainMenu)
         {
             buttonMainMenu.onClick.RemoveAllListeners();
             buttonMainMenu.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.None));
@@ -62,7 +59,7 @@ public class MenuPagePause : MenuPage
             
         }
 
-        if (buttonQuit != null)
+        if (buttonQuit)
         {
             buttonQuit.onClick.RemoveAllListeners();
             buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));

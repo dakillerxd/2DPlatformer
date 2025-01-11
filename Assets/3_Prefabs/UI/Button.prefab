@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4995072033234997596}
   - component: {fileID: 5048904389642680137}
+  - component: {fileID: 1028472814931518231}
   - component: {fileID: 2086485610490327656}
   - component: {fileID: 7358345205031731663}
-  - component: {fileID: 1028472814931518231}
+  - component: {fileID: 5146382772944590864}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -48,6 +49,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4630772646296596848}
   m_CullTransparentMesh: 1
+--- !u!114 &1028472814931518231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4630772646296596848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_Priority: 0
+  m_ComponentVersion: 5
+  m_HasRenderer: 0
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_AlphaCutoff: 0.1
+  m_ApplyToSortingLayers: 5954211a0000000081a6f949cd70452e
+  m_ShapePath:
+  - {x: -160, y: -30, z: 0}
+  - {x: -160, y: 30, z: 0}
+  - {x: 160, y: 30, z: 0}
+  - {x: 160, y: -30, z: 0}
+  m_ShapePathHash: -1407847147
+  m_InstanceId: 0
+  m_ShadowShape2DComponent: {fileID: 0}
+  m_ShadowShape2DProvider:
+    rid: -2
+  m_ShadowCastingSource: 1
+  m_ShadowMesh:
+    m_Mesh: {fileID: 0}
+    m_LocalBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 160, y: 30, z: 0}
+    m_EdgeProcessing: 1
+    m_TrimEdge: 0
+    m_FlipX: 0
+    m_FlipY: 0
+    m_InitialTrim: 0
+  m_CastingOption: 1
+  m_PreviousTrimEdge: 0
+  m_PreviousEdgeProcessing: 1
+  m_PreviousShadowCastingSource: 1
+  m_PreviousShadowShape2DSource: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &2086485610490327656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,7 +175,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1028472814931518231
+--- !u!114 &5146382772944590864
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,49 +184,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4630772646296596848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ShadowGroup: 0
-  m_Priority: 0
-  m_ComponentVersion: 5
-  m_HasRenderer: 0
-  m_UseRendererSilhouette: 1
-  m_CastsShadows: 1
-  m_SelfShadows: 0
-  m_AlphaCutoff: 0.1
-  m_ApplyToSortingLayers: 5954211a0000000081a6f949cd70452e
-  m_ShapePath:
-  - {x: -160, y: -30, z: 0}
-  - {x: -160, y: 30, z: 0}
-  - {x: 160, y: 30, z: 0}
-  - {x: 160, y: -30, z: 0}
-  m_ShapePathHash: -1407847147
-  m_InstanceId: 0
-  m_ShadowShape2DComponent: {fileID: 0}
-  m_ShadowShape2DProvider:
-    rid: -2
-  m_ShadowCastingSource: 1
-  m_ShadowMesh:
-    m_Mesh: {fileID: 0}
-    m_LocalBounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 160, y: 30, z: 0}
-    m_EdgeProcessing: 1
-    m_TrimEdge: 0
-    m_FlipX: 0
-    m_FlipY: 0
-    m_InitialTrim: 0
-  m_CastingOption: 1
-  m_PreviousTrimEdge: 0
-  m_PreviousEdgeProcessing: 1
-  m_PreviousShadowCastingSource: 1
-  m_PreviousShadowShape2DSource: {fileID: 0}
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+  m_Delegates: []
 --- !u!1 &7578560023148881231
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ public class MenuCategory : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private bool selectFirstPageOnEnable = true;
-    [SerializeField] private List<MenuPage> pages = new List<MenuPage>();
+    [SerializeField] protected List<MenuPage> pages = new List<MenuPage>();
     public bool IsAtFirstPage => pages[0].gameObject.activeSelf;
     protected MenuPage _currentPage;
 
@@ -23,7 +23,7 @@ public class MenuCategory : MonoBehaviour
     
     public void OnNavigate(Vector2 input)
     {
-        if (_currentPage != null)
+        if (_currentPage)
         {
             _currentPage.OnNavigate(input);
         }
@@ -32,7 +32,7 @@ public class MenuCategory : MonoBehaviour
 
     public void OnToggleMenu()
     {
-        if (_currentPage == null) return;
+        if (!_currentPage) return;
         
         if (_currentPage != pages[0])
         {
@@ -45,11 +45,11 @@ public class MenuCategory : MonoBehaviour
     {
         if (!page || !pages.Contains(page)) return;
 
+        StartCoroutine(DisableOtherPages(1.5f));
         _currentPage = page;
         page.gameObject.SetActive(true);
-        page.OnPageSelected();
         
-        // StartCoroutine(DisableOtherPages(1.5f));
+        
     }
 
     public void SelectFirstPage()

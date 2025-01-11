@@ -33,8 +33,14 @@ public class GameUIManager : MenuController
     }
     
     
-    private void Update()
+    protected override void Update()
     {
+        if (InputManager.NavigateUI != Vector2.zero)
+        {
+            OnNavigate(InputManager.NavigateUI);
+        }
+        
+        
         UpdateDebugUI();
     }
     
@@ -44,12 +50,12 @@ public class GameUIManager : MenuController
         {
             // VFXManager.Instance?.PlayAnimationTrigger(animator, "EnterScene1");
             DisableAllCategories();
-        }
-        else
-        {
+        } else {
             SelectFirstCategory();
-            base.OnActiveSceneChanged(currentScene, nextScene);
+            _currentCategory.OnActiveSceneChanged(currentScene, nextScene);
         }
+        
+        ToggleDebugUI(GameManager.Instance.debugMode);
     }
     
     protected override void OnGameStateChange(GameStates state)
@@ -99,7 +105,7 @@ public class GameUIManager : MenuController
     
     
     private readonly StringBuilder fpsStringBuilder = new StringBuilder(256);
-    public void UpdateFpsText() {
+    private void UpdateFpsText() {
 
         fpsStringBuilder.Clear();
 

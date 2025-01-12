@@ -24,10 +24,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F4;
     [SerializeField] private KeyCode finishGame = KeyCode.F5;
     [SerializeField] private KeyCode deleteSave = KeyCode.F6;
-    
-    // public Level[] levels;
+    public Level[] levels;
     public Unlock[] unlocks;
-    public Collectible[] collectibles;
     [EndTab]
     
     [Tab("References")] // ------------------------------------------
@@ -125,15 +123,14 @@ public class GameManager : MonoBehaviour
     
     [Button] private void FinishGame() {
         
-        
         // Collect all collectibles
         CollectAllCollectibles();
 
         
         // Set highest level
-        SaveManager.Instance?.SaveInt("HighestLevel", SceneManager.sceneCountInBuildSettings - 3);
+        SaveManager.Instance?.SaveInt("HighestLevel", levels.Length);
         SaveManager.Instance?.SaveString("SavedLevel", "Level1");
-        SaveManager.Instance?.SaveInt("TotalCollectibles", collectibles.Length);
+        SaveManager.Instance?.SaveInt("TotalCollectibles", levels.Length);
         
         // Restart scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -159,6 +156,11 @@ public class GameManager : MonoBehaviour
     #region GameStates // -----------------------------------------
 
     private void TogglePause() {
+
+        if (PlayerController.Instance.CheckPlayerState() == PlayerState.Teleporting)
+        {
+            return;
+        }
         
         if (gameState == GameStates.GamePlay) {
             SetGameState(GameStates.Paused);
@@ -305,20 +307,20 @@ public class GameManager : MonoBehaviour
         
         if (IsCollectibleCollected(connectedLevelName)) { return; }
         
-        foreach (Collectible collectible in collectibles) {
-            if (collectible.connectedLevel.SceneName == connectedLevelName) {
-                collectible.collected = true;
-                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+        foreach (Level level in levels) {
+            if (level.name == connectedLevelName) {
+                level.collectibleCollected = true;
+                SaveManager.Instance.SaveBool(level.name + " Collectible", level.collectibleCollected);
                 return;
             }
         }
     }
     
     
-    public bool IsCollectibleCollected(string connectedLevelName) {
-        foreach (Collectible collectible in collectibles) {
-            if (collectible.connectedLevel.SceneName == connectedLevelName) {
-                return collectible.collected;
+    public bool IsCollectibleCollected(string levelName) {
+        foreach (Level level in levels) {
+            if (level.name == levelName) {
+                return level.collectibleCollected;
             }
         }
         return false;
@@ -327,8 +329,8 @@ public class GameManager : MonoBehaviour
     public int TotalCollectiblesAmount() // The total amount of collectibles in the game
     {
         int total = 0;
-        foreach (Collectible collectible in collectibles) {
-            if (collectible.countsTowardsUnlocks) {
+        foreach (Level level in levels) {
+            if (level.countsTowardsUnlocks) {
                 total++;
             }
         }
@@ -338,8 +340,8 @@ public class GameManager : MonoBehaviour
     public int TotalCollectiblesCollected() // The total amount of the collected collectibles
     {
         int total = 0;
-        foreach (Collectible collectible in collectibles) {
-            if (collectible.collected && collectible.countsTowardsUnlocks) {
+        foreach (Level level in levels) {
+            if (level.collectibleCollected && level.countsTowardsUnlocks) {
                 total++;
             }
         }
@@ -348,9 +350,9 @@ public class GameManager : MonoBehaviour
 
     private void LoadCollectibles()
     {
-        foreach (Collectible collectible in collectibles) {
+        foreach (Level level in levels) {
             
-            collectible.collected = SaveManager.Instance.LoadBool("Collectible " + collectible.connectedLevel.SceneName);
+            level.collectibleCollected = SaveManager.Instance.LoadBool(level.name + " Collectible");
         }
 
         CheckUnlocks();
@@ -359,10 +361,10 @@ public class GameManager : MonoBehaviour
 
     private void ResetCollectibles()
     {
-            foreach (Collectible collectible in collectibles) 
+            foreach (Level level in levels) 
             {
-                collectible.collected = false;
-                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+                level.collectibleCollected = false;
+                SaveManager.Instance.SaveBool(level.name + " Collectible", level.collectibleCollected);
             }
             
             CheckUnlocks();
@@ -371,10 +373,10 @@ public class GameManager : MonoBehaviour
     private void CollectAllCollectibles()
     {
         
-            foreach (Collectible collectible in collectibles) 
+            foreach (Level level in levels) 
             {
-                collectible.collected = true;
-                SaveManager.Instance.SaveBool("Collectible " + collectible.connectedLevel.SceneName, collectible.collected);
+                level.collectibleCollected = true;
+                SaveManager.Instance.SaveBool(level.name  + " Collectible", level.collectibleCollected);
             }
 
             CheckUnlocks();

@@ -6,13 +6,11 @@ using UnityEngine.UI;
 public class MenuPagePause : MenuPage
 {
     
-    [Header("Buttons")]
+    [Header("UI Elements")]
     [SerializeField] private Button buttonResume;
     [SerializeField] private Button buttonOptions;
     [SerializeField] private Button buttonMainMenu;
     [SerializeField] private Button buttonQuit;
-    
-    [Header("Collectibles")]
     [SerializeField] private  TMP_Text pauseCollectiblesText;
     
 

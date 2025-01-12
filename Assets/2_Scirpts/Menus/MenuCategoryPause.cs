@@ -10,13 +10,11 @@ public class MenuCategoryPause : MenuCategory
     public override void SelectPage(MenuPage page)
     {
         if (page == _currentPage) return;
-        
         pauseMenuPage.gameObject.SetActive(false);
         optionsMenuPage.gameObject.SetActive(false);
         
+        base.SelectPage(page);
         
-        _currentPage = page;
-        page.gameObject.SetActive(true);
     }
     
 }

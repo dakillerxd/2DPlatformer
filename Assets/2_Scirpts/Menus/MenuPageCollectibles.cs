@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class MenuPageCollectibles : MenuPage
 {
+    [Header("UI Elements")]
+    [SerializeField] private Button buttonBack;
     
     [Header("Collectibles")]
     [SerializeField] private TextMeshProUGUI coinsHeaderText;
@@ -23,12 +25,10 @@ public class MenuPageCollectibles : MenuPage
     [SerializeField] private GameObject googlyEyes;
     [SerializeField] private GameObject propellerHat;
     [SerializeField] private GameObject curlyMustache;
+    
+    
     private readonly StringBuilder _collectiblesStringBuilder = new StringBuilder(256);
     private readonly StringBuilder _unlockStringBuilder = new StringBuilder(256);
-    
-    
-    [Header("Other")]
-    [SerializeField] private Button buttonBack;
     
 
 
@@ -44,7 +44,7 @@ public class MenuPageCollectibles : MenuPage
         UpdateUnlocks();
     }
 
-    public override void OnEnable()
+    protected override void OnEnable()
     {
         base.OnEnable();
         UpdateCollectibles();
@@ -112,13 +112,13 @@ public class MenuPageCollectibles : MenuPage
         {
             _collectiblesStringBuilder.Clear();
         
-            if (GameManager.Instance.collectibles != null)
+            if (GameManager.Instance.levels != null)
             {
-                foreach (Collectible collectible in GameManager.Instance.collectibles)
+                foreach (Level level in GameManager.Instance.levels)
                 {
-                    if (collectible != null && collectible.countsTowardsUnlocks)
+                    if (level is { countsTowardsUnlocks: true })
                     {
-                        _collectiblesStringBuilder.AppendFormat("{0}: {1}\n \n", collectible.connectedLevel?.SceneName ?? "Unknown", collectible.collected ? "<color=green>Collected</color>" : "<color=red>Not Collected</color>");
+                        _collectiblesStringBuilder.AppendFormat("{0}: {1}\n \n", level.name ?? "Unknown", level.collectibleCollected ? "<color=green>Collected</color>" : "<color=red>Not Collected</color>");
                     }
                 }
             

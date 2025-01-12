@@ -3,9 +3,7 @@ using UnityEngine.UI;
 
 public class MenuPageCredits : MenuPage
 {
-    
-    
-    [Header("Buttons")]
+    [Header("UI Elements")]
     [SerializeField] private Button buttonBack;
     
     

@@ -1,8 +1,5 @@
-using System;
 using CustomAttribute;
 using UnityEngine;
-using UnityEngine.Serialization;
-using VInspector;
 
 
 
@@ -30,6 +27,7 @@ public enum CosmeticItems
 public enum PlayerState {
     Controllable,
     Frozen,
+    Teleporting,
 }
 
 public enum PlayerAbilities {
@@ -75,7 +73,7 @@ public class Unlock
     public string unlockName;
     public bool unlockState;
     public int unlockedAtCollectible;
-    [FormerlySerializedAs("received")] [CustomAttribute.ReadOnly] public bool unlockReceived;
+    [CustomAttribute.ReadOnly] public bool unlockReceived;
 }
 
 [System.Serializable]
@@ -89,10 +87,16 @@ public class Collectible
 [System.Serializable]
 public class Level
 {
-    public string levelName;
-    public SceneField scene;
-    public bool gameLevel = true;
-    [VInspector.ShowIf("gameLevel")] public int levelNumber ;
+    public string name;
+    public SceneField connectedScene;
+    
+    [Header("Collectible")]
+    public bool countsTowardsUnlocks = true;
+    [CustomAttribute.ReadOnly] public bool collectibleCollected;
+    
+    [Header("Stats")]
+    [CustomAttribute.ReadOnly] public int totalDeaths;
+    [CustomAttribute.ReadOnly] public float bestTime;
 }
 
 

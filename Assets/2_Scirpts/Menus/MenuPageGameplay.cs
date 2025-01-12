@@ -7,10 +7,8 @@ using PrimeTween;
 public class MenuPageGameplay : MenuPage
 {
     
-    [Header("Level Title")]
+    [Header("UI Elements")]
     [SerializeField] private  TMP_Text levelTitleText;
-    
-    [Header("Abilities")] 
     [SerializeField] private  Color abilityUnlocked = Color.white;
     [SerializeField] private  Color abilityLocked = new Color(1f, 1f, 1f, 0.5f);
     [SerializeField] private GameObject doubleJump;

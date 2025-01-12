@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class MenuPageGameOver : MenuPage
 {
 
-    [Header("Game Over Info")]
+    [Header("UI Elements")]
     [SerializeField] private  TMP_Text gameOverCollectiblesText;
     [SerializeField] private  TMP_Text gameOverTitleText;
     [SerializeField] private  TMP_Text gameOverMessageText;

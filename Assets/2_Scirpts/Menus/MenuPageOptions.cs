@@ -21,10 +21,10 @@ public class MenuPageOptions : MenuPage
     [SerializeField] private Scrollbar musicVolumeSlider;
     [SerializeField] private TextMeshProUGUI musicVolumeSliderAmount;
     
-    [Header("Buttons")]
+    [Header("UI Elements")]
     [SerializeField] private Button buttonOptionsBack;
     [SerializeField] private Button buttonDeleteSave;
-    private Resolution[] uniqueResolutions;
+    private Resolution[] _uniqueResolutions;
     
 
     
@@ -107,7 +107,7 @@ public class MenuPageOptions : MenuPage
 
     private void SetupResolutionDropdown()
     {
-        uniqueResolutions = Screen.resolutions
+        _uniqueResolutions = Screen.resolutions
             .GroupBy(resolution => new { resolution.width, resolution.height })
             .Select(group => group.First())
             .OrderByDescending(resolution => resolution.width * resolution.height)
@@ -115,7 +115,7 @@ public class MenuPageOptions : MenuPage
     
         if (!resolutionDropdown) return;
         resolutionDropdown.ClearOptions();
-        List<string> options = uniqueResolutions.Select(res => $"{res.width} x {res.height}").ToList();
+        List<string> options = _uniqueResolutions.Select(res => $"{res.width} x {res.height}").ToList();
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = SettingsManager.Instance.resolutionIndex;
         resolutionDropdown.onValueChanged.AddListener((value) => SettingsManager.Instance.SetResolution(value));

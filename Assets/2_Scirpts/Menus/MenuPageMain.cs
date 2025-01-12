@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class MenuPageMain : MenuPage
 {
 
-    [Header("Buttons")]
+    [Header("UI Elements")]
     [SerializeField] private Button buttonStart;
     [SerializeField] private Button buttonResume;
     [SerializeField] private Button buttonLevelSelect;

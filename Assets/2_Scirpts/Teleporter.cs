@@ -102,7 +102,7 @@ public class Teleporter : MonoBehaviour
         }
         
         // Start effects
-        player.SetPlayerState(PlayerState.Frozen);
+        player.SetPlayerState(PlayerState.Teleporting);
         player.PlayAnimationTrigger("TeleportIn");
         StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));

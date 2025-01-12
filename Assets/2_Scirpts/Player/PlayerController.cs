@@ -193,7 +193,7 @@ public class PlayerController : MonoBehaviour {
     public bool isFastFalling { get; private set; }
     public bool atMaxFallSpeed { get; private set; } 
     public bool isWallSliding{ get; private set; } 
-    
+    public bool isTeleporting { get; private set; } 
     
     [Header("Input")] 
     private float _horizontalInput;
@@ -1279,6 +1279,7 @@ public class PlayerController : MonoBehaviour {
                 isFastFalling = false;
                 isJumping = false;
                 _canCoyoteJump = false;
+                isTeleporting = false;
                 _invincibilityTime = 0f;
                 _stunLockTime = 0f;
                 _currentHealth = maxHealth;
@@ -1288,7 +1289,17 @@ public class PlayerController : MonoBehaviour {
                 rigidBody.simulated = true;
                 rigidBody.linearVelocity = Vector2.zero;
                 break;
+            case PlayerState.Teleporting:
+                rigidBody.simulated = false;
+                rigidBody.linearVelocity = Vector2.zero;
+                break;
         }
+    }
+
+
+    public PlayerState CheckPlayerState()
+    {
+        return  currentPlayerState;
     }
 
     public void ReceiveAbility(PlayerAbilities ability, bool playEffects = true)
@@ -1377,7 +1388,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (!CameraController.Instance) return;
     
-        if (currentPlayerState == PlayerState.Frozen)
+        if (currentPlayerState != PlayerState.Controllable)
         {
             CameraController.Instance.SetDynamicOffset(Vector3.zero);
             CameraController.Instance.SetDynamicZoom(frozenZoomOffset);

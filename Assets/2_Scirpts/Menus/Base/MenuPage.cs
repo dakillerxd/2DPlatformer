@@ -99,18 +99,18 @@ public class MenuPage : MonoBehaviour
     
     
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-        foreach (Transform child in transform)
-        {
-            if (!child.TryGetComponent(out Selectable selectable)) continue;
-            if (!selectables.Contains(selectable))
-            {
-                selectables.Add(selectable);
-            }
-        }
-        selectables.RemoveAll(menu => menu == null);
-    }
+    // private void OnValidate()
+    // {
+    //     foreach (Transform child in transform)
+    //     {
+    //         if (!child.TryGetComponent(out Selectable selectable)) continue;
+    //         if (!selectables.Contains(selectable))
+    //         {
+    //             selectables.Add(selectable);
+    //         }
+    //     }
+    //     selectables.RemoveAll(menu => menu == null);
+    // }
 #endif
     
     

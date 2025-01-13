@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
+using UnityEngine.Serialization;
 
 
 public class SettingsManager : MonoBehaviour
 {
-    
     public static SettingsManager Instance { get; private set; }
     
     public enum ScreenModes
@@ -22,24 +23,28 @@ public class SettingsManager : MonoBehaviour
     public float masterGameVolume;
     public float soundFXVolume;
     public float musicVolume;
+    public bool force16By9AspectRatio;
     
     [Header("Default Settings")]
-    [SerializeField] private  int defaultTargetFPS = 999;
+    [SerializeField] private int defaultTargetFPS = 999;
     [SerializeField] private int defaultVSync = 0;
     [SerializeField] private ScreenModes defaultScreenMode = ScreenModes.Borderless;
     [SerializeField] private int defaultResolutionIndex = 0;
     [SerializeField] private float defaultMasterGameVolume = 1f;
     [SerializeField] private float defaultSoundFXVolume = 0.7f;
     [SerializeField] private float defaultMusicVolume = 0.5f;
+    [SerializeField] private bool defaultForce16By9 = true;
     
     [Header("Events")]
     public UnityEvent onSoundFXVolumeChange = new UnityEvent();
     public UnityEvent onMusicVolumeChange = new UnityEvent();
     public UnityEvent onMasterVolumeChange = new UnityEvent();
+    public UnityEvent onResolutionChange = new UnityEvent();
+
+    private Resolution[] _cachedResolutions;
 
     private void Awake()
     {
-        
         if (Instance != null && Instance != this) 
         {
             Destroy(gameObject);
@@ -47,13 +52,38 @@ public class SettingsManager : MonoBehaviour
         }
         Instance = this;
 
-
-        defaultResolutionIndex = Screen.resolutions.Length - 1;
+        UpdateAvailableResolutions();
+        defaultResolutionIndex = _cachedResolutions.Length - 1;
         LoadAllSettings();
+    }
+
+    private void UpdateAvailableResolutions()
+    {
+        Resolution[] allResolutions = Screen.resolutions;
+        
+        if (force16By9AspectRatio)
+        {
+            // Filter for 16:9 resolutions (allowing for small floating-point differences)
+            _cachedResolutions = allResolutions.Where(r => 
+            {
+                float aspect = (float)r.width / r.height;
+                return Mathf.Approximately(aspect, 16f/9f);
+            }).ToArray();
+        }
+        else
+        {
+            _cachedResolutions = allResolutions;
+        }
+    }
+
+    public Resolution[] GetAvailableResolutions()
+    {
+        return _cachedResolutions;
     }
 
     public void LoadAllSettings()
     {
+        SetForce16by9(SaveManager.Instance.LoadBool("Force16by9", defaultForce16By9));
         SetResolution(SaveManager.Instance.LoadInt("ResolutionIndex", defaultResolutionIndex));
         SetScreenMode((ScreenModes)SaveManager.Instance.LoadInt("screenMode", (int)defaultScreenMode));
         SetVSync(SaveManager.Instance.LoadInt("VSync", defaultVSync));
@@ -62,13 +92,29 @@ public class SettingsManager : MonoBehaviour
         SetSoundFXVolume(SaveManager.Instance.LoadFloat("GameVolume", defaultSoundFXVolume));
         SetMusicVolume(SaveManager.Instance.LoadFloat("MusicVolume", defaultMusicVolume));
     }
-    
+
+    public void SetForce16by9(bool force)
+    {
+        if (force16By9AspectRatio != force)
+        {
+            force16By9AspectRatio = force;
+            SaveManager.Instance.SaveBool("Force16by9", force);
+            UpdateAvailableResolutions();
+            
+            // Reset resolution to highest available if current resolution is not valid
+            if (resolutionIndex >= _cachedResolutions.Length)
+            {
+                SetResolution(_cachedResolutions.Length - 1);
+            }
+            
+            onResolutionChange.Invoke();
+        }
+    }
 
     public void SetScreenMode(ScreenModes modes)
     {
         FullScreenMode unityScreenMode;
-        Resolution[] resolutions = Screen.resolutions;
-        Resolution highestResolution = resolutions[resolutions.Length - 1];
+        Resolution highestResolution = _cachedResolutions[_cachedResolutions.Length - 1];
     
         switch (modes)
         {
@@ -93,15 +139,14 @@ public class SettingsManager : MonoBehaviour
 
     public void SetResolution(int index)
     {
-        Resolution[] resolutions = Screen.resolutions;
-        if (index >= 0 && index < resolutions.Length)
+        if (index >= 0 && index < _cachedResolutions.Length)
         {
-            Resolution resolution = resolutions[index];
+            Resolution resolution = _cachedResolutions[index];
             resolutionIndex = index;
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
             SaveManager.Instance.SaveInt("ResolutionIndex", index);
+            onResolutionChange.Invoke();
         }
-
     }
 
     public void SetVSync(int vSyncCount)
@@ -138,5 +183,4 @@ public class SettingsManager : MonoBehaviour
         SaveManager.Instance.SaveFloat("MusicVolume", musicVolume);
         onMusicVolumeChange.Invoke();
     }
-    
 }

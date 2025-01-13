@@ -222,19 +222,22 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    public void SaveNoDeathRun(string connectedLevelName, bool state)
+    public void SaveNoDeathRun(string connectedLevelName)
     {
         foreach (Level level in levels) {
             if (level.connectedScene.SceneName == connectedLevelName) {
-                if (level.noDeathRunRun) return;
-                level.noDeathRunRun = state;
-                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
-                
-                if (PlayerController.Instance)
+                if (!level.noDeathRunRun)
                 {
-                    StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position,text:"No Death Run!", color: Color.green));    
-                }
+                    level.noDeathRunRun = true;
+                    SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", true);
                 
+                    if (PlayerController.Instance)
+                    {
+                        StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position,text:"No Death Run!", color: Color.green));    
+                    }
+                    
+                }
+
             }
         }
     }
@@ -497,6 +500,7 @@ public class GameManager : MonoBehaviour
         AddInfoText("doubleJump", "press jump mid-air  \n to double jump"); // press <sprite=66> / <sprite=210> mid-air  \n \nto double jump
         AddInfoText("fastSlide", "press <sprite=44> / <sprite=206> to slide faster");
         AddInfoText("dropDown", "press down + jump to drop");
+        AddInfoText("dash", "press down + jump to drop");
     }
 
     private void AddInfoText(string id, string text)

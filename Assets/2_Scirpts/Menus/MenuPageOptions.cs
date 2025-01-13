@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.Serialization;
 
 public class MenuPageOptions : MenuPage
 {
@@ -20,13 +20,11 @@ public class MenuPageOptions : MenuPage
     [SerializeField] private TextMeshProUGUI sfxVolumeSliderAmount;
     [SerializeField] private Scrollbar musicVolumeSlider;
     [SerializeField] private TextMeshProUGUI musicVolumeSliderAmount;
+    [SerializeField] private Toggle force16By9AspectRatioToggle;
     
     [Header("UI Elements")]
     [SerializeField] private Button buttonOptionsBack;
     [SerializeField] private Button buttonDeleteSave;
-    private Resolution[] _uniqueResolutions;
-    
-
     
     protected override void Start()
     {
@@ -36,7 +34,20 @@ public class MenuPageOptions : MenuPage
         SetupScreenModeDropdown();
         SetupVSyncDropDown();
         SetupFPSSlider();
+        SetupForce16By9Toggle();
         SetupVolumeSliders();
+
+        // Subscribe to resolution change events
+        SettingsManager.Instance.onResolutionChange.AddListener(UpdateResolutionDropdown);
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from events when the object is destroyed
+        if (SettingsManager.Instance != null)
+        {
+            SettingsManager.Instance.onResolutionChange.RemoveListener(UpdateResolutionDropdown);
+        }
     }
     
     private void Update()
@@ -50,7 +61,6 @@ public class MenuPageOptions : MenuPage
     public override void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
         base.OnActiveSceneChanged(currentScene, nextScene);
-        
         SetupButtons();
     }
 
@@ -59,11 +69,9 @@ public class MenuPageOptions : MenuPage
         if (buttonOptionsBack)
         {
             if (SceneManager.GetActiveScene().name == "MainMenu") {
-            
                 buttonOptionsBack.onClick.RemoveAllListeners();
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
                 buttonOptionsBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
-            
             } else {
                 buttonOptionsBack.onClick.RemoveAllListeners();
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
@@ -77,7 +85,6 @@ public class MenuPageOptions : MenuPage
             buttonDeleteSave.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonDeleteSave.onClick.AddListener(() => GameManager.Instance?.DeleteSave());
         }
-
     }
 
     private void SetupVSyncDropDown()
@@ -92,6 +99,7 @@ public class MenuPageOptions : MenuPage
         });
     
         vSyncDropdown.value = SettingsManager.Instance.vSync;
+        vSyncDropdown.onValueChanged.RemoveAllListeners();
         vSyncDropdown.onValueChanged.AddListener((value) => SettingsManager.Instance.SetVSync(value));
     }
     
@@ -102,6 +110,7 @@ public class MenuPageOptions : MenuPage
         List<string> options = System.Enum.GetNames(typeof(SettingsManager.ScreenModes)).ToList();
         screenModeDropdown.AddOptions(options);
         screenModeDropdown.value = (int)SettingsManager.Instance.screenMode;
+        screenModeDropdown.onValueChanged.RemoveAllListeners();
         screenModeDropdown.onValueChanged.AddListener((value) => 
         {
             SettingsManager.Instance.SetScreenMode((SettingsManager.ScreenModes)value);
@@ -110,30 +119,53 @@ public class MenuPageOptions : MenuPage
 
     private void SetupResolutionDropdown()
     {
-        _uniqueResolutions = Screen.resolutions
-            .GroupBy(resolution => new { resolution.width, resolution.height })
-            .Select(group => group.First())
-            .OrderByDescending(resolution => resolution.width * resolution.height)
-            .ToArray();
-    
         if (!resolutionDropdown) return;
+        UpdateResolutionDropdown();
+    }
+
+    private void UpdateResolutionDropdown()
+    {
+        if (!resolutionDropdown) return;
+
+        // Get the filtered resolutions from SettingsManager
+        Resolution[] availableResolutions = SettingsManager.Instance.GetAvailableResolutions();
+
         resolutionDropdown.ClearOptions();
-        List<string> options = _uniqueResolutions.Select(res => $"{res.width} x {res.height}").ToList();
+        List<string> options = availableResolutions
+            .Select(res => $"{res.width} x {res.height}")
+            .ToList();
+        
         resolutionDropdown.AddOptions(options);
+
+        // Set the current resolution index
         resolutionDropdown.value = SettingsManager.Instance.resolutionIndex;
+
+        // Update the dropdown listener
+        resolutionDropdown.onValueChanged.RemoveAllListeners();
         resolutionDropdown.onValueChanged.AddListener((value) => SettingsManager.Instance.SetResolution(value));
     }
 
     private void SetupFPSSlider()
     {
+        if (!fpsSlider) return;
+        
         fpsSlider.value = (SettingsManager.Instance.targetFPS - 30f) / (999f - 30f); // Convert FPS to 0-1 range
-
+        fpsSlider.onValueChanged.RemoveAllListeners();
         fpsSlider.onValueChanged.AddListener((value) =>
         {
             float fps = 30f + (value * (999f - 30f));
             SettingsManager.Instance.SetFPS((int)fps);
         });
+    }
+    
+    private void SetupForce16By9Toggle()
+    {
+        if (!force16By9AspectRatioToggle) return;
         
+        force16By9AspectRatioToggle.isOn = SettingsManager.Instance.force16By9AspectRatio;
+        force16By9AspectRatioToggle.onValueChanged.RemoveAllListeners();
+        force16By9AspectRatioToggle.onValueChanged.AddListener((value) => SettingsManager.Instance?.SetForce16by9(value));
+        force16By9AspectRatioToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
     }
 
     private void SetupVolumeSliders()
@@ -141,25 +173,26 @@ public class MenuPageOptions : MenuPage
         if (masterVolumeSlider)
         {
             masterVolumeSlider.value = SettingsManager.Instance.masterGameVolume;
-            masterVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance.SetMasterVolume(value));
-            masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.PlaySoundFX("Player Jump"));
-            masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.RestartPlayingMusic());
-            
+            masterVolumeSlider.onValueChanged.RemoveAllListeners();
+            masterVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance?.SetMasterVolume(value));
+            masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Player Jump"));
+            masterVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance?.RestartPlayingMusic());
         }
         
         if (sfxVolumeSlider)
         {
             sfxVolumeSlider.value = SettingsManager.Instance.soundFXVolume;
-            sfxVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance.SetSoundFXVolume(value));
-            sfxVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.PlaySoundFX("Player Jump"));
+            sfxVolumeSlider.onValueChanged.RemoveAllListeners();
+            sfxVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance?.SetSoundFXVolume(value));
+            sfxVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Player Jump"));
         }
 
         if (musicVolumeSlider)
         {
             musicVolumeSlider.value = SettingsManager.Instance.musicVolume;
-            musicVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance.SetMusicVolume(value));
-            musicVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance.RestartPlayingMusic());
+            musicVolumeSlider.onValueChanged.RemoveAllListeners();
+            musicVolumeSlider.onValueChanged.AddListener((value) => SettingsManager.Instance?.SetMusicVolume(value));
+            musicVolumeSlider.onValueChanged.AddListener((value) => SoundManager.Instance?.RestartPlayingMusic());
         }
     }
-    
 }

@@ -1065,7 +1065,12 @@ public class PlayerController : MonoBehaviour {
         SoundManager.Instance?.PlaySoundFX("Teleporter In");
         CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);
         GameManager.Instance?.SaveBestTime(SceneManager.GetActiveScene().name, _currentTime);
-        GameManager.Instance?.SaveNoDeathRun(SceneManager.GetActiveScene().name, _currentDeaths == 0);
+        
+        if (_currentDeaths <= 0)
+        {
+            GameManager.Instance?.SaveNoDeathRun(SceneManager.GetActiveScene().name);
+        }
+        
     }
 
     private void CheckIfDead(string cause = "")

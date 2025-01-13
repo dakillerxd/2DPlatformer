@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +6,6 @@ using UnityEngine.EventSystems;
 using PrimeTween;
 using VInspector;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class MenuPage : MonoBehaviour
 {
@@ -146,12 +144,14 @@ public class MenuPage : MonoBehaviour
         eventTrigger.triggers.Add(entry);
     }
 
-    private void ResetAllSelectables() 
+    protected void ResetAllSelectables() 
     {
         if (selectables.Count == 0) return;
         
         foreach (Selectable selectable in selectables)
         {
+            if (!selectable.gameObject.activeSelf) continue;
+            
             selectable.transform.localScale = _selectableOriginalScales[selectable];
             selectable.transform.localRotation = Quaternion.Euler(_selectableOriginalRotations[selectable]);
             selectable.transform.localPosition = _selectableOriginalPositions[selectable];

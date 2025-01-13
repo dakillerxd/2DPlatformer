@@ -1,9 +1,7 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 using CustomAttribute;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class MenuCategory : MonoBehaviour
 {
@@ -23,10 +21,16 @@ public class MenuCategory : MonoBehaviour
 
     private void OnEnable()
     {
+        if (currentPage)
+        {
+            SelectPage(currentPage);
+        }
+        
         if (selectFirstPageOnEnable)
         {
             SelectFirstPage();
-        }
+            
+        } 
     }
     
     public void OnActiveSceneChanged(Scene currentScene, Scene nextScene)

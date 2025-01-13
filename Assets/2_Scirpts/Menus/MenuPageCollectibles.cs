@@ -61,12 +61,12 @@ public class MenuPageCollectibles : MenuPage
             GameObject toggleObject = Instantiate(togglePrefab.gameObject, unlocksContainer.transform);
             Toggle toggle = toggleObject.GetComponent<Toggle>();
             
-            toggleObject.GetComponentInChildren<TextMeshProUGUI>().text = $"{unlock.unlockedAtCollectible} Coins: {unlock.unlockName}";
-            toggleObject.name = unlock.unlockName;
+            toggleObject.GetComponentInChildren<TextMeshProUGUI>().text = $"{unlock.unlockedAtCollectible} Coins: {unlock.name}";
+            toggleObject.name = unlock.name;
             
-            toggle.isOn = unlock.unlockState;
-            toggle.interactable = unlock.unlockReceived;
-            toggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock(unlock.unlockName, value));
+            toggle.isOn = unlock.state;
+            toggle.interactable = unlock.received;
+            toggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock(unlock.name, value));
             toggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
 
             selectables.Add(toggle);

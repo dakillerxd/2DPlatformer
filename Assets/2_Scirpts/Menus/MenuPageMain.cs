@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -21,15 +22,13 @@ public class MenuPageMain : MenuPage
     {
         SetupButtons();
         base.Start();
-        SelectFirstAvailableSelectable();
     }
 
 
-
-
+    
     private void SetupButtons()
     {
-        if (buttonResume != null || buttonStart != null)
+        if (buttonResume || buttonStart)
         {
             // Check save
             if (SaveManager.Instance.LoadInt("HighestLevel") < 1) { // New game
@@ -56,13 +55,13 @@ public class MenuPageMain : MenuPage
             
                 buttonResume.gameObject.SetActive(true);
                 buttonStart.gameObject.SetActive(false);
-            
             }
             
             
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonStart.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
             buttonStart.onClick.AddListener(() => SceneManager.LoadScene(1));
+            // buttonStart.GetComponentInChildren<TextMeshProUGUI>().text = "Start";
             
             
             buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));

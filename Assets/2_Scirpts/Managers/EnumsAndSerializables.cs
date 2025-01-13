@@ -70,10 +70,10 @@ public class Sound
 [System.Serializable]
 public class Unlock
 {
-    public string unlockName;
-    public bool unlockState;
+    public string name;
     public int unlockedAtCollectible;
-    [CustomAttribute.ReadOnly] public bool unlockReceived;
+    [CustomAttribute.ReadOnly] public bool state;
+    [CustomAttribute.ReadOnly] public bool received;
 }
 
 [System.Serializable]

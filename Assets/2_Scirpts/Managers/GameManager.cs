@@ -1,12 +1,11 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
+using PrimeTween;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using UnityEngine.TextCore.Text;
 using VInspector;
-
 
 
 public class GameManager : MonoBehaviour
@@ -29,10 +28,11 @@ public class GameManager : MonoBehaviour
     [EndTab]
     
     [Tab("References")] // ------------------------------------------
-    public InputManager inputManagerPrefab;
-    public SoundManager soundManagerPrefab;
-    public GameUIManager gameUIManagerPrefab;
-    public VFXManager vfxManagerPrefab;
+    [SerializeField] private InputManager inputManagerPrefab;
+    [SerializeField] private SoundManager soundManagerPrefab;
+    [SerializeField] private GameUIManager gameUIManagerPrefab;
+    [SerializeField] private VFXManager vfxManagerPrefab;
+    [SerializeField] private TextMeshPro statUpdatePrefab;
     private Camera _camera;
     [EndTab]
     
@@ -194,6 +194,11 @@ public class GameManager : MonoBehaviour
                 if (time < level.bestTime || level.bestTime == 0) {
                     level.bestTime = time;
                     SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " BestTime", level.bestTime);
+
+                    if (PlayerController.Instance)
+                    {
+                        StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position, text: $"New Best Time! {time:F1}", color: Color.green));
+                    }
                 }
                 return;
             }
@@ -207,20 +212,53 @@ public class GameManager : MonoBehaviour
 
                 level.totalDeaths += 1;
                 SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " TotalDeaths", level.totalDeaths);
-
+                
+                if (PlayerController.Instance)
+                {
+                    StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position, text:"+1 Death", color: Color.red));    
+                }
+                
             }
         }
     }
     
-    public void SavePerfectRun(string connectedLevelName, bool state)
+    public void SaveNoDeathRun(string connectedLevelName, bool state)
     {
         foreach (Level level in levels) {
             if (level.connectedScene.SceneName == connectedLevelName) {
                 if (level.noDeathRunRun) return;
                 level.noDeathRunRun = state;
                 SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
+                
+                if (PlayerController.Instance)
+                {
+                    StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position,text:"No Death Run!", color: Color.green));    
+                }
+                
             }
         }
+    }
+    
+    
+    
+    private IEnumerator UpdateStatEffect(Vector3 position, string text, float duration = 2, Color color = default)
+    {
+        if (!statUpdatePrefab) yield return null;
+
+        TextMeshPro stat = Instantiate(statUpdatePrefab, position, statUpdatePrefab.transform.rotation);
+        Vector3 randDir = new Vector3(Random.Range(-3f, 3f), Random.Range(1f, 2f), 0);
+        Vector3 randRot = new Vector3(0, 0, Random.Range(-60f, 60f));
+        float randSize = Random.Range(1.2f, 1.7f);
+        
+        stat.text = text;
+        stat.color = color;
+        Tween.Alpha(stat,startValue:1, 0, duration);
+        Tween.Position(stat.transform, stat.transform.position + randDir, duration);
+        Tween.Rotation(stat.transform, randRot, duration);
+        Tween.Scale(stat.transform, randSize, duration);
+        
+        yield return new WaitForSeconds(duration);
+        if (stat) Destroy(stat.gameObject);
     }
     
     #endregion // -----------------------------------------
@@ -305,7 +343,7 @@ public class GameManager : MonoBehaviour
         {
             if (TotalCollectiblesCollected() >= unlock.unlockedAtCollectible)
             {
-                unlock.unlockReceived = TotalCollectiblesCollected() >= unlock.unlockedAtCollectible;
+                unlock.received = TotalCollectiblesCollected() >= unlock.unlockedAtCollectible;
             }
         }
     }
@@ -314,10 +352,10 @@ public class GameManager : MonoBehaviour
     {
         foreach (Unlock unlock in unlocks)
         {
-            if (unlock.unlockName == unlockName)
+            if (unlock.name == unlockName)
             {
-                unlock.unlockState = state;
-                SaveManager.Instance.SaveBool(unlockName, unlock.unlockState);
+                unlock.state = state;
+                SaveManager.Instance.SaveBool(unlockName, unlock.state);
                 PlayerController.Instance?.ToggleAllCosmetics();
                 return;
             }
@@ -329,9 +367,9 @@ public class GameManager : MonoBehaviour
     {
         foreach (Unlock unlock in unlocks)
         {
-            if (unlock.unlockName == unlockName)
+            if (unlock.name == unlockName)
             {
-                return unlock.unlockReceived;
+                return unlock.received;
             }
         }
         Debug.LogError("Unlock not found");
@@ -342,9 +380,9 @@ public class GameManager : MonoBehaviour
     {
         foreach (Unlock unlock in unlocks)
         {
-            if (unlock.unlockName == unlockName)
+            if (unlock.name == unlockName)
             {
-                return unlock.unlockState;
+                return unlock.state;
             }
         }
         Debug.LogError("Unlock not found");
@@ -355,8 +393,8 @@ public class GameManager : MonoBehaviour
     {
         foreach (Unlock unlock in unlocks)
         {
-            unlock.unlockReceived = false;
-            unlock.unlockState = false;
+            unlock.received = false;
+            unlock.state = false;
         }
     }
     

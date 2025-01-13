@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3541980689378132058, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
       propertyPath: m_Name
-      value: StatUpdateText Variant
+      value: StatUpdateText
       objectReference: {fileID: 0}
     - target: {fileID: 3717269721487764816, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
       propertyPath: m_Pivot.x
@@ -74,11 +74,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3717269721487764816, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 6.117745
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3717269721487764816, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -4.869598
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3717269721487764816, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -92,25 +92,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8041475605686594892, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8041475605686594892, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 776302797
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5274215416256463837, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3541980689378132058, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 800048263605254484}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
---- !u!1 &4306113028471378817 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3541980689378132058, guid: 1e380d23fc1f33f488cdeaf1e1c6fc95, type: 3}
-  m_PrefabInstance: {fileID: 785251789814010843}
-  m_PrefabAsset: {fileID: 0}
---- !u!33 &800048263605254484
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4306113028471378817}
-  m_Mesh: {fileID: 0}

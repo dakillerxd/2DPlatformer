@@ -56,107 +56,95 @@ MonoBehaviour:
   restartSceneKey: 285
   finishGame: 286
   deleteSave: 287
-  unlocks:
-  - unlockName: Curly Mustache
-    unlockState: 0
-    unlockedAtCollectible: 2
-    unlockReceived: 0
-  - unlockName: Propeller Hat
-    unlockState: 0
-    unlockedAtCollectible: 4
-    unlockReceived: 0
-  - unlockName: Googly Eye
-    unlockState: 0
-    unlockedAtCollectible: 6
-    unlockReceived: 0
-  collectibles:
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
-      m_SceneName: Level1
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: fdff390fd69488141992d81f655a8dcd, type: 3}
-      m_SceneName: Level2
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 591ec75145a03ae449728a9f949392ad, type: 3}
-      m_SceneName: Level3
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 1fef8a30b0a64ee42935456a44ef89ef, type: 3}
-      m_SceneName: Level4
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: 2a961657cc954194bb3921b85289fe5a, type: 3}
-      m_SceneName: Level5
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: b37d4a79f9e6bfe47bbf656d2a6c1bc1, type: 3}
-      m_SceneName: Level6
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: aa971e4ec77bba3418be408940dc17f3, type: 3}
-      m_SceneName: Level7
-    countsTowardsUnlocks: 1
-    collected: 0
-  - connectedLevel:
-      m_SceneAsset: {fileID: 102900000, guid: ca4a4456747d3474e9e5324203c0978e, type: 3}
-      m_SceneName: Level8
-    countsTowardsUnlocks: 0
-    collected: 0
   levels:
   - name: Level 1
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
       m_SceneName: Level1
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 2
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: fdff390fd69488141992d81f655a8dcd, type: 3}
       m_SceneName: Level2
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 3
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 591ec75145a03ae449728a9f949392ad, type: 3}
       m_SceneName: Level3
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 4
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 1fef8a30b0a64ee42935456a44ef89ef, type: 3}
       m_SceneName: Level4
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 5
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 2a961657cc954194bb3921b85289fe5a, type: 3}
       m_SceneName: Level5
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 6
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: b37d4a79f9e6bfe47bbf656d2a6c1bc1, type: 3}
       m_SceneName: Level6
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
   - name: Level 7
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: aa971e4ec77bba3418be408940dc17f3, type: 3}
       m_SceneName: Level7
+      m_BuildIndex: -1
     countsTowardsUnlocks: 1
     collectibleCollected: 0
+    noDeathRunRun: 0
+    totalDeaths: 0
+    bestTime: 0
+  unlocks:
+  - name: Curly Mustache
+    unlockedAtCollectible: 2
+    state: 0
+    received: 0
+  - name: Propeller Hat
+    unlockedAtCollectible: 4
+    state: 0
+    received: 0
+  - name: Googly Eye
+    unlockedAtCollectible: 6
+    state: 0
+    received: 0
   inputManagerPrefab: {fileID: 6668247925252254685, guid: 11d09469762d9de4590abaad657a7eef, type: 3}
   soundManagerPrefab: {fileID: 8169659688527411552, guid: 29762c76c6068794ab6c06aa1576adc5, type: 3}
-  gameUIManagerPrefab: {fileID: 0}
+  gameUIManagerPrefab: {fileID: 3659276992571845032, guid: 59fec0a17b3d3944a86933bf0e31a6d4, type: 3}
   vfxManagerPrefab: {fileID: 53827270003700011, guid: cc712b86b54ab2c4b9ab5af92ef15fbc, type: 3}
+  statUpdatePrefab: {fileID: 4085009876117232941, guid: 556dd011eee7e34438b7443a1f5c26ea, type: 3}
 --- !u!114 &3787602947778312689
 MonoBehaviour:
   m_ObjectHideFlags: 0

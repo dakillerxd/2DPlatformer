@@ -22,7 +22,27 @@ namespace CustomAttribute
 
         public int BuildIndex
         {
-            get { return m_BuildIndex; }
+            get 
+            {
+                #if UNITY_EDITOR
+                // Find build index if it's not set correctly
+                if (m_BuildIndex == -1 && !string.IsNullOrEmpty(m_SceneName))
+                {
+                    EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
+                    string scenePath = AssetDatabase.GetAssetPath(m_SceneAsset);
+                    
+                    for (int i = 0; i < scenes.Length; i++)
+                    {
+                        if (scenes[i].path == scenePath)
+                        {
+                            m_BuildIndex = i;
+                            break;
+                        }
+                    }
+                }
+                #endif
+                return m_BuildIndex;
+            }
         }
 
         // makes it work with the existing Unity methods (LoadLevel/LoadScene)

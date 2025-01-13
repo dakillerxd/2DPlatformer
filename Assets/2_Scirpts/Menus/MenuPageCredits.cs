@@ -7,8 +7,9 @@ public class MenuPageCredits : MenuPage
     [SerializeField] private Button buttonBack;
     
     
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         SetupButtons();
     }
 

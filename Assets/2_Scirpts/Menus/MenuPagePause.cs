@@ -14,8 +14,9 @@ public class MenuPagePause : MenuPage
     [SerializeField] private  TMP_Text pauseCollectiblesText;
     
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         SetupButtons();
         UpdatePauseScreenInfo();
     }

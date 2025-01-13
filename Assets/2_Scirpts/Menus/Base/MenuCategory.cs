@@ -1,7 +1,8 @@
-using System.Collections;
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class MenuCategory : MonoBehaviour
 {
@@ -9,10 +10,16 @@ public class MenuCategory : MonoBehaviour
     [SerializeField] private bool selectFirstPageOnEnable = true;
     [SerializeField] protected List<MenuPage> pages = new List<MenuPage>();
     public bool IsAtFirstPage => pages[0].gameObject.activeSelf;
-    protected MenuPage _currentPage;
+    public MenuPage currentPage;
 
-    
-    
+    private void Awake()
+    {
+        if (selectFirstPageOnEnable)
+        {
+            SelectFirstPage();
+        }
+    }
+
     private void OnEnable()
     {
         if (selectFirstPageOnEnable)
@@ -23,18 +30,18 @@ public class MenuCategory : MonoBehaviour
     
     public void OnNavigate(Vector2 input)
     {
-        if (_currentPage)
+        if (currentPage)
         {
-            _currentPage.OnNavigate(input);
+            currentPage.OnNavigate(input);
         }
     }
     
 
     public void OnToggleMenu()
     {
-        if (!_currentPage) return;
+        if (!currentPage) return;
         
-        if (_currentPage != pages[0])
+        if (currentPage != pages[0])
         {
             SelectFirstPage();
         }
@@ -45,9 +52,12 @@ public class MenuCategory : MonoBehaviour
     {
         if (!page || !pages.Contains(page)) return;
         
-        _currentPage = page;
+        currentPage = page;
         page.gameObject.SetActive(true);
-        
+        // page.ResetAllSelectables(); // Resetting the position bugs the selectables that are in a layout group
+        page.ResetSelectablesState();
+        StartCoroutine(page.SelectFirstAvailableSelectableCar());
+        DisableNonActivePagesSelectables();
     }
 
     private void SelectFirstPage()
@@ -61,7 +71,7 @@ public class MenuCategory : MonoBehaviour
     public void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
 
-        _currentPage.OnActiveSceneChanged(currentScene, nextScene);
+        currentPage.OnActiveSceneChanged(currentScene, nextScene);
     }
     
     public virtual void OnGameStateChange(GameStates state)
@@ -73,9 +83,21 @@ public class MenuCategory : MonoBehaviour
     {
         foreach (MenuPage page in pages)
         {
-            page.DisableSelectables();
+            if (currentPage == page) continue; // skip the current page
+            page.DisableAllSelectables();
+            page.ResetAllSelectablesSize();
         }
         
+    }
+
+    public void DisableAllPage()
+    {
+        foreach (MenuPage page in pages)
+        {
+            page.DisableAllSelectables();
+            page.gameObject.SetActive(false);
+        }
+        currentPage = null;
     }
     
 

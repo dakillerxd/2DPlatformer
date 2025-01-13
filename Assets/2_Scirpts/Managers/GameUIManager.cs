@@ -22,7 +22,9 @@ public class GameUIManager : MenuController
     [SerializeField] private Animator animator;
     
 
-    private void Awake() {
+    protected override void Awake() {
+        base.Awake();
+        
         if (Instance != null && Instance != this) 
         {
             Destroy(gameObject);
@@ -30,16 +32,20 @@ public class GameUIManager : MenuController
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            DisableAllCategories();
+        }
     }
     
     
     protected override void Update()
     {
-        if (InputManager.NavigateUI != Vector2.zero)
+        if (InputManager.NavigateUI != Vector2.zero || currentCategory)
         {
             OnNavigate(InputManager.NavigateUI);
         }
-        
         
         UpdateDebugUI();
     }
@@ -52,7 +58,7 @@ public class GameUIManager : MenuController
             DisableAllCategories();
         } else {
             SelectFirstCategory();
-            _currentCategory.OnActiveSceneChanged(currentScene, nextScene);
+            currentCategory.OnActiveSceneChanged(currentScene, nextScene);
         }
         
         ToggleDebugUI(GameManager.Instance.debugMode);

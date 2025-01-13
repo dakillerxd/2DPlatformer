@@ -28,8 +28,9 @@ public class MenuPageOptions : MenuPage
     
 
     
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         SetupButtons();
         SetupResolutionDropdown();
         SetupScreenModeDropdown();

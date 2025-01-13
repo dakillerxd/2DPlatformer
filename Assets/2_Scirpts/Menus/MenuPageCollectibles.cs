@@ -32,7 +32,7 @@ public class MenuPageCollectibles : MenuPage
     
 
 
-    private void Start()
+    protected override void Start()
     {
         if (buttonBack != null) {
             
@@ -42,14 +42,11 @@ public class MenuPageCollectibles : MenuPage
         
         UpdateCollectibles();
         UpdateUnlocks();
+        
+        base.Start();
     }
-
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        UpdateCollectibles();
-        UpdateUnlocks();
-    }
+    
+    
 
     private void Update()
     {
@@ -66,6 +63,10 @@ public class MenuPageCollectibles : MenuPage
             googlyEyesToggle.interactable = GameManager.Instance.CheckUnlockReceived("Googly Eye");
             googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Googly Eye", value));
             googlyEyesToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
+            selectables.Add(googlyEyesToggle);
+            SetupSelectable(googlyEyesToggle);
+            StoreOriginalTransforms(googlyEyesToggle);
+            StoreOriginalState(googlyEyesToggle);
         }
         
         if (propellerHatToggle) {
@@ -73,13 +74,22 @@ public class MenuPageCollectibles : MenuPage
             propellerHatToggle.interactable = GameManager.Instance.CheckUnlockReceived("Propeller Hat");
             propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Propeller Hat", value));
             propellerHatToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
+            selectables.Add(propellerHatToggle);
+            SetupSelectable(propellerHatToggle);
+            StoreOriginalTransforms(propellerHatToggle);
+            StoreOriginalState(propellerHatToggle);
         }
         
-        if (curlyMustacheToggle) {
+        if (curlyMustacheToggle)
+        {
             curlyMustacheToggle.isOn = GameManager.Instance.CheckUnlockActive("Curly Mustache");
             curlyMustacheToggle.interactable = GameManager.Instance.CheckUnlockReceived("Curly Mustache");
             curlyMustacheToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Curly Mustache", value));
             curlyMustacheToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
+            selectables.Add(curlyMustacheToggle);
+            SetupSelectable(curlyMustacheToggle);
+            StoreOriginalTransforms(curlyMustacheToggle);
+            StoreOriginalState(curlyMustacheToggle);
         }
 
         if (!unlocksText || GameManager.Instance.unlocks != null)

@@ -17,8 +17,9 @@ public class MenuPageGameplay : MenuPage
     [SerializeField] private GameObject dash;
 
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         UpdateAbilitiesUI();
     }
     

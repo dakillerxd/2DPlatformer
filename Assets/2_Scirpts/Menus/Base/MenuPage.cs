@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,7 +57,6 @@ public class MenuPage : MonoBehaviour
     protected MenuCategory _menuCategory;
     protected  MenuCategoryMainMenu _menuCategoryMain;
     protected MenuCategoryPause _menuCategoryPause;
-    public bool canSelect;
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalScales = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalRotations = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalPositions = new Dictionary<Selectable, Vector3>();
@@ -77,30 +77,42 @@ public class MenuPage : MonoBehaviour
             StoreOriginalTransforms(selectable);
             StoreOriginalState(selectable);
         }
+        
+    }
+
+    protected virtual void Start()
+    {
+        if (_menuCategory.currentPage != this || _menuController.currentCategory != _menuCategory)
+        {
+            DisableAllSelectables();
+        }
+        else
+        {
+            ResetAllSelectables();
+        }
+        
+        
     }
 
     protected virtual void OnDisable()
     {
-        DisableSelectables();
+        DisableAllSelectables();
 
         if (forgetLastSelectableOnDisable)
         {
             _currentSelectable = null;
             _previousSelectable = null;
         }
-        
     }
     
     protected virtual void OnEnable()
     {
-        ResetAllSelectables();
         
-        // StartCoroutine(SetCanSelect(true, 0f)); // bugged the custom selectable interactable state
-            
-        if (selectFirstSelectableOnEnable) {
-            StartCoroutine(SelectFirstAvailableSelectable(0.03f));
-        }
+        ResetAllSelectables();
+        StartCoroutine(SelectFirstAvailableSelectableCar());
     }
+    
+    
     
 #if UNITY_EDITOR
     private void OnValidate()
@@ -153,13 +165,12 @@ public class MenuPage : MonoBehaviour
         eventTrigger.triggers.Add(entry);
     }
 
-    private void ResetAllSelectables()
+    public void ResetAllSelectables() 
     {
         if (selectables.Count == 0) return;
         
         foreach (Selectable selectable in selectables)
         {
-            if (!selectable.gameObject.activeSelf) continue;
             selectable.transform.localScale = _selectableOriginalScales[selectable];
             selectable.transform.localRotation = Quaternion.Euler(_selectableOriginalRotations[selectable]);
             selectable.transform.localPosition = _selectableOriginalPositions[selectable];
@@ -167,17 +178,15 @@ public class MenuPage : MonoBehaviour
         }
     }
 
-    private IEnumerator SelectFirstAvailableSelectable(float delay)
+    public IEnumerator SelectFirstAvailableSelectableCar()
     {
-        yield return new WaitForSeconds(delay); // small delay so the selectables will have time to initialize
-        
+        yield return new WaitForSeconds(0.3f); // small delay so the selectables will have time to initialize
         SelectFirstAvailableSelectable();
     }
     
-    private void SelectFirstAvailableSelectable()
+    public void SelectFirstAvailableSelectable()
     {
-        if (selectables.Count == 0) return;
-        
+        if (selectables.Count == 0 || !selectFirstSelectableOnEnable) return;
         
         // Try to select previous selectable if it's valid
         if (_previousSelectable && _previousSelectable.isActiveAndEnabled)
@@ -194,38 +203,34 @@ public class MenuPage : MonoBehaviour
             return;
         }
     }
-    
-    
-    private IEnumerator SetCanSelect(bool state, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        canSelect = state;
 
-        foreach (Selectable selectable in selectables)
-        {
-            
-            selectable.interactable = state;
-            
-        }
-    }
 
-    public void DisableSelectables()
+    public void DisableAllSelectables()
     {
         foreach (Selectable selectable in selectables)
         {
-            
             selectable.interactable = false;
-            
         }
     }
-
-    protected void RestSelectableState()
+    
+    public virtual void ResetSelectablesState()
     {
         foreach (Selectable selectable in selectables)
         {
             selectable.interactable = _selectableOriginalState[selectable];
         }
     }
+
+    public virtual void ResetAllSelectablesSize()
+    {
+            foreach (Selectable selectable in selectables)
+            {
+                selectable.transform.localScale = _selectableOriginalScales[selectable];
+            }
+    }
+    
+
+    
     
     
     #endregion Page Management // ---------------------------------------------------------------------
@@ -235,12 +240,11 @@ public class MenuPage : MonoBehaviour
     
     protected virtual void OnSelect(BaseEventData eventData)
     {
-        if (!canSelect) return;
         
         if (!eventData.selectedObject.activeSelf) return;
         
         _currentSelectable = eventData.selectedObject.GetComponent<Selectable>();
-        if (_currentSelectable == null) return;
+        if (!_currentSelectable || !_currentSelectable.interactable) return;
 
         if (scaleOnSelect && !scaleExclusions.Contains(_currentSelectable))
         {
@@ -263,9 +267,8 @@ public class MenuPage : MonoBehaviour
 
     protected virtual void OnDeselect(BaseEventData eventData)
     {
-        if (!canSelect) return;
         
-        if (!eventData.selectedObject.activeSelf || _currentSelectable == null) return;
+        if (!eventData.selectedObject.activeSelf || _currentSelectable == null || !_currentSelectable.interactable) return;
         
         if (scaleOnSelect && !scaleExclusions.Contains(_currentSelectable))
         {
@@ -288,7 +291,6 @@ public class MenuPage : MonoBehaviour
 
     private void OnPointerEnter(BaseEventData eventData)
     {
-        if (!canSelect) return;
         
         if (eventData is PointerEventData pointerEventData)
         {
@@ -298,7 +300,6 @@ public class MenuPage : MonoBehaviour
     
     private void OnPointerExit(BaseEventData eventData)
     {
-        if (!canSelect) return;
         
         if (eventData is PointerEventData pointerEventData)
         {
@@ -308,7 +309,6 @@ public class MenuPage : MonoBehaviour
     
     public void OnNavigate(Vector2 input)
     {
-        if (!canSelect) return;
 
         if (EventSystem.current.currentSelectedGameObject) return;
         SelectFirstAvailableSelectable();

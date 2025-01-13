@@ -92,11 +92,13 @@ public class GameManager : MonoBehaviour
             
             SetGameState(GameStates.None);
             SetGameDifficulty(GameDifficulty.None);
-            LoadCollectibles();
         } else {
             SetGameState(GameStates.GamePlay);
             SetGameDifficulty(GameDifficulty.None);
         }
+        
+        LoadCollectibles();
+        LoadStats();
     }
     
     
@@ -108,7 +110,6 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(finishGame)) { FinishGame(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (Input.GetKeyUp(deleteSave)) { DeleteSave(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (InputManager.TogglePauseWasPressed) { TogglePause(); }
-        
     }
     
 
@@ -148,11 +149,56 @@ public class GameManager : MonoBehaviour
         SettingsManager.Instance?.LoadAllSettings();
         ResetCollectibles();
         ResetUnlocks();
+        ResetStats();
         
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    
 
+    
+    #region Stats // -----------------------------------------
+    
+    private void LoadStats()
+    {
+        foreach (Level level in levels) {
+            
+            level.totalDeaths = SaveManager.Instance.LoadInt(level.connectedScene.SceneName + " Total Deaths");
+            level.bestTime = SaveManager.Instance.LoadFloat(level.connectedScene.SceneName + " Best Time");
+        }
+    }
+
+    private void ResetStats()
+    {
+        foreach (Level level in levels)
+        {
+            level.totalDeaths = 0;
+            level.bestTime = 0;
+        }
+    }
+    
+
+    public void SaveCurrentLevelStats(string connectedLevelName, int deaths, float time)
+    {
+        foreach (Level level in levels) {
+            if (level.connectedScene.SceneName == connectedLevelName) {
+                
+                level.totalDeaths += deaths;
+                SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " Total Deaths", level.totalDeaths);
+                
+                if (time < level.bestTime || level.bestTime == 0) {
+                    level.bestTime = time;
+                    SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " Best Time", level.bestTime);
+                }
+                Debug.Log("Saved " + level.connectedScene.SceneName + " stats");
+                return;
+            }
+        }
+    }
+    
+    #endregion // -----------------------------------------
+
+    
     #region GameStates // -----------------------------------------
 
     private void TogglePause() {
@@ -308,9 +354,9 @@ public class GameManager : MonoBehaviour
         if (IsCollectibleCollected(connectedLevelName)) { return; }
         
         foreach (Level level in levels) {
-            if (level.name == connectedLevelName) {
+            if (level.connectedScene.SceneName == connectedLevelName) {
                 level.collectibleCollected = true;
-                SaveManager.Instance.SaveBool(level.name + " Collectible", level.collectibleCollected);
+                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
                 return;
             }
         }
@@ -352,7 +398,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (Level level in levels) {
             
-            level.collectibleCollected = SaveManager.Instance.LoadBool(level.name + " Collectible");
+            level.collectibleCollected = SaveManager.Instance.LoadBool(level.connectedScene.SceneName + " Collectible");
         }
 
         CheckUnlocks();
@@ -364,7 +410,7 @@ public class GameManager : MonoBehaviour
             foreach (Level level in levels) 
             {
                 level.collectibleCollected = false;
-                SaveManager.Instance.SaveBool(level.name + " Collectible", level.collectibleCollected);
+                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
             }
             
             CheckUnlocks();
@@ -376,7 +422,7 @@ public class GameManager : MonoBehaviour
             foreach (Level level in levels) 
             {
                 level.collectibleCollected = true;
-                SaveManager.Instance.SaveBool(level.name  + " Collectible", level.collectibleCollected);
+                SaveManager.Instance.SaveBool(level.connectedScene.SceneName  + " Collectible", level.collectibleCollected);
             }
 
             CheckUnlocks();

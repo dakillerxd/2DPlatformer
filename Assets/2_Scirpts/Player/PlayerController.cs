@@ -6,7 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
-
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 
 public class PlayerController : MonoBehaviour {
@@ -22,7 +23,8 @@ public class PlayerController : MonoBehaviour {
     [ShowIf("canTakeFallDamage")][SerializeField] private int maxFallDamage = 1;[EndIf]
     [SerializeField] [Range(0f, 5f)] private float deathTime;
     private int _currentHealth;
-    private int _deaths;
+    private int _currentDeaths;
+    private float _currentTime;
     private float _invincibilityTime;
     private float _stunLockTime;
 
@@ -170,9 +172,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
     [SerializeField] private Color deadColor = Color.clear;
     private readonly Color _defaultColor = Color.white;
-    
-    [Header("Events")]
-    public UnityEvent onPlayerDeath = new UnityEvent();
 
 
     [Header("States")] 
@@ -194,6 +193,7 @@ public class PlayerController : MonoBehaviour {
     public bool atMaxFallSpeed { get; private set; } 
     public bool isWallSliding{ get; private set; } 
     public bool isTeleporting { get; private set; } 
+    public static event UnityAction OnPlayerDeath;
     
     [Header("Input")] 
     private float _horizontalInput;
@@ -256,6 +256,8 @@ public class PlayerController : MonoBehaviour {
     private void Update() {
         
         if (!CanPlay()) { return; }
+        
+        _currentTime += Time.deltaTime;
         
         CheckForInput();
         CheckFaceDirection();
@@ -971,7 +973,7 @@ public class PlayerController : MonoBehaviour {
     
     [Button] private void RespawnFromCheckpoint() {
 
-        _deaths += 1;
+        _currentDeaths += 1;
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
             CheckpointManager.Instance.UseCheckpoint();
@@ -979,7 +981,7 @@ public class PlayerController : MonoBehaviour {
     }
     [Button] public void RespawnFromTeleporter() {
 
-        _deaths = 0;
+        _currentDeaths = 0;
         if (CheckpointManager.Instance.startTeleporter) {
             Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
             CheckpointManager.Instance.UseTeleporter();
@@ -990,7 +992,8 @@ public class PlayerController : MonoBehaviour {
 
     [Button] private void RespawnFromSpawnPoint() {
         
-        _deaths = 0;
+        _currentDeaths = 0;
+        _currentTime = 0;
         StartCoroutine(VFXManager.Instance?.LerpColorAdjustments(true, 0.5f));
         Respawn(CheckpointManager.Instance.playerSpawnPoint);
     }
@@ -1002,7 +1005,7 @@ public class PlayerController : MonoBehaviour {
         Teleport(position, false);
         PlayAnimationTrigger("TeleportOut");
         SoundManager.Instance?.PlaySoundFX("Player Spawn");
-        onPlayerDeath.Invoke();
+        OnPlayerDeath?.Invoke();
     }
     
     private void Restart()
@@ -1039,6 +1042,17 @@ public class PlayerController : MonoBehaviour {
             VFXManager.Instance?.StopVfxEffect(hurtVfx, true);
             VFXManager.Instance?.StopVfxEffect(deathVfx, true);
         }
+    }
+
+    public void TeleportOutOfLevel()
+    {
+        SetPlayerState(PlayerState.Teleporting);
+        PlayAnimationTrigger("TeleportIn");
+        StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
+        StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
+        SoundManager.Instance?.PlaySoundFX("Teleporter In");
+        CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);
+        GameManager.Instance?.SaveCurrentLevelStats(SceneManager.GetActiveScene().name, _currentDeaths, _currentTime);
     }
 
     private void CheckIfDead(string cause = "")
@@ -1444,7 +1458,8 @@ public class PlayerController : MonoBehaviour {
             _debugText.Clear()
                 .AppendLine("\n<color=#00FF00>Player</color>")
                 .AppendLine($"HP: {_currentHealth}/{maxHealth}")
-                .AppendLine($"Deaths: {_deaths}")
+                .AppendLine($"Deaths: {_currentDeaths}")
+                .AppendLine($"Time: {_currentTime}")
                 .AppendLine($"Velocity: X: {rigidBody.linearVelocity.x:F1} Y: {rigidBody.linearVelocity.y:F1}")
                 .AppendLine($"Speed: Move: {_moveSpeed:F1} Fall: {fallSpeed:F1}");
 
@@ -1573,5 +1588,6 @@ public class PlayerController : MonoBehaviour {
     #endif
     
     #endregion Debugging functions
-    
+
+
 }

@@ -25,8 +25,9 @@ public class MenuCategoryMainMenu : MenuCategory
     
     public override void SelectPage(MenuPage page)
     {
+        
         base.SelectPage(page);
-        DisableNonActivePagesSelectables();
+        
 
         if (page == mainMenuPage)
         {

@@ -1,14 +1,23 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class MenuController : MonoBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private bool selectFirstCategoryOnEnable = true;
     [SerializeField] private List<MenuCategory> menuCategories = new List<MenuCategory>();
-    protected MenuCategory _currentCategory;
-    
+    public MenuCategory currentCategory;
+
+    protected virtual void Awake()
+    {
+        if (selectFirstCategoryOnEnable)
+        {
+            SelectFirstCategory();
+        }
+    }
 
     private void OnEnable()
     {
@@ -46,15 +55,15 @@ public class MenuController : MonoBehaviour
 
     protected void OnNavigate(Vector2 context)
     {
-        if (_currentCategory)
+        if (currentCategory)
         {
-            _currentCategory.OnNavigate(context);
+            currentCategory.OnNavigate(context);
         }
     }
     
     protected virtual void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
-        _currentCategory.OnActiveSceneChanged(currentScene, nextScene);
+        currentCategory.OnActiveSceneChanged(currentScene, nextScene);
     }
 
     protected virtual void OnGameStateChange(GameStates state)
@@ -64,14 +73,14 @@ public class MenuController : MonoBehaviour
     
     private void OnToggleMenu()
     {
-        if (!_currentCategory) return;
+        if (!currentCategory) return;
         
         
-        if (!_currentCategory.IsAtFirstPage) // if the first page is not the one that is selected pass on the event
+        if (!currentCategory.IsAtFirstPage) // if the first page is not the one that is selected pass on the event
         {
-            _currentCategory.OnToggleMenu();
+            currentCategory.OnToggleMenu();
                 
-        } else if (_currentCategory != menuCategories[0]) { // Else go to the first menu
+        } else if (currentCategory != menuCategories[0]) { // Else go to the first menu
                 
             SelectFirstCategory();
         }
@@ -82,12 +91,12 @@ public class MenuController : MonoBehaviour
     {
         if (!category || !menuCategories.Contains(category)) return;
 
-        if (_currentCategory)
+        if (currentCategory)
         {
-            _currentCategory.gameObject.SetActive(false);
+            currentCategory.gameObject.SetActive(false);
         }
 
-        _currentCategory = category;
+        currentCategory = category;
         category.gameObject.SetActive(true);
     }
 
@@ -105,6 +114,7 @@ public class MenuController : MonoBehaviour
         {
             category.gameObject.SetActive(false);
         }
+        currentCategory = null;
         
     }
     

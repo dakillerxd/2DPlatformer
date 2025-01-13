@@ -92,23 +92,16 @@ public class Teleporter : MonoBehaviour
     {
         activated = true;
         
-        
         Rigidbody2D rb = objectTransform.GetComponentInChildren<Rigidbody2D>();
         PlayerController player = objectTransform.GetComponentInParent<PlayerController>();
         
-        if (rb == null) {
+        if (!rb) {
             Debug.LogError("No Rigidbody2D found!");
             yield break;
         }
         
-        // Start effects
-        player.SetPlayerState(PlayerState.Teleporting);
-        player.PlayAnimationTrigger("TeleportIn");
-        StartCoroutine(VFXManager.Instance?.LerpChromaticAberration(true, 2.5f));
-        StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
-        VFXManager.Instance?.PlayAnimationTrigger(animator, "Teleport");
-        SoundManager.Instance?.PlaySoundFX("Teleporter In");
-        CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);
+        player.TeleportOutOfLevel();
+        VFXManager.Instance?.PlayAnimationTrigger(animator, "Teleport"); // Teleporter animation
 
         
         // Start pulling

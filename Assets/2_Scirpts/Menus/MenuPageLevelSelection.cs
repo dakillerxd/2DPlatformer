@@ -20,27 +20,25 @@ public class MenuPageLevelSelection : MenuPage
     
     
     
-    private void Start()
+    protected override void Start()
     {
+        
         SetupButtons();
         SetupLevelButtons();
+        if (selectedLevelInfo) selectedLevelInfo.alpha = 0f;
+        
+        base.Start();
     }
     
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        if (selectedLevelInfo) selectedLevelInfo.alpha = 0f;
-
-    }
 
     protected override void OnSelect(BaseEventData eventData)
     {
         base.OnSelect(eventData);
-    
-        if (eventData.selectedObject != null)
+        
+        if (eventData.selectedObject)
         {
             Button selectedButton = eventData.selectedObject.GetComponent<Button>();
-            if (selectedButton != null)
+            if (selectedButton && selectedButton.interactable)
             {
                 // Get the level index from the button's text
                 TextMeshProUGUI buttonText = selectedButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -62,11 +60,30 @@ public class MenuPageLevelSelection : MenuPage
     protected override void OnDeselect(BaseEventData eventData)
     {
         base.OnDeselect(eventData);
-        HideSelectedLevelInfo();
+        
+        if (eventData.selectedObject)
+        {
+            Button selectedButton = eventData.selectedObject.GetComponent<Button>();
+            if (selectedButton&& selectedButton.interactable)
+            {
+                // Get the level index from the button's text
+                TextMeshProUGUI buttonText = selectedButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (buttonText != null && int.TryParse(buttonText.text, out int levelNumber))
+                {
+                    // Find the corresponding level in GameManager
+                    // Subtract 1 because array is 0-based but level numbers start at 1
+                    int levelIndex = levelNumber - 1;
+                    if (levelIndex >= 0 && levelIndex < GameManager.Instance.levels.Length)
+                    {
+                        HideSelectedLevelInfo();
+                    }
+                }
+            }
+        }
+        
     }
     
     
-
     private void SetupButtons()
     {
         if (buttonBack)
@@ -93,32 +110,36 @@ public class MenuPageLevelSelection : MenuPage
     private void SetupLevelButtons()
     {
         if (GameManager.Instance.levels.Length == 0 || !buttonLevelPrefab || !levelsContainer) return;
-        
-        
+    
         foreach (Transform child in levelsContainer.transform) // Delete all buttons before creating new ones
         {
             Destroy(child.gameObject);
         }
-        
-        foreach (Level level in GameManager.Instance.levels) // Create a button for each level in the list
+    
+        for (int i = 0; i < GameManager.Instance.levels.Length; i++) // Using index loop instead of foreach
         {
+            Level level = GameManager.Instance.levels[i];
             GameObject buttonObject = Instantiate(buttonLevelPrefab.gameObject, levelsContainer.transform);
             Button button = buttonObject.GetComponent<Button>();
-            selectables.Add(button);
-            SetupSelectable(button);
-            StoreOriginalTransforms(button);
-            button.interactable = level.connectedScene.BuildIndex <= SaveManager.Instance.LoadInt("HighestLevel");
+            
+            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = level.name.Replace("Level ", "");
+            buttonObject.name = "ButtonLevel" + level.name;
+            button.interactable = (i + 1) <= SaveManager.Instance.LoadInt("HighestLevel");
             button.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             button.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
             button.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
             button.onClick.AddListener(() => SceneManager.LoadScene(level.connectedScene.BuildIndex));
-            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = level.name.Replace("Level ", "");
+            
+            selectables.Add(button);
+            SetupSelectable(button);
+            StoreOriginalTransforms(button);
+            StoreOriginalState(button);
         }
     }
     
     private void HideSelectedLevelInfo()
     {
-        if (selectedLevelInfo)
+        if (selectedLevelInfo && selectedLevelInfo.alpha > 0)
         {
             Tween.Alpha(selectedLevelInfo, startValue:1f, endValue: 0f, duration: 1f);
         }
@@ -136,7 +157,7 @@ public class MenuPageLevelSelection : MenuPage
             string formattedDeaths = FormatDeaths(level.totalDeaths);
 
             selectedLevelInfo.text = 
-                $"<color=#00FF00>{level.name}</color>\n" +
+                $"<b><color=#00FF00>{level.name}</color><b>\n" +
                 $"Collectible: {(collectibleCollected ? 1 : 0)}/1\n" +
                 $"Total Deaths: {formattedDeaths}\n" +
                 $"Best Time: {formattedTime}";

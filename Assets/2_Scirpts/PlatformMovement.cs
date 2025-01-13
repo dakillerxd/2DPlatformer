@@ -27,8 +27,8 @@ public class PlatformMovement : MonoBehaviour {
     [SerializeField] private List<GameObject> waypoints = new List<GameObject>();
     
     
-    private int currentWaypointIndex;
-    private float waypointWaitTimer;
+    private int _currentWaypointIndex;
+    private float _waypointWaitTimer;
     
     
     [Header("References")]
@@ -46,7 +46,7 @@ public class PlatformMovement : MonoBehaviour {
     private void OnEnable()
     {
         if (resetPositionOnPlayerDeath) {
-            PlayerController.Instance?.onPlayerDeath.AddListener(OnPlayerDeath);
+            PlayerController.OnPlayerDeath += OnPlayerDeath;
         }
     }
 
@@ -54,7 +54,7 @@ public class PlatformMovement : MonoBehaviour {
     {
         if (resetPositionOnPlayerDeath)
         {
-            PlayerController.Instance?.onPlayerDeath.RemoveListener(OnPlayerDeath); 
+            PlayerController.OnPlayerDeath -= OnPlayerDeath;
         }
     }
     
@@ -89,8 +89,8 @@ public class PlatformMovement : MonoBehaviour {
     [Button] public void ResetPosition()
     {
         objectRigidBody.transform.position = waypoints[0].transform.position; 
-        currentWaypointIndex = 0;
-        waypointWaitTimer = waypointWaitTime;
+        _currentWaypointIndex = 0;
+        _waypointWaitTimer = waypointWaitTime;
         objectRigidBody.linearVelocity = Vector2.zero;
         
     }
@@ -135,14 +135,14 @@ public class PlatformMovement : MonoBehaviour {
         
         if (waypoints.Count <= 1 || enableMovement == false) return;
         
-        if (waypointWaitTimer > 0)
+        if (_waypointWaitTimer > 0)
         {
-            waypointWaitTimer -= Time.fixedDeltaTime;
+            _waypointWaitTimer -= Time.fixedDeltaTime;
             objectRigidBody.linearVelocity = Vector2.zero;
             return;
         }
 
-        Vector3 targetPosition = waypoints[currentWaypointIndex].transform.position;
+        Vector3 targetPosition = waypoints[_currentWaypointIndex].transform.position;
         Vector2 directionToTarget = ((Vector2)(targetPosition - objectRigidBody.transform.position)).normalized;
         float distanceToTarget = Vector2.Distance(objectRigidBody.transform.position, targetPosition);
         
@@ -172,22 +172,22 @@ public class PlatformMovement : MonoBehaviour {
         if (distanceToTarget < 0.1f)
         {
             objectRigidBody.linearVelocity = Vector2.zero;
-            waypointWaitTimer = waypointWaitTime;
+            _waypointWaitTimer = waypointWaitTime;
             
             if (loopBetweenPoints)
             {
-                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
+                _currentWaypointIndex = (_currentWaypointIndex + 1) % waypoints.Count;
             }
             else
             {
-                if (currentWaypointIndex >= waypoints.Count - 1)
+                if (_currentWaypointIndex >= waypoints.Count - 1)
                 {
                     waypoints.Reverse();
-                    currentWaypointIndex = 0;
+                    _currentWaypointIndex = 0;
                 }
                 else
                 {
-                    currentWaypointIndex++;
+                    _currentWaypointIndex++;
                 }
             }
         }

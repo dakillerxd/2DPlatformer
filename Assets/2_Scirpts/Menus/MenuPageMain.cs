@@ -19,8 +19,9 @@ public class MenuPageMain : MenuPage
     
     protected override void Start()
     {
-        base.Start();
         SetupButtons();
+        base.Start();
+        SelectFirstAvailableSelectable();
     }
 
 
@@ -72,25 +73,25 @@ public class MenuPageMain : MenuPage
         if (buttonLevelSelect != null)
         {
             buttonLevelSelect.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonLevelSelect.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.levelSelectMenuPage));
+            buttonLevelSelect.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.levelSelectMenuPage));
         }
         
         if (buttonCollectibles != null)
         {
             buttonCollectibles.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonCollectibles.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.collectiblesMenuPage));
+            buttonCollectibles.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.collectiblesMenuPage));
         }
 
         if (buttonOptions != null)
         {
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptions.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.optionsMenuPage));
+            buttonOptions.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.optionsMenuPage));
         }
 
         if (buttonCredits != null)
         {
             buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonCredits.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.creditsMenuPage));
+            buttonCredits.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.creditsMenuPage));
         }
 
         if (buttonQuit != null)

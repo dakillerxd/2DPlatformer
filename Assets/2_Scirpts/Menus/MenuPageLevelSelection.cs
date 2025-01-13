@@ -89,7 +89,7 @@ public class MenuPageLevelSelection : MenuPage
         if (buttonBack)
         {
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
+            buttonBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
         }
         if (buttonShowcaseLevel)
         {
@@ -132,8 +132,6 @@ public class MenuPageLevelSelection : MenuPage
             
             selectables.Add(button);
             SetupSelectable(button);
-            StoreOriginalTransforms(button);
-            StoreOriginalState(button);
         }
     }
     
@@ -153,12 +151,14 @@ public class MenuPageLevelSelection : MenuPage
 
             // Get saved data for the level
             bool collectibleCollected = level.collectibleCollected;
+            bool noDeathRun = level.noDeathRunRun;
             string formattedTime = FormatTime(level.bestTime);
             string formattedDeaths = FormatDeaths(level.totalDeaths);
 
             selectedLevelInfo.text = 
                 $"<b><color=#00FF00>{level.name}</color><b>\n" +
                 $"Collectible: {(collectibleCollected ? 1 : 0)}/1\n" +
+                $"No Death Run: {(noDeathRun ? "Yes" : "No")}\n" +
                 $"Total Deaths: {formattedDeaths}\n" +
                 $"Best Time: {formattedTime}";
         }

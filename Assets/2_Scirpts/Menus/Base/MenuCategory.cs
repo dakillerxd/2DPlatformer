@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using CustomAttribute;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
@@ -9,8 +10,8 @@ public class MenuCategory : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private bool selectFirstPageOnEnable = true;
     [SerializeField] protected List<MenuPage> pages = new List<MenuPage>();
-    public bool IsAtFirstPage => pages[0].gameObject.activeSelf;
-    public MenuPage currentPage;
+    [ReadOnly] public MenuPage currentPage;
+    public bool IsAtFirstPage => currentPage == pages[0];
 
     private void Awake()
     {
@@ -28,46 +29,6 @@ public class MenuCategory : MonoBehaviour
         }
     }
     
-    public void OnNavigate(Vector2 input)
-    {
-        if (currentPage)
-        {
-            currentPage.OnNavigate(input);
-        }
-    }
-    
-
-    public void OnToggleMenu()
-    {
-        if (!currentPage) return;
-        
-        if (currentPage != pages[0])
-        {
-            SelectFirstPage();
-        }
-
-    }
-
-    public virtual void SelectPage(MenuPage page)
-    {
-        if (!page || !pages.Contains(page)) return;
-        
-        currentPage = page;
-        page.gameObject.SetActive(true);
-        // page.ResetAllSelectables(); // Resetting the position bugs the selectables that are in a layout group
-        page.ResetSelectablesState();
-        StartCoroutine(page.SelectFirstAvailableSelectableCar());
-        DisableNonActivePagesSelectables();
-    }
-
-    private void SelectFirstPage()
-    {
-        if (pages.Count >= 0)
-        {
-            SelectPage(pages[0]);
-        }
-    }
-    
     public void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
     {
 
@@ -78,6 +39,42 @@ public class MenuCategory : MonoBehaviour
     {
         
     }
+    
+    public void OnNavigate(Vector2 input)
+    {
+        if (currentPage)
+        {
+            currentPage.OnNavigate(input);
+        }
+    }
+
+    public void OnToggleMenu()
+    {
+        if (!currentPage) return;
+        
+        if (currentPage != pages[0])
+        {
+            SelectFirstPage();
+        }
+    }
+
+    public virtual void SelectPage(MenuPage page)
+    {
+        if (!page || !pages.Contains(page)) return;
+        
+        currentPage?.OnPageDeselected();
+        currentPage = page;
+        page.gameObject.SetActive(true);
+        page.OnPageSelected(); 
+    }
+
+    private void SelectFirstPage()
+    {
+        if (pages.Count >= 0)
+        {
+            SelectPage(pages[0]);
+        }
+    }
 
     protected void DisableNonActivePagesSelectables()
     {
@@ -85,9 +82,16 @@ public class MenuCategory : MonoBehaviour
         {
             if (currentPage == page) continue; // skip the current page
             page.DisableAllSelectables();
-            page.ResetAllSelectablesSize();
         }
-        
+    }
+    
+    protected void DisableNonActivePages()
+    {
+        foreach (MenuPage page in pages)
+        {
+            if (currentPage == page) continue; // skip the current page
+            page.gameObject.SetActive(false);
+        }
     }
 
     public void DisableAllPage()

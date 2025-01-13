@@ -37,12 +37,12 @@ public class MenuPageGameplay : MenuPage
 
 
     
-    private void StartLevelTitleEffect(float duration, string title) {
+    private void StartLevelTitleEffect(float duration, string title, float startDelay = 0) {
         
         if (levelTitleText)
         {
             levelTitleText.text = title;
-            Tween.Alpha(levelTitleText, startValue: 1, endValue:0, duration, ease: Ease.InOutSine, useUnscaledTime: true);
+            Tween.Alpha(levelTitleText, startValue: 1, endValue:0, duration, startDelay: startDelay, ease: Ease.InOutSine, useUnscaledTime: true);
         }
         
     }
@@ -54,7 +54,7 @@ public class MenuPageGameplay : MenuPage
         if (nextScene.name == "ShowcaseLevel")
         {
             UpdateAbilitiesUI();
-            StartLevelTitleEffect(1, "Showcase Level");
+            StartLevelTitleEffect(1, "Showcase Level", 1);
         } else {
             UpdateAbilitiesUI();
             StartLevelTitleEffect(2, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());

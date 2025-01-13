@@ -109,7 +109,6 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyUp(toggleFunnyMode)) { ToggleFunnyMode(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (Input.GetKeyUp(finishGame)) { FinishGame(); SoundManager.Instance?.PlaySoundFX("Toggle");}
         if (Input.GetKeyUp(deleteSave)) { DeleteSave(); SoundManager.Instance?.PlaySoundFX("Toggle");}
-        if (InputManager.TogglePauseWasPressed) { TogglePause(); }
     }
     
 
@@ -126,6 +125,12 @@ public class GameManager : MonoBehaviour
         
         // Collect all collectibles
         CollectAllCollectibles();
+        
+        // Set no death run for all levels
+        foreach (Level level in levels) {
+            level.noDeathRunRun = true;
+            SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
+        }
 
         
         // Set highest level
@@ -163,8 +168,9 @@ public class GameManager : MonoBehaviour
     {
         foreach (Level level in levels) {
             
-            level.totalDeaths = SaveManager.Instance.LoadInt(level.connectedScene.SceneName + " Total Deaths");
-            level.bestTime = SaveManager.Instance.LoadFloat(level.connectedScene.SceneName + " Best Time");
+            level.totalDeaths = SaveManager.Instance.LoadInt(level.connectedScene.SceneName + " TotalDeaths");
+            level.bestTime = SaveManager.Instance.LoadFloat(level.connectedScene.SceneName + " BestTime");
+            level.noDeathRunRun = SaveManager.Instance.LoadBool(level.connectedScene.SceneName + " NoDeathRun");
         }
     }
 
@@ -174,24 +180,45 @@ public class GameManager : MonoBehaviour
         {
             level.totalDeaths = 0;
             level.bestTime = 0;
+            level.noDeathRunRun = false;
         }
     }
     
-
-    public void SaveCurrentLevelStats(string connectedLevelName, int deaths, float time)
+    
+    
+    public void SaveBestTime(string connectedLevelName, float time)
     {
         foreach (Level level in levels) {
             if (level.connectedScene.SceneName == connectedLevelName) {
-                
-                level.totalDeaths += deaths;
-                SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " Total Deaths", level.totalDeaths);
-                
+
                 if (time < level.bestTime || level.bestTime == 0) {
                     level.bestTime = time;
-                    SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " Best Time", level.bestTime);
+                    SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " BestTime", level.bestTime);
                 }
-                Debug.Log("Saved " + level.connectedScene.SceneName + " stats");
                 return;
+            }
+        }
+    }
+
+    public void SaveDeath(string connectedLevelName)
+    {
+        foreach (Level level in levels) {
+            if (level.connectedScene.SceneName == connectedLevelName) {
+
+                level.totalDeaths += 1;
+                SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " TotalDeaths", level.totalDeaths);
+
+            }
+        }
+    }
+    
+    public void SavePerfectRun(string connectedLevelName, bool state)
+    {
+        foreach (Level level in levels) {
+            if (level.connectedScene.SceneName == connectedLevelName) {
+                if (level.noDeathRunRun) return;
+                level.noDeathRunRun = state;
+                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
             }
         }
     }
@@ -201,19 +228,6 @@ public class GameManager : MonoBehaviour
     
     #region GameStates // -----------------------------------------
 
-    private void TogglePause() {
-
-        if (PlayerController.Instance.CheckPlayerState() == PlayerState.Teleporting)
-        {
-            return;
-        }
-        
-        if (gameState == GameStates.GamePlay) {
-            SetGameState(GameStates.Paused);
-        } else if (gameState == GameStates.Paused) {
-            SetGameState(GameStates.GamePlay);
-        }
-    }
     
     private void ToggleFunnyMode()
     {
@@ -227,7 +241,9 @@ public class GameManager : MonoBehaviour
     
     
     public void SetGameState(GameStates state) {
+        
         gameState = state;
+        OnOnGameStateChange?.Invoke(state);
         
         switch (state) {
             case GameStates.GamePlay:
@@ -247,7 +263,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        OnOnGameStateChange?.Invoke(state);
+        
     }
     
     private void SetGameDifficulty(GameDifficulty gameMode) {

@@ -27,7 +27,7 @@ public class MenuCategoryMainMenu : MenuCategory
     {
         
         base.SelectPage(page);
-        
+        DisableNonActivePagesSelectables();
 
         if (page == mainMenuPage)
         {

@@ -1,15 +1,15 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using CustomAttribute;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class MenuController : MonoBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private bool selectFirstCategoryOnEnable = true;
     [SerializeField] private List<MenuCategory> menuCategories = new List<MenuCategory>();
-    public MenuCategory currentCategory;
+    [ReadOnly] public MenuCategory currentCategory;
 
     protected virtual void Awake()
     {
@@ -74,7 +74,6 @@ public class MenuController : MonoBehaviour
     private void OnToggleMenu()
     {
         if (!currentCategory) return;
-        
         
         if (!currentCategory.IsAtFirstPage) // if the first page is not the one that is selected pass on the event
         {

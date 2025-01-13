@@ -1,6 +1,6 @@
 using CustomAttribute;
 using UnityEngine;
-
+using UnityEngine.Serialization;
 
 
 public enum GameStates {
@@ -94,7 +94,9 @@ public class Level
     public bool countsTowardsUnlocks = true;
     [CustomAttribute.ReadOnly] public bool collectibleCollected;
     
+    [FormerlySerializedAs("perfectRun")]
     [Header("Stats")]
+    [CustomAttribute.ReadOnly] public bool noDeathRunRun;
     [CustomAttribute.ReadOnly] public int totalDeaths;
     [CustomAttribute.ReadOnly] public float bestTime;
 }

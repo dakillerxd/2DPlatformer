@@ -51,12 +51,12 @@ public class MenuPage : MonoBehaviour
     [EndFoldout]
     
     
-    private Selectable _currentSelectable;
-    private Selectable _previousSelectable;
-    protected MenuController _menuController;
-    protected MenuCategory _menuCategory;
-    protected  MenuCategoryMainMenu _menuCategoryMain;
-    protected MenuCategoryPause _menuCategoryPause;
+    [ReadOnly] public Selectable currentSelectable;
+    [ReadOnly] public Selectable previousSelectable;
+    protected MenuController menuController;
+    protected MenuCategory menuCategory;
+    protected  MenuCategoryMainMenu menuCategoryMain;
+    protected MenuCategoryPause menuCategoryPause;
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalScales = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalRotations = new Dictionary<Selectable, Vector3>();
     private readonly Dictionary<Selectable, Vector3> _selectableOriginalPositions = new Dictionary<Selectable, Vector3>();
@@ -65,53 +65,39 @@ public class MenuPage : MonoBehaviour
   
     private void Awake()
     {
-        _menuController = GetComponentInParent<MenuController>();
-        _menuCategory = GetComponentInParent<MenuCategory>();
-        _menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
-        _menuCategoryPause = GetComponentInParent<MenuCategoryPause>();
+        menuController = GetComponentInParent<MenuController>();
+        menuCategory = GetComponentInParent<MenuCategory>();
+        menuCategoryMain = GetComponentInParent<MenuCategoryMainMenu>();
+        menuCategoryPause = GetComponentInParent<MenuCategoryPause>();
         
         if (selectables.Count == 0) return;
         foreach (Selectable selectable in selectables)
         {
             SetupSelectable(selectable);
-            StoreOriginalTransforms(selectable);
-            StoreOriginalState(selectable);
         }
         
     }
 
     protected virtual void Start()
     {
-        if (_menuCategory.currentPage != this || _menuController.currentCategory != _menuCategory)
+        if (menuCategory.currentPage != this || menuController.currentCategory != menuCategory)
         {
             DisableAllSelectables();
         }
-        else
-        {
-            ResetAllSelectables();
-        }
-        
-        
-    }
-
-    protected virtual void OnDisable()
-    {
-        DisableAllSelectables();
-
-        if (forgetLastSelectableOnDisable)
-        {
-            _currentSelectable = null;
-            _previousSelectable = null;
-        }
     }
     
-    protected virtual void OnEnable()
+    
+    public virtual void OnPageSelected()
     {
-        
         ResetAllSelectables();
-        StartCoroutine(SelectFirstAvailableSelectableCar());
+        StartCoroutine(SelectFirstAvailableSelectableCar()); 
     }
     
+    public virtual void OnPageDeselected()
+    {
+        previousSelectable = forgetLastSelectableOnDisable ? null : currentSelectable;
+        currentSelectable = null;
+    }
     
     
 #if UNITY_EDITOR
@@ -134,22 +120,17 @@ public class MenuPage : MonoBehaviour
     
     
     
-    protected void StoreOriginalTransforms(Selectable selectable)
+    protected virtual void SetupSelectable(Selectable selectable)
     {
+        // Store all original information
         _selectableOriginalScales[selectable] = selectable.transform.localScale;
         _selectableOriginalRotations[selectable] = selectable.transform.localRotation.eulerAngles;
         _selectableOriginalPositions[selectable] = selectable.transform.localPosition;
-    }
-    
-    protected void StoreOriginalState(Selectable selectable)
-    {
         _selectableOriginalState[selectable] = selectable.interactable;
-    }
-    
-    protected virtual void SetupSelectable(Selectable selectable)
-    {
-        var eventTrigger = selectable.GetComponent<EventTrigger>() ?? selectable.gameObject.AddComponent<EventTrigger>();
         
+        
+        // Add events
+        var eventTrigger = selectable.GetComponent<EventTrigger>() ?? selectable.gameObject.AddComponent<EventTrigger>();
         AddEventTriggerEntry(eventTrigger, EventTriggerType.Select, OnSelect);
         AddEventTriggerEntry(eventTrigger, EventTriggerType.Deselect, OnDeselect);
         AddEventTriggerEntry(eventTrigger, EventTriggerType.PointerEnter, OnPointerEnter);
@@ -165,7 +146,7 @@ public class MenuPage : MonoBehaviour
         eventTrigger.triggers.Add(entry);
     }
 
-    public void ResetAllSelectables() 
+    private void ResetAllSelectables() 
     {
         if (selectables.Count == 0) return;
         
@@ -175,23 +156,40 @@ public class MenuPage : MonoBehaviour
             selectable.transform.localRotation = Quaternion.Euler(_selectableOriginalRotations[selectable]);
             selectable.transform.localPosition = _selectableOriginalPositions[selectable];
             selectable.interactable = _selectableOriginalState[selectable];
+
+            // Just resetting the position bugs the selectables that are in a layout group
+            // so find the layout group if it exists and restart it to fix the positions
+            LayoutGroup group = selectable.gameObject.GetComponentInParent<LayoutGroup>();
+            if (group)
+            {
+                group.enabled = false;
+                group.enabled = true;
+            }
+        }
+    }
+    
+    public void DisableAllSelectables()
+    {
+        foreach (Selectable selectable in selectables)
+        {
+            selectable.interactable = false;
         }
     }
 
-    public IEnumerator SelectFirstAvailableSelectableCar()
+    private IEnumerator SelectFirstAvailableSelectableCar()
     {
         yield return new WaitForSeconds(0.3f); // small delay so the selectables will have time to initialize
         SelectFirstAvailableSelectable();
     }
     
-    public void SelectFirstAvailableSelectable()
+    protected void SelectFirstAvailableSelectable()
     {
         if (selectables.Count == 0 || !selectFirstSelectableOnEnable) return;
         
         // Try to select previous selectable if it's valid
-        if (_previousSelectable && _previousSelectable.isActiveAndEnabled)
+        if (previousSelectable && previousSelectable.isActiveAndEnabled)
         {
-            EventSystem.current.SetSelectedGameObject(_previousSelectable.gameObject);
+            EventSystem.current.SetSelectedGameObject(previousSelectable.gameObject);
             return;
         }
     
@@ -203,35 +201,6 @@ public class MenuPage : MonoBehaviour
             return;
         }
     }
-
-
-    public void DisableAllSelectables()
-    {
-        foreach (Selectable selectable in selectables)
-        {
-            selectable.interactable = false;
-        }
-    }
-    
-    public virtual void ResetSelectablesState()
-    {
-        foreach (Selectable selectable in selectables)
-        {
-            selectable.interactable = _selectableOriginalState[selectable];
-        }
-    }
-
-    public virtual void ResetAllSelectablesSize()
-    {
-            foreach (Selectable selectable in selectables)
-            {
-                selectable.transform.localScale = _selectableOriginalScales[selectable];
-            }
-    }
-    
-
-    
-    
     
     #endregion Page Management // ---------------------------------------------------------------------
     
@@ -243,20 +212,20 @@ public class MenuPage : MonoBehaviour
         
         if (!eventData.selectedObject.activeSelf) return;
         
-        _currentSelectable = eventData.selectedObject.GetComponent<Selectable>();
-        if (!_currentSelectable || !_currentSelectable.interactable) return;
+        currentSelectable = eventData.selectedObject.GetComponent<Selectable>();
+        if (!currentSelectable || !currentSelectable.interactable) return;
 
-        if (scaleOnSelect && !scaleExclusions.Contains(_currentSelectable))
+        if (scaleOnSelect && !scaleExclusions.Contains(currentSelectable))
         {
             PlayScaleAnimation(eventData.selectedObject.transform, true);
         }
         
-        if (rotateOnSelect && !rotateExclusions.Contains(_currentSelectable))
+        if (rotateOnSelect && !rotateExclusions.Contains(currentSelectable))
         {
             PlayRotateAnimation(eventData.selectedObject.transform, true);
         }
         
-        if (shakeOnSelect && !shakeExclusions.Contains(_currentSelectable))
+        if (shakeOnSelect && !shakeExclusions.Contains(currentSelectable))
         {
             PlayShakeAnimation(eventData.selectedObject.transform);
         }
@@ -268,25 +237,25 @@ public class MenuPage : MonoBehaviour
     protected virtual void OnDeselect(BaseEventData eventData)
     {
         
-        if (!eventData.selectedObject.activeSelf || _currentSelectable == null || !_currentSelectable.interactable) return;
+        if (!eventData.selectedObject.activeSelf || currentSelectable == null || !currentSelectable.interactable) return;
         
-        if (scaleOnSelect && !scaleExclusions.Contains(_currentSelectable))
+        if (scaleOnSelect && !scaleExclusions.Contains(currentSelectable))
         {
             PlayScaleAnimation(eventData.selectedObject.transform, false);
         }
 
-        if (rotateOnSelect && !rotateExclusions.Contains(_currentSelectable))
+        if (rotateOnSelect && !rotateExclusions.Contains(currentSelectable))
         {
             PlayRotateAnimation(eventData.selectedObject.transform, false);
         }
         
-        if (shakeOnSelect && shakeOnDeselect && !shakeExclusions.Contains(_currentSelectable))
+        if (shakeOnSelect && shakeOnDeselect && !shakeExclusions.Contains(currentSelectable))
         {
             PlayShakeAnimation(eventData.selectedObject.transform);
         }
         
-        _previousSelectable = _currentSelectable;
-        _currentSelectable = null;
+        previousSelectable = currentSelectable;
+        currentSelectable = null;
     }
 
     private void OnPointerEnter(BaseEventData eventData)
@@ -319,6 +288,9 @@ public class MenuPage : MonoBehaviour
 
 
     }
+
+
+
     
     #endregion Events // ---------------------------------------------------------------------
     
@@ -327,13 +299,13 @@ public class MenuPage : MonoBehaviour
     
     private void PlayScaleAnimation(Transform target, bool scaleUp)
     {
-        Vector3 endScale = scaleUp ? _selectableOriginalScales[_currentSelectable] * scaleMultiplier : _selectableOriginalScales[_currentSelectable];
+        Vector3 endScale = scaleUp ? _selectableOriginalScales[currentSelectable] * scaleMultiplier : _selectableOriginalScales[currentSelectable];
         Tween.Scale(target, endScale, scaleDuration, scaleEase, useUnscaledTime: true);
     }
 
     private void PlayRotateAnimation(Transform target, bool rotateToTarget)
     {
-        Vector3 endRotation = rotateToTarget ? rotationStrength : _selectableOriginalRotations[_currentSelectable];
+        Vector3 endRotation = rotateToTarget ? rotationStrength : _selectableOriginalRotations[currentSelectable];
         Tween.LocalRotation(target, endRotation, rotationDuration, rotationEase, useUnscaledTime: true);
     }
 

@@ -906,11 +906,9 @@ MonoBehaviour:
   healVfx: {fileID: 5060159489429807464, guid: c674c06862f8b3b4193fff63307b08ed, type: 3}
   landVfx: {fileID: 5060159489429807464, guid: df6e33d8b8e298f4b83972fbf598075d, type: 3}
   landMaxSpeedVfx: {fileID: 2330993811950128915, guid: 12fc2adb50925694087370efed179643, type: 3}
+  statUpdatePrefab: {fileID: 4085009876117232941, guid: 556dd011eee7e34438b7443a1f5c26ea, type: 3}
   invincibilityColor: {r: 1, g: 1, b: 1, a: 0.5}
   deadColor: {r: 0, g: 0, b: 0, a: 0}
-  onPlayerDeath:
-    m_PersistentCalls:
-      m_Calls: []
   isMoving: 0
   baseHorizontalOffset: 1
   baseVerticalOffset: 1.5

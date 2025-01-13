@@ -61,11 +61,11 @@ public class MenuPageOptions : MenuPage
             if (SceneManager.GetActiveScene().name == "MainMenu") {
             
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
+                buttonOptionsBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
             
             } else {
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-                buttonOptionsBack.onClick.AddListener(() => _menuCategoryPause.SelectPage(_menuCategoryPause.pauseMenuPage));
+                buttonOptionsBack.onClick.AddListener(() => menuCategoryPause.SelectPage(menuCategoryPause.pauseMenuPage));
             }
         }
         

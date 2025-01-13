@@ -3,11 +3,11 @@ using UnityEngine;
 using TMPro;
 using System.Text;
 using System.Collections;
-using System.Collections.Generic;
+using PrimeTween;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
+
 
 
 public class PlayerController : MonoBehaviour {
@@ -167,6 +167,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem healVfx;
     [SerializeField] private ParticleSystem landVfx;
     [SerializeField] private ParticleSystem landMaxSpeedVfx;
+    [SerializeField] private TextMeshPro statUpdatePrefab;
     
     [Header("Colors")]
     [SerializeField] private Color invincibilityColor = new Color(1,1,1,0.5f);
@@ -255,32 +256,41 @@ public class PlayerController : MonoBehaviour {
     
     private void Update() {
         
-        if (!CanPlay()) { return; }
+        if (InputManager.TogglePauseWasPressed) { TogglePause(); }
+
         
-        _currentTime += Time.deltaTime;
+        if (CanPlay())
+        {
+            _currentTime += Time.deltaTime;
         
-        CheckForInput();
-        CheckFaceDirection();
-        HandleDropDown();
-        JumpChecks();
-        DashTimer();
-        WallSlideTimer();
+            CheckForInput();
+            CheckFaceDirection();
+            HandleDropDown();
+            JumpChecks();
+            DashTimer();
+            WallSlideTimer();
+        }
+        
+
     }
     
     
     private void FixedUpdate() {
+
+        if (CanPlay())
+        {
+            CollisionChecks();
+            HandleGravity();
+            HandleMovement();
+            HandleStepClimbing();
+            HandleFastDrop();
+            HandleJump();
+            HandleWallSlide();
+            HandleWallJump();
+            HandleDashing();
+        }
         
-        if (!CanPlay()) { return; }
-        
-        CollisionChecks();
-        HandleGravity();
-        HandleMovement();
-        HandleStepClimbing();
-        HandleFastDrop();
-        HandleJump();
-        HandleWallSlide();
-        HandleWallJump();
-        HandleDashing();
+
     }
     
     private void LateUpdate()
@@ -969,19 +979,25 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Collision functions
     
+    
     #region Health/Checkpoint functions //------------------------------------
     
     [Button] private void RespawnFromCheckpoint() {
 
         _currentDeaths += 1;
+        GameManager.Instance?.SaveDeath(SceneManager.GetActiveScene().name);
+        StartCoroutine(UpdateStatEffect("+1 Death", 2f, Color.red));
+        
         if (CheckpointManager.Instance.activeCheckpoint) {
             Respawn(CheckpointManager.Instance.activeCheckpoint.transform.position);
             CheckpointManager.Instance.UseCheckpoint();
         } else { RespawnFromTeleporter();}
     }
     [Button] public void RespawnFromTeleporter() {
-
+        
         _currentDeaths = 0;
+        _currentTime = 0;
+        
         if (CheckpointManager.Instance.startTeleporter) {
             Respawn(CheckpointManager.Instance.startTeleporter.transform.position);
             CheckpointManager.Instance.UseTeleporter();
@@ -1000,7 +1016,6 @@ public class PlayerController : MonoBehaviour {
     
     
     private void Respawn(Vector2 position) {
-        
         SetPlayerState(PlayerState.Frozen);
         Teleport(position, false);
         PlayAnimationTrigger("TeleportOut");
@@ -1052,7 +1067,13 @@ public class PlayerController : MonoBehaviour {
         StartCoroutine(VFXManager.Instance?.LerpLensDistortion(true, 2f));
         SoundManager.Instance?.PlaySoundFX("Teleporter In");
         CameraController.Instance?.ShakeCamera(2f, 2f, 2, 2);
-        GameManager.Instance?.SaveCurrentLevelStats(SceneManager.GetActiveScene().name, _currentDeaths, _currentTime);
+        
+        
+        
+        StartCoroutine(UpdateStatEffect($"New Best Time! {_currentTime}", 1f, Color.green));
+        StartCoroutine(UpdateStatEffect("No Death Run!", 1f, Color.green));
+        GameManager.Instance?.SaveBestTime(SceneManager.GetActiveScene().name, _currentTime);
+        GameManager.Instance?.SavePerfectRun(SceneManager.GetActiveScene().name, _currentDeaths == 0);
     }
 
     private void CheckIfDead(string cause = "")
@@ -1182,6 +1203,35 @@ public class PlayerController : MonoBehaviour {
             _verticalInput = 0;
         }
     }
+
+    private IEnumerator UpdateStatEffect(string text, float duration = 1, Color color = default)
+    {
+        if (!statUpdatePrefab) yield return null;
+
+        TextMeshPro stat = Instantiate(statUpdatePrefab, transform.position, statUpdatePrefab.transform.rotation);
+        Vector3 randDir = new Vector3(Random.Range(-3f, 3f), Random.Range(1f, 2f), 0);
+        Vector3 randRot = new Vector3(0, 0, Random.Range(-60f, 60f));
+        
+        stat.text = text;
+        stat.color = color;
+        Tween.Alpha(stat,startValue:1, 0, duration);
+        Tween.Position(stat.transform, stat.transform.position + randDir, duration);
+        Tween.Rotation(stat.transform, randRot, duration);
+        
+        yield return new WaitForSeconds(duration);
+        Destroy(stat.gameObject);
+    }
+    
+    private void TogglePause() {
+        
+        if (CheckPlayerState() != PlayerState.Controllable) return;
+        
+        if (GameManager.Instance.gameState == GameStates.GamePlay) {
+            GameManager.Instance.SetGameState(GameStates.Paused);
+        } else if (GameManager.Instance.gameState == GameStates.Paused) {
+            GameManager.Instance.SetGameState(GameStates.GamePlay);
+        }
+    }
     
     public void Push(Vector2 pushForce) {
         
@@ -1270,6 +1320,7 @@ public class PlayerController : MonoBehaviour {
         _isTouchingWallOnLeft = false;
         _isTouchingWallOnRight = false;
         isGrounded = false;
+        isJumping = false;
         currentPlayerState = state;
         
         switch (state) {
@@ -1304,7 +1355,7 @@ public class PlayerController : MonoBehaviour {
                 rigidBody.linearVelocity = Vector2.zero;
                 break;
             case PlayerState.Teleporting:
-                rigidBody.simulated = false;
+                rigidBody.simulated = true;
                 rigidBody.linearVelocity = Vector2.zero;
                 break;
         }

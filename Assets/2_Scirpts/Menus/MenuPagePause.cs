@@ -10,6 +10,7 @@ public class MenuPagePause : MenuPage
     [SerializeField] private Button buttonResume;
     [SerializeField] private Button buttonOptions;
     [SerializeField] private Button buttonMainMenu;
+    [SerializeField] private Button buttonRestartLevel;
     [SerializeField] private Button buttonQuit;
     [SerializeField] private  TMP_Text pauseCollectiblesText;
     
@@ -46,7 +47,7 @@ public class MenuPagePause : MenuPage
         {
             buttonOptions.onClick.RemoveAllListeners();
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonOptions.onClick.AddListener(() => _menuCategoryPause.SelectPage(_menuCategoryPause.optionsMenuPage));
+            buttonOptions.onClick.AddListener(() => menuCategoryPause.SelectPage(menuCategoryPause.optionsMenuPage));
         }
         
         if (buttonMainMenu)
@@ -55,7 +56,14 @@ public class MenuPagePause : MenuPage
             buttonMainMenu.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.None));
             buttonMainMenu.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
-            
+        }
+        
+        if (buttonRestartLevel)
+        {
+            buttonRestartLevel.onClick.RemoveAllListeners();
+            buttonRestartLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
+            buttonRestartLevel.onClick.AddListener(() => PlayerController.Instance?.RespawnFromTeleporter());
+            buttonRestartLevel.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
         }
 
         if (buttonQuit)

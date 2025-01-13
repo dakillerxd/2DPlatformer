@@ -7,28 +7,18 @@ using UnityEngine.UI;
 public class MenuPageCollectibles : MenuPage
 {
     [Header("UI Elements")]
+    [SerializeField] private Toggle togglePrefab;
     [SerializeField] private Button buttonBack;
-    
-    [Header("Collectibles")]
     [SerializeField] private TextMeshProUGUI coinsHeaderText;
     [SerializeField] private TextMeshProUGUI coinsText;
-    
-    [Header("Unlocks")]
-    [SerializeField] private TextMeshProUGUI unlocksHeaderText;
-    [SerializeField] private TextMeshProUGUI unlocksText;
-    [Space(10f)]
-    [SerializeField] GameObject playerGfx;
-    [SerializeField] private Toggle googlyEyesToggle;
-    [SerializeField] private Toggle propellerHatToggle;
-    [SerializeField] private Toggle curlyMustacheToggle;
     [SerializeField] private GameObject normalEyes;
     [SerializeField] private GameObject googlyEyes;
     [SerializeField] private GameObject propellerHat;
     [SerializeField] private GameObject curlyMustache;
+    [SerializeField] private GameObject unlocksContainer;
     
     
     private readonly StringBuilder _collectiblesStringBuilder = new StringBuilder(256);
-    private readonly StringBuilder _unlockStringBuilder = new StringBuilder(256);
     
 
 
@@ -37,7 +27,7 @@ public class MenuPageCollectibles : MenuPage
         if (buttonBack != null) {
             
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonBack.onClick.AddListener(() => _menuCategoryMain.SelectPage(_menuCategoryMain.mainMenuPage));
+            buttonBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
         }
         
         UpdateCollectibles();
@@ -58,51 +48,29 @@ public class MenuPageCollectibles : MenuPage
 
     private void UpdateUnlocks()
     {
-        if (googlyEyesToggle) {
-            googlyEyesToggle.isOn = GameManager.Instance.CheckUnlockActive("Googly Eye");
-            googlyEyesToggle.interactable = GameManager.Instance.CheckUnlockReceived("Googly Eye");
-            googlyEyesToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Googly Eye", value));
-            googlyEyesToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
-            selectables.Add(googlyEyesToggle);
-            SetupSelectable(googlyEyesToggle);
-            StoreOriginalTransforms(googlyEyesToggle);
-            StoreOriginalState(googlyEyesToggle);
-        }
-        
-        if (propellerHatToggle) {
-            propellerHatToggle.isOn = GameManager.Instance.CheckUnlockActive("Propeller Hat");
-            propellerHatToggle.interactable = GameManager.Instance.CheckUnlockReceived("Propeller Hat");
-            propellerHatToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Propeller Hat", value));
-            propellerHatToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
-            selectables.Add(propellerHatToggle);
-            SetupSelectable(propellerHatToggle);
-            StoreOriginalTransforms(propellerHatToggle);
-            StoreOriginalState(propellerHatToggle);
-        }
-        
-        if (curlyMustacheToggle)
+        if (GameManager.Instance.unlocks.Length == 0 || !togglePrefab || !unlocksContainer) return;
+    
+        foreach (Transform child in unlocksContainer.transform) // Delete all buttons before creating new ones
         {
-            curlyMustacheToggle.isOn = GameManager.Instance.CheckUnlockActive("Curly Mustache");
-            curlyMustacheToggle.interactable = GameManager.Instance.CheckUnlockReceived("Curly Mustache");
-            curlyMustacheToggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock("Curly Mustache", value));
-            curlyMustacheToggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
-            selectables.Add(curlyMustacheToggle);
-            SetupSelectable(curlyMustacheToggle);
-            StoreOriginalTransforms(curlyMustacheToggle);
-            StoreOriginalState(curlyMustacheToggle);
+            Destroy(child.gameObject);
         }
-
-        if (!unlocksText || GameManager.Instance.unlocks != null)
+    
+        for (int i = 0; i < GameManager.Instance.unlocks.Length; i++) // Using index loop instead of foreach
         {
-            _unlockStringBuilder.Clear();
+            Unlock unlock = GameManager.Instance.unlocks[i];
+            GameObject toggleObject = Instantiate(togglePrefab.gameObject, unlocksContainer.transform);
+            Toggle toggle = toggleObject.GetComponent<Toggle>();
             
-            foreach (Unlock unlock in GameManager.Instance.unlocks)
-            {
-                _unlockStringBuilder.AppendLine($"{unlock.unlockedAtCollectible} Coins: {unlock.unlockName} \n");
-            }
+            toggleObject.GetComponentInChildren<TextMeshProUGUI>().text = $"{unlock.unlockedAtCollectible} Coins: {unlock.unlockName}";
+            toggleObject.name = unlock.unlockName;
+            
+            toggle.isOn = unlock.unlockState;
+            toggle.interactable = unlock.unlockReceived;
+            toggle.onValueChanged.AddListener((value) => GameManager.Instance?.ToggleUnlock(unlock.unlockName, value));
+            toggle.onValueChanged.AddListener((value) => SoundManager.Instance?.PlaySoundFX("Toggle"));
 
-
-            unlocksText.text = _unlockStringBuilder.ToString();
+            selectables.Add(toggle);
+            SetupSelectable(toggle);
         }
 
     }

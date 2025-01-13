@@ -9,10 +9,18 @@ namespace CustomAttribute
     [System.Serializable]
     public class SortingLayerField
     {
-        [SerializeField]
+       
+        [SerializeField, HideInInspector]
         private string m_LayerName = "Default";
+
+        
         [SerializeField]
         private int m_LayerID;
+
+        public string LayerName
+        {
+            get { return m_LayerName; }
+        }
 
         public int LayerID
         {
@@ -59,9 +67,7 @@ namespace CustomAttribute
             if (GUI.Button(buttonRect, "..."))
             {
                 EditorApplication.ExecuteMenuItem("Edit/Project Settings...");
-                var settingsWindow = EditorWindow.GetWindow<EditorWindow>("Project Settings");
-                var tagsAndLayersHeader = typeof(Editor).Assembly.GetType("UnityEditor.TagManager");
-                var window = SettingsService.OpenProjectSettings("Project/Tags and Layers");
+                SettingsService.OpenProjectSettings("Project/Tags and Layers");
             }
             
             EditorGUI.EndProperty();

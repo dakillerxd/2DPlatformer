@@ -1,5 +1,5 @@
 using UnityEngine;
-using CustomAttributes;
+using CustomAttribute;
 using VInspector;
 #if UNITY_EDITOR
 using UnityEditor;

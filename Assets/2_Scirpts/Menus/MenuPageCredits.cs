@@ -16,8 +16,9 @@ public class MenuPageCredits : MenuPage
     private void SetupButtons()
     {
         
-        if (buttonBack != null)
+        if (buttonBack)
         {
+            buttonBack.onClick.RemoveAllListeners();
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
         }

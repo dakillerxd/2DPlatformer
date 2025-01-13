@@ -26,6 +26,7 @@ public class MenuPageCollectibles : MenuPage
     {
         if (buttonBack != null) {
             
+            buttonBack.onClick.RemoveAllListeners();
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
         }

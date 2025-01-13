@@ -1,4 +1,3 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,12 +38,18 @@ public class MenuPageGameplay : MenuPage
     
     private void StartLevelTitleEffect(float duration, string title, float startDelay = 0) {
         
-        if (levelTitleText)
-        {
+        if (levelTitleText) {
+            
+            // Set the text and initial alpha
             levelTitleText.text = title;
-            Tween.Alpha(levelTitleText, startValue: 1, endValue:0, duration, startDelay: startDelay, ease: Ease.InOutSine, useUnscaledTime: true);
+            levelTitleText.alpha = 0f;
+
+            Sequence.Create(useUnscaledTime: true)
+                .ChainDelay(startDelay) // Delay if specified
+                .Chain(Tween.Alpha(levelTitleText, startValue: 0f, endValue: 1f, duration: duration * 0.5f, ease: Ease.OutSine)) // Fade in
+                .ChainDelay(duration * 0.2f) // Delay to make text readable
+                .Chain(Tween.Alpha(levelTitleText, startValue: 1f, endValue: 0f, duration: duration * 0.5f, ease: Ease.InSine)); // Fade out
         }
-        
     }
     
 
@@ -54,7 +59,7 @@ public class MenuPageGameplay : MenuPage
         if (nextScene.name == "ShowcaseLevel")
         {
             UpdateAbilitiesUI();
-            StartLevelTitleEffect(1, "Showcase Level", 1);
+            StartLevelTitleEffect(2, "Showcase Level", 2);
         } else {
             UpdateAbilitiesUI();
             StartLevelTitleEffect(2, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());

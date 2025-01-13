@@ -61,7 +61,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 5e5efdc77c857db4db05e93b5998911a, type: 3}
       m_SceneName: Level1
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level1.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -71,7 +71,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: fdff390fd69488141992d81f655a8dcd, type: 3}
       m_SceneName: Level2
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level2.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -81,7 +81,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 591ec75145a03ae449728a9f949392ad, type: 3}
       m_SceneName: Level3
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level3.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -91,7 +91,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 1fef8a30b0a64ee42935456a44ef89ef, type: 3}
       m_SceneName: Level4
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level4.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: 2a961657cc954194bb3921b85289fe5a, type: 3}
       m_SceneName: Level5
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level5.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -111,7 +111,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: b37d4a79f9e6bfe47bbf656d2a6c1bc1, type: 3}
       m_SceneName: Level6
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level6.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
     connectedScene:
       m_SceneAsset: {fileID: 102900000, guid: aa971e4ec77bba3418be408940dc17f3, type: 3}
       m_SceneName: Level7
-      m_BuildIndex: -1
+      m_ScenePath: Assets/1_Scenes/Level7.unity
     countsTowardsUnlocks: 1
     collectibleCollected: 0
     noDeathRunRun: 0

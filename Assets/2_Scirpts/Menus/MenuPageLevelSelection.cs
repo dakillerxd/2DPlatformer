@@ -1,5 +1,4 @@
-using System.Text;
-using CustomAttributes;
+using CustomAttribute;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -88,11 +87,13 @@ public class MenuPageLevelSelection : MenuPage
     {
         if (buttonBack)
         {
+            buttonBack.onClick.RemoveAllListeners();
             buttonBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
         }
         if (buttonShowcaseLevel)
         {
+            buttonShowcaseLevel.onClick.RemoveAllListeners();
             buttonShowcaseLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonShowcaseLevel.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
             buttonShowcaseLevel.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
@@ -101,6 +102,7 @@ public class MenuPageLevelSelection : MenuPage
         
         if (buttonTestLevel)
         {
+            buttonTestLevel.onClick.RemoveAllListeners();
             buttonTestLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonTestLevel.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
             buttonTestLevel.onClick.AddListener(() => SceneManager.LoadScene("TestLevel"));

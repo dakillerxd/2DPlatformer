@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,39 +14,46 @@ namespace CustomAttribute
         [SerializeField]
         private string m_SceneName = "";
         [SerializeField]
-        private int m_BuildIndex = -1;
+        private string m_ScenePath = "";
 
-        public string SceneName
-        {
-            get { return m_SceneName; }
-        }
+        public string SceneName => m_SceneName;
+        public string ScenePath => m_ScenePath;
 
         public int BuildIndex
         {
-            get 
+            get
             {
-                #if UNITY_EDITOR
-                // Find build index if it's not set correctly
-                if (m_BuildIndex == -1 && !string.IsNullOrEmpty(m_SceneName))
+                if (string.IsNullOrEmpty(m_SceneName))
                 {
-                    EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
-                    string scenePath = AssetDatabase.GetAssetPath(m_SceneAsset);
-                    
-                    for (int i = 0; i < scenes.Length; i++)
+                    Debug.LogWarning("Scene name is empty!");
+                    return -1;
+                }
+
+                #if UNITY_EDITOR
+                // Get all scenes in build settings
+                EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
+                
+                for (int i = 0; i < scenes.Length; i++)
+                {
+
+                    if (scenes[i].enabled && scenes[i].path == m_ScenePath)
                     {
-                        if (scenes[i].path == scenePath)
-                        {
-                            m_BuildIndex = i;
-                            break;
-                        }
+                        return i;
                     }
                 }
+                Debug.LogWarning($"Scene '{m_SceneName}' not found in build settings or is disabled!");
+                return -1;
+                #else
+                int buildIndex = SceneUtility.GetBuildIndexByScenePath(m_ScenePath);
+                if (buildIndex == -1)
+                {
+                    Debug.LogWarning($"Runtime: Scene '{m_ScenePath}' not found in build settings!");
+                }
+                return buildIndex;
                 #endif
-                return m_BuildIndex;
             }
         }
 
-        // makes it work with the existing Unity methods (LoadLevel/LoadScene)
         public static implicit operator string(SceneField sceneField)
         {
             return sceneField.SceneName;
@@ -57,7 +65,7 @@ namespace CustomAttribute
         }
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(SceneField))]
     public class SceneFieldPropertyDrawer : PropertyDrawer
     {
@@ -66,9 +74,10 @@ namespace CustomAttribute
             EditorGUI.BeginProperty(position, GUIContent.none, property);
             SerializedProperty sceneAsset = property.FindPropertyRelative("m_SceneAsset");
             SerializedProperty sceneName = property.FindPropertyRelative("m_SceneName");
-            SerializedProperty buildIndex = property.FindPropertyRelative("m_BuildIndex");
+            SerializedProperty scenePath = property.FindPropertyRelative("m_ScenePath");
             
             position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+            
             if (sceneAsset != null)
             {
                 EditorGUI.BeginChangeCheck();
@@ -80,32 +89,37 @@ namespace CustomAttribute
                     {
                         SceneAsset scene = sceneAsset.objectReferenceValue as SceneAsset;
                         sceneName.stringValue = scene.name;
+                        scenePath.stringValue = AssetDatabase.GetAssetPath(scene);
                         
-                        // Find build index
+                        
+                        // Validate if scene is in build settings
+                        bool sceneInBuild = false;
                         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
-                        string scenePath = AssetDatabase.GetAssetPath(scene);
-                        buildIndex.intValue = -1;
+                        Debug.Log($"Checking against {scenes.Length} scenes in build settings");
                         
-                        for (int i = 0; i < scenes.Length; i++)
+                        foreach (var buildScene in scenes)
                         {
-                            if (scenes[i].path == scenePath)
+                            if (buildScene.path == scenePath.stringValue)
                             {
-                                buildIndex.intValue = i;
+                                sceneInBuild = true;
                                 break;
                             }
+                        }
+                        
+                        if (!sceneInBuild)
+                        {
+                            Debug.LogWarning($"Scene '{sceneName.stringValue}' is not in build settings! Please add it to your build settings.");
                         }
                     }
                     else
                     {
                         sceneName.stringValue = "";
-                        buildIndex.intValue = -1;
-                        
-                        Debug.LogError("Scene is not in build index");
+                        scenePath.stringValue = "";
                     }
                 }
             }
             EditorGUI.EndProperty();
         }
     }
-#endif
+    #endif
 }

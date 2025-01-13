@@ -1,3 +1,4 @@
+using CustomAttribute;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,6 @@ public class MenuPageMain : MenuPage
 
     [Header("UI Elements")]
     [SerializeField] private Button buttonStart;
-    [SerializeField] private Button buttonResume;
     [SerializeField] private Button buttonLevelSelect;
     [SerializeField] private Button buttonCollectibles;
     [SerializeField] private Button buttonOptions;
@@ -28,73 +28,69 @@ public class MenuPageMain : MenuPage
     
     private void SetupButtons()
     {
-        if (buttonResume || buttonStart)
+        if (buttonStart)
         {
-            // Check save
-            if (SaveManager.Instance.LoadInt("HighestLevel") < 1) { // New game
-                
-                buttonResume.gameObject.SetActive(false);
-                buttonStart.gameObject.SetActive(true);
-                
-            } else if (SaveManager.Instance.LoadInt("HighestLevel") == 1) { 
-            
-
-                if (SaveManager.Instance.LoadInt("SavedCheckpoint") > 0) { // At level one with a checkpoint saved
-                
-                    buttonResume.gameObject.SetActive(true);
-                    buttonStart.gameObject.SetActive(false);
-
-                
-                } else { // At level 1 with no checkpoint saved
-                
-                    buttonResume.gameObject.SetActive(false);
-                    buttonStart.gameObject.SetActive(true);
-                }
-                
-            } else if (SaveManager.Instance.LoadInt("HighestLevel") > 1) { // At higher level then 1
-            
-                buttonResume.gameObject.SetActive(true);
-                buttonStart.gameObject.SetActive(false);
-            }
-            
-            
+            buttonStart.onClick.RemoveAllListeners();
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonStart.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
-            buttonStart.onClick.AddListener(() => SceneManager.LoadScene(1));
-            // buttonStart.GetComponentInChildren<TextMeshProUGUI>().text = "Start";
             
+            var buttonText = buttonStart.GetComponentInChildren<TextMeshProUGUI>();
+            int highestLevel = SaveManager.Instance.LoadInt("HighestLevel");
+            int savedCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint");
+            string savedLevel = SaveManager.Instance.LoadString("SavedLevel");
+            SceneField level1 = GameManager.Instance.levels[0].connectedScene;
             
-            buttonResume.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonResume.onClick.AddListener(() => SceneManager.LoadScene(SaveManager.Instance.LoadString("SavedLevel")));
+            // Check save
+            if (highestLevel <= 1) // At level 1
+            {
+                buttonStart.onClick.AddListener(() => SceneManager.LoadScene(level1.BuildIndex));
+                buttonText.text = savedCheckpoint > 0 ? "Resume" : "Start";
+                
+            } else { // At higher level then 1
+
+                if (savedLevel == level1) // if there is the last level was level 1
+                {
+                    buttonStart.onClick.AddListener(() => SceneManager.LoadScene(level1.BuildIndex));
+                    buttonText.text = savedCheckpoint > 0 ? "Resume" : "Start";
+                    
+                } else {
+                    buttonStart.onClick.AddListener(() => SceneManager.LoadScene(savedLevel));
+                    buttonText.text = "Resume";
+                }
+            }
         }
         
         
-        if (buttonLevelSelect != null)
+        if (buttonLevelSelect)
         {
+            buttonLevelSelect.onClick.RemoveAllListeners();
             buttonLevelSelect.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonLevelSelect.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.levelSelectMenuPage));
         }
         
-        if (buttonCollectibles != null)
+        if (buttonCollectibles)
         {
+            buttonCollectibles.onClick.RemoveAllListeners();
             buttonCollectibles.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonCollectibles.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.collectiblesMenuPage));
         }
 
-        if (buttonOptions != null)
+        if (buttonOptions)
         {
+            buttonOptions.onClick.RemoveAllListeners();
             buttonOptions.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonOptions.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.optionsMenuPage));
         }
 
-        if (buttonCredits != null)
+        if (buttonCredits)
         {
+            buttonCredits.onClick.RemoveAllListeners();
             buttonCredits.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonCredits.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.creditsMenuPage));
         }
 
-        if (buttonQuit != null)
+        if (buttonQuit)
         {
+            buttonQuit.onClick.RemoveAllListeners();
             buttonQuit.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonQuit.onClick.AddListener(() => GameManager.Instance?.QuitGame());
         }

@@ -60,18 +60,20 @@ public class MenuPageOptions : MenuPage
         {
             if (SceneManager.GetActiveScene().name == "MainMenu") {
             
+                buttonOptionsBack.onClick.RemoveAllListeners();
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
                 buttonOptionsBack.onClick.AddListener(() => menuCategoryMain.SelectPage(menuCategoryMain.mainMenuPage));
             
             } else {
+                buttonOptionsBack.onClick.RemoveAllListeners();
                 buttonOptionsBack.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
                 buttonOptionsBack.onClick.AddListener(() => menuCategoryPause.SelectPage(menuCategoryPause.pauseMenuPage));
             }
         }
         
-        
         if (buttonDeleteSave)
         {
+            buttonDeleteSave.onClick.RemoveAllListeners();
             buttonDeleteSave.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             buttonDeleteSave.onClick.AddListener(() => GameManager.Instance?.DeleteSave());
         }

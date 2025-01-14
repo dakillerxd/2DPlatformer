@@ -115,6 +115,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float wallSlideAcceleration = 3f;
     [SerializeField] private float maxWallSlideSpeed = 4f;
     [SerializeField] [Range(0, 1f)] private float wallSlideStickTime = 0.2f;
+    [SerializeField, ShowIf("wallJumpAbility")] [Range(1, 3f)] private float wallJumpStickTimeMultiplier = 2f;[EndIf]
     private float _wallSlideStickTimer;
 
     [Header("Wall Jump")]
@@ -364,7 +365,8 @@ public class PlayerController : MonoBehaviour {
         }
         
         
-        if (isWallSliding && _wallSlideStickTimer < wallSlideStickTime) {
+        float stickTime = wallJumpAbility ? wallSlideStickTime * wallJumpStickTimeMultiplier : wallSlideStickTime;
+        if (isWallSliding && _wallSlideStickTimer < stickTime) {
             targetSpeed = 0;
         }
         

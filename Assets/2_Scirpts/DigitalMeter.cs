@@ -1,8 +1,7 @@
-using UnityEngine;
-using VInspector;
 #if UNITY_EDITOR
+using UnityEngine;
 using UnityEditor;
-#endif
+
 
 public class DigitalMeter : MonoBehaviour
 {
@@ -20,7 +19,7 @@ public class DigitalMeter : MonoBehaviour
    [SerializeField] private string units = "m";
    [SerializeField] [Range(0, 10)] private int decimals = 2;
    
-#if UNITY_EDITOR
+
     
    private void OnDrawGizmos()
    {
@@ -32,17 +31,22 @@ public class DigitalMeter : MonoBehaviour
        Vector3 direction = (end - start).normalized;
        Vector3 midPoint = Vector3.Lerp(start, end, 0.5f);
 
-       #if UNITY_EDITOR
+       
        // Draw line
        Handles.color = lineColor;
        Handles.DrawLine(start, end);
 
        // Prepare label style
-       GUIStyle style = new GUIStyle();
-       style.normal.textColor = fontColor;
-       style.fontSize = (int)fontSize;
-       style.alignment = TextAnchor.MiddleCenter;
-       
+       GUIStyle style = new GUIStyle
+       {
+           normal =
+           {
+               textColor = fontColor
+           },
+           fontSize = (int)fontSize,
+           alignment = TextAnchor.MiddleCenter
+       };
+
        // Create measurement text
        string measurementText = $"{distance.ToString($"F{decimals}")}{units}";
        
@@ -64,7 +68,7 @@ public class DigitalMeter : MonoBehaviour
 
        // Draw label
        Handles.Label(midPoint + Vector3.up * labelOffset, measurementText, style);
-       #endif
+
    }
 
    
@@ -75,5 +79,6 @@ public class DigitalMeter : MonoBehaviour
        labelOffset = Mathf.Max(0, labelOffset);
    }
    
-   #endif
+
 }
+#endif

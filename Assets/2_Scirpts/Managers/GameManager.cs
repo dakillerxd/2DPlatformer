@@ -18,11 +18,11 @@ public class GameManager : MonoBehaviour
     public bool funnyMode; 
     public bool debugMode;
     [SerializeField] private KeyCode quitGameKey;
-    [SerializeField] private KeyCode toggleFunnyMode;
+    [SerializeField] private KeyCode toggleFunnyMode = KeyCode.F2;
     [SerializeField] private KeyCode toggleDebugMode = KeyCode.F1;
     [SerializeField] private KeyCode restartSceneKey = KeyCode.F4;
-    [SerializeField] private KeyCode finishGame = KeyCode.F5;
-    [SerializeField] private KeyCode deleteSave = KeyCode.F6;
+    [SerializeField] private KeyCode finishGame = KeyCode.F8;
+    [SerializeField] private KeyCode deleteSave = KeyCode.F9;
     public Level[] levels;
     public Unlock[] unlocks;
     [EndTab]
@@ -195,7 +195,7 @@ public class GameManager : MonoBehaviour
                     level.bestTime = time;
                     SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " BestTime", level.bestTime);
 
-                    if (PlayerController.Instance)
+                    if (PlayerController.Instance && funnyMode)
                     {
                         StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position, text: $"New Best Time! {time:F1}", color: Color.green));
                     }
@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
                 level.totalDeaths += 1;
                 SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " TotalDeaths", level.totalDeaths);
                 
-                if (PlayerController.Instance)
+                if (PlayerController.Instance&& funnyMode)
                 {
                     StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position, text:"+1 Death", color: Color.red));    
                 }
@@ -231,7 +231,7 @@ public class GameManager : MonoBehaviour
                     level.noDeathRunRun = true;
                     SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", true);
                 
-                    if (PlayerController.Instance)
+                    if (PlayerController.Instance&& funnyMode)
                     {
                         StartCoroutine(UpdateStatEffect(PlayerController.Instance.transform.position,text:"No Death Run!", color: Color.green));    
                     }
@@ -500,7 +500,7 @@ public class GameManager : MonoBehaviour
         AddInfoText("doubleJump", "press jump mid-air  \n to double jump"); // press <sprite=66> / <sprite=210> mid-air  \n \nto double jump
         AddInfoText("fastSlide", "press <sprite=44> / <sprite=206> to slide faster");
         AddInfoText("dropDown", "press down + jump to drop");
-        AddInfoText("dash", "press down + jump to drop");
+        AddInfoText("dash", "press Alt to dash");
     }
 
     private void AddInfoText(string id, string text)

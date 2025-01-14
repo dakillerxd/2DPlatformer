@@ -18,9 +18,6 @@ public class GameUIManager : MenuController
     public TextMeshProUGUI fpsText;
     
     
-    [Header("Other")] 
-    [SerializeField] private Animator animator;
-    
 
     protected override void Awake() {
         base.Awake();
@@ -54,7 +51,6 @@ public class GameUIManager : MenuController
     {
         if (nextScene.name == "MainMenu")
         {
-            // VFXManager.Instance?.PlayAnimationTrigger(animator, "EnterScene1");
             DisableAllCategories();
         } else {
             SelectFirstCategory();

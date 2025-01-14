@@ -29,8 +29,7 @@ public class EventsTrigger : MonoBehaviour
         }
 
         
-        
-        StartCoroutine(ResetTrigger());
+        if (this.isActiveAndEnabled) StartCoroutine(ResetTrigger());
     }
 
     private IEnumerator ResetTrigger()

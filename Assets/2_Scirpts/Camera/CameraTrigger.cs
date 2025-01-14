@@ -5,7 +5,7 @@ using VInspector;
 [RequireComponent(typeof(BoxCollider2D))]
 public class CameraTrigger : MonoBehaviour
 {
-    [Header("Size")]
+    [Header("Boundary")]
     [SerializeField] private bool useColliderAsBoundary = true;
     [DisableIf(nameof(useColliderAsBoundary))]
     [SerializeField] private float boundaryMinX;
@@ -41,13 +41,6 @@ public class CameraTrigger : MonoBehaviour
     [SerializeField] private BoxCollider2D boxCollider2D;
     [SerializeField] public Transform cameraPosition;
     
-    private void Start()
-    {
-        if (!boxCollider2D) {
-            boxCollider2D = GetComponent<BoxCollider2D>();
-            boxCollider2D.isTrigger = true;
-        }
-    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -60,11 +53,12 @@ public class CameraTrigger : MonoBehaviour
         if (other.gameObject.transform.root != CameraController.Instance.target) return;
         CameraController.Instance.RemoveActiveTrigger(this);
     }
+    
 
-
-
-#region Debug
 #if UNITY_EDITOR
+    
+#region Editor // -----------------------------------------------
+
     
     private void OnValidate()
     {
@@ -213,6 +207,9 @@ public class CameraTrigger : MonoBehaviour
     }
     
     
+
+#endregion Editor // -----------------------------------------------
+
 #endif
-#endregion
+    
 }

@@ -51,11 +51,11 @@ MonoBehaviour:
   funnyMode: 0
   debugMode: 0
   quitGameKey: 0
-  toggleFunnyMode: 0
+  toggleFunnyMode: 283
   toggleDebugMode: 282
   restartSceneKey: 285
-  finishGame: 286
-  deleteSave: 287
+  finishGame: 289
+  deleteSave: 290
   levels:
   - name: Level 1
     connectedScene:
@@ -176,6 +176,7 @@ MonoBehaviour:
   masterGameVolume: 0
   soundFXVolume: 0
   musicVolume: 0
+  force16By9AspectRatio: 0
   defaultTargetFPS: 999
   defaultVSync: 0
   defaultScreenMode: 1
@@ -183,6 +184,7 @@ MonoBehaviour:
   defaultMasterGameVolume: 1
   defaultSoundFXVolume: 0.7
   defaultMusicVolume: 0.2
+  defaultForce16By9: 1
   onSoundFXVolumeChange:
     m_PersistentCalls:
       m_Calls: []
@@ -190,5 +192,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onMasterVolumeChange:
+    m_PersistentCalls:
+      m_Calls: []
+  onResolutionChange:
     m_PersistentCalls:
       m_Calls: []

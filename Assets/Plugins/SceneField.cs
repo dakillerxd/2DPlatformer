@@ -95,7 +95,6 @@ namespace CustomAttribute
                         // Validate if scene is in build settings
                         bool sceneInBuild = false;
                         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
-                        Debug.Log($"Checking against {scenes.Length} scenes in build settings");
                         
                         foreach (var buildScene in scenes)
                         {

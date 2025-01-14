@@ -243,7 +243,7 @@ public class SoundManager : MonoBehaviour
         int rand = Random.Range(0, newMusic.clips.Length);
         
         newMusic.source.clip = newMusic.clips[rand];
-        newMusic.source.volume = newMusic.volume * SettingsManager.Instance.musicVolume * SettingsManager.Instance.masterGameVolume;
+      newMusic.source.volume = newMusic.volume * SettingsManager.Instance.musicVolume * SettingsManager.Instance.masterGameVolume;
         newMusic.source.Play();
     }
 

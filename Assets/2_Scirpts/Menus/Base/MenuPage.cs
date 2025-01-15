@@ -303,6 +303,9 @@ public class MenuPage : MonoBehaviour
     
     #endregion Animations // ---------------------------------------------------------------------
 
+    
+    
+    
 #if UNITY_EDITOR
     [Button] private void AddAllSelectablesInPage()
     {

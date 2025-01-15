@@ -752,7 +752,8 @@ public class PlayerController : MonoBehaviour {
         isJumping = true;
         
         
-        if (_wallJumpCombo > 0) TurnStunLocked(0.1f * _wallJumpCombo); // Stop the player from wall climbing
+        if (_wallJumpCombo > 0) TurnStunLocked(0.1f * _wallJumpCombo); // Makes wall jumping harder for each wall jump
+        // Add (if the last wall jump was from a different side then reset combo)
         _wallJumpCombo += 1;
     }
 

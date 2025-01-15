@@ -98,20 +98,7 @@ public class MenuPage : MonoBehaviour
     }
     
     
-#if UNITY_EDITOR
-    // private void OnValidate()
-    // {
-    //     foreach (Transform child in transform)
-    //     {
-    //         if (!child.TryGetComponent(out Selectable selectable)) continue;
-    //         if (!selectables.Contains(selectable))
-    //         {
-    //             selectables.Add(selectable);
-    //         }
-    //     }
-    //     selectables.RemoveAll(menu => menu == null);
-    // }
-#endif
+
     
     
     #region Page Management // ---------------------------------------------------------------------
@@ -144,7 +131,7 @@ public class MenuPage : MonoBehaviour
         eventTrigger.triggers.Add(entry);
     }
 
-    protected void ResetAllSelectables() 
+    protected virtual void ResetAllSelectables() 
     {
         if (selectables.Count == 0) return;
         
@@ -316,5 +303,19 @@ public class MenuPage : MonoBehaviour
     
     #endregion Animations // ---------------------------------------------------------------------
 
+#if UNITY_EDITOR
+    [Button] private void AddAllSelectablesInPage()
+    {
+        foreach (Transform child in transform)
+        {
+            if (!child.TryGetComponent(out Selectable selectable)) continue;
+            if (!selectables.Contains(selectable))
+            {
+                selectables.Add(selectable);
+            }
+        }
+        selectables.RemoveAll(menu => menu == null);
+    }
     
+#endif
 }

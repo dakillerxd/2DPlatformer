@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using CustomAttribute;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VInspector;
 using PrimeTween;
+using TMPro;
 using UnityEngine.UI;
 
 public class IntroSceneManager : MonoBehaviour
@@ -14,29 +16,42 @@ public class IntroSceneManager : MonoBehaviour
     [SerializeField] private SceneField mainMenuScene;
     [SerializeField] private Image player;
     [SerializeField] private Image background;
+    [SerializeField] private TextMeshProUGUI gameTitle;
     
     private Vector3 _defaultPlayerSize;
     private Vector3 _defaultPlayerRotation;
     private Vector3 _defaultPlayerPosition;
     private  Color _defaultPlayerColor;
     private float _defaultPlayerAlpha;
+    private Vector3 _defaultGameTitlePosition;
+    private Vector3 _defaultGameTitleRotation;
+    private Vector3 _defaultGameTitleSize;
+    private Color _defaultGameTitleColor;
+    private float _defaultGameTitleAlpha;
     private  Sequence _sequence;
-    
-    
-    
 
-    private void Start()
+    private void Awake()
     {
         _defaultPlayerSize = player.transform.localScale;
         _defaultPlayerRotation = player.transform.eulerAngles;
         _defaultPlayerPosition = player.transform.position;
         _defaultPlayerColor = player.color;
         _defaultPlayerAlpha = player.color.a;
-
-        PlaySpiralFadeIntro();
+        
+        _defaultGameTitlePosition = gameTitle.transform.position;
+        _defaultGameTitleRotation = gameTitle.transform.eulerAngles;
+        _defaultGameTitleSize = gameTitle.transform.localScale;
+        _defaultGameTitleColor = gameTitle.color;
+        _defaultPlayerAlpha = gameTitle.color.a;
     }
 
+
+    private void Start()
+    {
+        PlayTestIntro2();
+    }
     
+
     private void GoToMainMenu()
     {
         if (mainMenuScene == null) return;
@@ -88,7 +103,7 @@ public class IntroSceneManager : MonoBehaviour
             .OnComplete(GoToMainMenu);
     }
 
-    [Button] private void PlaySpirelFadeIntro2()
+    [Button] private void PlaySpiralFadeIntro2()
     {
         ResetIntroScreen();
 
@@ -125,7 +140,23 @@ public class IntroSceneManager : MonoBehaviour
     }
 
 
+    [Button] private void PlayTestIntro2()
+    {
+        ResetIntroScreen();
 
+        float duration = 2;
+
+        _sequence = Sequence.Create(cycles: 2, cycleMode: CycleMode.Yoyo)
+            .ChainDelay(1f)
+            .Group(Tween.Alpha(player, startValue: 0, endValue: 1, duration: 2, Ease.InExpo))
+            .Group(Tween.Scale(player.transform, startValue: 0.1f, endValue: 4, duration: 2))
+            .Group(Tween.EulerAngles(player.transform, startValue: Vector3.zero, endValue: new Vector3(0, 0, -720f), duration: 2, ease: Ease.InOutSine))
+            .OnComplete(GoToMainMenu);
+        
+        // .Group(Tween.Alpha(gameTitle, startValue: 0, endValue: 1, duration: 2, Ease.InExpo))
+        // .Group(Tween.Scale(gameTitle.transform, startValue: 0.1f, endValue: 1, duration: 2))
+
+    }
 
 
 

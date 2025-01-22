@@ -138,13 +138,15 @@ MonoBehaviour:
     outerSpriteColor: {r: 0.5647059, g: 1, b: 0.5647059, a: 1}
     lightColor: {r: 0, g: 0.7647059, b: 0, a: 0.39215687}
     rotateEffect: 1
-    vfx: {fileID: 8604298408129782361, guid: d43c16091b4faa141902567a145f873a, type: 3}
+    particleEffect: {fileID: 0}
+    events: []
   disabledStateGfx:
     innerSpriteColor: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
     outerSpriteColor: {r: 1, g: 0.98039216, b: 0, a: 0.5882353}
     lightColor: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
     rotateEffect: 0
-    vfx: {fileID: 5060159489429807464, guid: 2dadc2df3cb20a14db864d550615f891, type: 3}
+    particleEffect: {fileID: 0}
+    events: []
   eventsOnActivate:
   - m_PersistentCalls:
       m_Calls: []

@@ -1,20 +1,39 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
 using VInspector;
 
+
 public class Checkpoint : MonoBehaviour
 {
+    [System.Serializable]
+    public class StateGfx
+    {
+        public Color innerSpriteColor;
+        public Color outerSpriteColor;
+        public Color lightColor;
+        public bool rotateEffect;
+        public ParticleSystem particleEffect;
+        public UnityEvent[] events;
+
+        public void InvokeExtraEvents()
+        {
+            foreach (UnityEvent e in events) {
+                e.Invoke();
+            }
+        }
+    }
+    
     [Header("Settings")]
-    [SerializeField] private Color disabledColor = Color.white; 
-    [SerializeField] private Color activeColor = Color.green;
-    [SerializeField] private ParticleSystem activateVfx;
-    [SerializeField] private ParticleSystem deactivateVfx;
+    [SerializeField] private StateGfx activeStateGfx;
+    [SerializeField] private StateGfx disabledStateGfx;
     [SerializeField] private UnityEvent[] eventsOnActivate;
     [SerializeField] private UnityEvent[] eventsOnDeactivate;
-    private bool _isActive;
+    private bool _isActive = false;
+
     
-    [Header("Player Abilities")]
+    [Foldout("Player Abilities")]
     [SerializeField] private bool receiveAbilityOnUse;
     [EnableIf(nameof(receiveAbilityOnUse))]
     [SerializeField] private bool doubleJump;
@@ -22,17 +41,18 @@ public class Checkpoint : MonoBehaviour
     [SerializeField] private bool wallJump;
     [SerializeField] private bool dash;
     [EndIf]
+    [EndFoldout]
     
     [Header("References")]
-    [SerializeField] private SpriteRenderer[] spriteRenderers;
+    [SerializeField] private RotateEffect[] rotateEffects;
+    [SerializeField] private SpriteRenderer innerSprite;
+    [SerializeField] private SpriteRenderer outerSprite;
+    [SerializeField] private Light2D light2d;
     [SerializeField] public Animator animator;
 
+    
 
-    private void Start() {
-        SeCheckpointColor(disabledColor);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision) {
+    private void OnTriggerEnter2D(Collider2D collision) { 
 
         switch (collision.gameObject.tag) {
             case "Player":
@@ -51,23 +71,20 @@ public class Checkpoint : MonoBehaviour
         if (_isActive) return;
         
         _isActive = true;
-        SeCheckpointColor(activeColor);
-        foreach (UnityEvent e in eventsOnActivate) {
-            e.Invoke();
-        }
-        VFXManager.Instance?.SpawnParticleEffect(activateVfx, transform, transform.rotation, transform);
-        CheckpointManager.Instance?.ActivateCheckpoint(this);
+        SetCheckpointGfx(activeStateGfx);
+        VFXManager.Instance?.SpawnParticleEffect(activeStateGfx.particleEffect, transform, transform.rotation, transform);
         SoundManager.Instance?.PlaySoundFX("Checkpoint Set");
+        CheckpointManager.Instance?.ActivateCheckpoint(this);
     }
 
     [Button] public void DeactivateCheckpoint() {
         if (!_isActive) return;
         _isActive = false;
-        SeCheckpointColor(disabledColor);
+        SetCheckpointGfx(disabledStateGfx);
+        VFXManager.Instance?.SpawnParticleEffect(disabledStateGfx.particleEffect, transform, transform.rotation, transform);
         foreach (UnityEvent e in eventsOnDeactivate) {
             e.Invoke();
         }
-        VFXManager.Instance?.SpawnParticleEffect(deactivateVfx, transform, transform.rotation, transform);
         CheckpointManager.Instance?.DeactivateCheckpoint(this);
     }
     
@@ -83,12 +100,29 @@ public class Checkpoint : MonoBehaviour
         if (dash) PlayerController.Instance?.ReceiveAbility(PlayerAbilities.Dash, false);
     }
     
-    private void SeCheckpointColor(Color color) 
+
+    private void SetCheckpointGfx(StateGfx stateGfx)
     {
-        foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
-            spriteRenderer.color = color;
+        innerSprite.color = stateGfx.innerSpriteColor;
+        outerSprite.color = stateGfx.outerSpriteColor;
+        light2d.color = stateGfx.lightColor;
+        foreach (RotateEffect rotateEffect in rotateEffects)
+        {
+            rotateEffect.enabled = stateGfx.rotateEffect;
         }
+        
     }
+
+
+#region Unity Editor
+#if UNITY_EDITOR
+    
+        private void OnValidate() {
+            SetCheckpointGfx(disabledStateGfx);
+        }
+        
+#endif
+#endregion
     
 
 

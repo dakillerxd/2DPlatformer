@@ -39,6 +39,7 @@ public class GameUIManager : MenuController
     
     protected override void Update()
     {
+        if (!InputManager.Instance) return;
         if (InputManager.NavigateUI != Vector2.zero || currentCategory)
         {
             OnNavigate(InputManager.NavigateUI);

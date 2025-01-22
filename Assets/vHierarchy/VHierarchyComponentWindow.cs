@@ -13,28 +13,23 @@ using Type = System.Type;
 using static VHierarchy.VHierarchyData;
 using static VHierarchy.Libs.VUtils;
 using static VHierarchy.Libs.VGUI;
-
+// using static VTools.VDebug;
 
 
 namespace VHierarchy
 {
     public class VHierarchyComponentWindow : EditorWindow
     {
+
         void OnGUI()
         {
-            if (!component) { Close(); return; } // todo script components break on playmode
+            if (!component) { Close(); return; }
+            if (!editor) Init(component);
 
 
             void background()
             {
                 position.SetPos(0, 0).Draw(GUIColors.windowBackground);
-            }
-            void outline()
-            {
-                if (Application.platform == RuntimePlatform.OSXEditor) return;
-
-                position.SetPos(0, 0).DrawOutline(Greyscale(.1f));
-
             }
             void header()
             {
@@ -134,7 +129,9 @@ namespace VHierarchy
                 {
                     var nameRect = headerRect.MoveX(54).MoveY(-1);
 
-                    var s = VHierarchy.GetComponentName(component);
+                    var s = new GUIContent(EditorGUIUtility.ObjectContent(component, component.GetType())).text;
+                    s = s.Substring(s.LastIndexOf('(') + 1);
+                    s = s.Substring(0, s.Length - 1);
 
                     if (isPinned)
                         s += " of " + component.gameObject.name;
@@ -264,6 +261,13 @@ namespace VHierarchy
                 EditorGUIUtility.labelWidth = 0;
 
             }
+            void outline()
+            {
+                if (Application.platform == RuntimePlatform.OSXEditor) return;
+
+                position.SetPos(0, 0).DrawOutline(Greyscale(.1f));
+
+            }
 
             void updateHeight()
             {
@@ -309,8 +313,8 @@ namespace VHierarchy
 
                     var speed = 9;
 
-                    SmoothDamp(ref currentPosition, targetPosition, speed, ref positionDeriv, deltaTime);
-                    // Lerp(ref currentPosition, targetPosition, speed, deltaTime);
+                    MathUtil.SmoothDamp(ref currentPosition, targetPosition, speed, ref positionDeriv, deltaTime);
+                    // MathfUtils.Lerp(ref currentPosition, targetPosition, speed, deltaTime);
 
                 }
                 void setCurPos()
@@ -448,7 +452,6 @@ namespace VHierarchy
 
 
             background();
-            outline();
 
             horizontalResize();
             verticalResize();
@@ -458,6 +461,7 @@ namespace VHierarchy
 
             Space(3);
             body();
+            outline();
 
             Space(7);
 
@@ -465,8 +469,12 @@ namespace VHierarchy
             updatePosition();
             closeOnEscape();
 
+
             if (!isPinned)
                 Repaint();
+
+            EditorApplication.delayCall -= Repaint;
+            EditorApplication.delayCall += Repaint;
 
         }
 

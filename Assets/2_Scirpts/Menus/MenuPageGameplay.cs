@@ -14,6 +14,8 @@ public class MenuPageGameplay : MenuPage
     [SerializeField] private GameObject wallSlide;
     [SerializeField] private GameObject wallJump;
     [SerializeField] private GameObject dash;
+    private float _titleTextDuration = 3;
+    private float _titleTextStay = 1f;
 
 
     protected override void Start()
@@ -41,13 +43,13 @@ public class MenuPageGameplay : MenuPage
         if (levelTitleText) {
             
             // Set the text and initial alpha
-            levelTitleText.text = title;
+            levelTitleText.text = $"<b>{title}</b>";
             levelTitleText.alpha = 0f;
 
             Sequence.Create(useUnscaledTime: true)
                 .ChainDelay(startDelay) // Delay if specified
                 .Chain(Tween.Alpha(levelTitleText, startValue: 0f, endValue: 1f, duration: duration * 0.5f, ease: Ease.OutSine)) // Fade in
-                .ChainDelay(duration * 0.2f) // Delay to make text readable
+                .ChainDelay(_titleTextStay) // Delay to make text readable
                 .Chain(Tween.Alpha(levelTitleText, startValue: 1f, endValue: 0f, duration: duration * 0.5f, ease: Ease.InSine)); // Fade out
         }
     }
@@ -59,10 +61,10 @@ public class MenuPageGameplay : MenuPage
         if (nextScene.name == "ShowcaseLevel")
         {
             UpdateAbilitiesUI();
-            StartLevelTitleEffect(2, "Showcase Level", 2);
+            StartLevelTitleEffect(_titleTextDuration, "Showcase Level", 2);
         } else {
             UpdateAbilitiesUI();
-            StartLevelTitleEffect(2, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
+            StartLevelTitleEffect(_titleTextDuration, SceneManager.GetActiveScene().name.Replace("Level", "Level ").Trim());
         }
     }
     

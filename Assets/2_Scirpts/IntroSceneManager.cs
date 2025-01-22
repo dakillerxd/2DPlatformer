@@ -148,9 +148,9 @@ public class IntroSceneManager : MonoBehaviour
 
         _sequence = Sequence.Create(cycles: 2, cycleMode: CycleMode.Yoyo)
             .ChainDelay(1f)
-            .Group(Tween.Alpha(player, startValue: 0, endValue: 1, duration: 2, Ease.InExpo))
-            .Group(Tween.Scale(player.transform, startValue: 0.1f, endValue: 4, duration: 2))
-            .Group(Tween.EulerAngles(player.transform, startValue: Vector3.zero, endValue: new Vector3(0, 0, -720f), duration: 2, ease: Ease.InOutSine))
+            .Group(Tween.Alpha(player, startValue: 0, endValue: 1, duration: duration, Ease.InExpo))
+            .Group(Tween.Scale(player.transform, startValue: 0.1f, endValue: 4, duration: duration))
+            .Group(Tween.EulerAngles(player.transform, startValue: Vector3.zero, endValue: new Vector3(0, 0, -720f), duration: duration, ease: Ease.InOutSine))
             .OnComplete(GoToMainMenu);
         
         // .Group(Tween.Alpha(gameTitle, startValue: 0, endValue: 1, duration: 2, Ease.InExpo))

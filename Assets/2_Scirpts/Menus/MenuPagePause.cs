@@ -55,7 +55,7 @@ public class MenuPagePause : MenuPage
             buttonMainMenu.onClick.RemoveAllListeners();
             buttonMainMenu.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.None));
             buttonMainMenu.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene(0));
+            buttonMainMenu.onClick.AddListener(() => SceneManager.LoadScene("MainMenu"));
         }
         
         if (buttonRestartLevel)

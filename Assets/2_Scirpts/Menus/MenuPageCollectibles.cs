@@ -97,7 +97,7 @@ public class MenuPageCollectibles : MenuPage
                 {
                     if (level is { countsTowardsUnlocks: true })
                     {
-                        _collectiblesStringBuilder.AppendFormat("{0}: {1}\n \n", level.name ?? "Unknown", level.collectibleCollected ? "<color=green>Collected</color>" : "<color=red>Not Collected</color>");
+                        _collectiblesStringBuilder.AppendFormat("{0}: {1}\n \n", level.name ?? "Unknown", level.collectibleCollected ? "<wave><b><color=green>Collected</color></b></>" : "<shear><b><color=red>Not Collected</color></b></>");
                     }
                 }
             

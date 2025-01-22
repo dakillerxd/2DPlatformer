@@ -133,71 +133,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69a612298b6d23d46bb0a2c082a275fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
-  activeColor: {r: 0, g: 0.7647059, b: 0, a: 1}
-  activateVfx: {fileID: 8604298408129782361, guid: d43c16091b4faa141902567a145f873a, type: 3}
-  deactivateVfx: {fileID: 5060159489429807464, guid: 2dadc2df3cb20a14db864d550615f891, type: 3}
+  activeStateGfx:
+    innerSpriteColor: {r: 0.015686275, g: 0.7607843, b: 0.015686275, a: 1}
+    outerSpriteColor: {r: 0.5647059, g: 1, b: 0.5647059, a: 1}
+    lightColor: {r: 0, g: 0.7647059, b: 0, a: 0.39215687}
+    rotateEffect: 1
+    vfx: {fileID: 8604298408129782361, guid: d43c16091b4faa141902567a145f873a, type: 3}
+  disabledStateGfx:
+    innerSpriteColor: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
+    outerSpriteColor: {r: 1, g: 0.98039216, b: 0, a: 0.5882353}
+    lightColor: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
+    rotateEffect: 0
+    vfx: {fileID: 5060159489429807464, guid: 2dadc2df3cb20a14db864d550615f891, type: 3}
   eventsOnActivate:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4907466363621452442}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1981403261664881764}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   eventsOnDeactivate:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4907466363621452442}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1981403261664881764}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   receiveAbilityOnUse: 0
   doubleJump: 0
   wallSlide: 0
   wallJump: 0
   dash: 0
-  spriteRenderers:
-  - {fileID: 7889880374536673620}
+  rotateEffects:
+  - {fileID: 4907466363621452442}
+  - {fileID: 1981403261664881764}
+  innerSprite: {fileID: 7889880374536673620}
+  outerSprite: {fileID: 1749834162401920512}
+  light2d: {fileID: 2950109748056374628}
   animator: {fileID: 1875612208099709833}
 --- !u!1 &6414382879263183708
 GameObject:
@@ -277,7 +241,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 0d04b02beccb31f4f83fa6feb2a51ce3, type: 3}
-  m_Color: {r: 0.68526214, g: 1, b: 0.5503144, a: 1}
+  m_Color: {r: 1, g: 0.98039216, b: 0, a: 0.5882353}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -367,7 +331,7 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 0.21921761, g: 1, b: 0.16981131, a: 1}
+  m_Color: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
@@ -392,7 +356,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.07
-  m_PointLightOuterRadius: 0.3
+  m_PointLightOuterRadius: 0.6
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -481,7 +445,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 0d04b02beccb31f4f83fa6feb2a51ce3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 1, g: 0.98039216, b: 0, a: 0.39215687}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

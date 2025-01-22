@@ -158,7 +158,7 @@ public class MenuPageLevelSelection : MenuPage
             string formattedDeaths = FormatDeaths(level.totalDeaths);
 
             selectedLevelInfo.text = 
-                $"<b><color=#00FF00>{level.name}</color><b>\n" +
+                $"<!show><jump><b><color=#00FF00>{level.name}</color><b></!show></>\n" +
                 $"Collectible: {(collectibleCollected ? 1 : 0)}/1\n" +
                 $"No Death Run: {(noDeathRun ? "Yes" : "No")}\n" +
                 $"Total Deaths: {formattedDeaths}\n" +

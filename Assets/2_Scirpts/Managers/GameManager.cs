@@ -129,14 +129,14 @@ public class GameManager : MonoBehaviour
         // Set no death run for all levels
         foreach (Level level in levels) {
             level.noDeathRunRun = true;
-            SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
+            SaveManager.SaveBool(level.connectedScene.SceneName + " NoDeathRun", level.noDeathRunRun);
         }
 
         
         // Set highest level
-        SaveManager.Instance?.SaveInt("HighestLevel", levels.Length);
-        SaveManager.Instance?.SaveString("SavedLevel", "Level1");
-        SaveManager.Instance?.SaveInt("TotalCollectibles", levels.Length);
+        SaveManager.SaveInt("HighestLevel", levels.Length);
+        SaveManager.SaveString("SavedLevel", "Level1");
+        SaveManager.SaveInt("TotalCollectibles", levels.Length);
         
         // Restart scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -147,10 +147,10 @@ public class GameManager : MonoBehaviour
     
     [Button] public void DeleteSave()
     {
-        SaveManager.Instance?.DeleteAllKeys();
-        SaveManager.Instance?.SaveInt("HighestLevel", 1);
-        SaveManager.Instance?.SaveString("SavedLevel", "Level1");
-        SaveManager.Instance?.SaveInt("SavedCheckpoint", 0);
+        SaveManager.DeleteAllKeys();
+        SaveManager.SaveInt("HighestLevel", 1);
+        SaveManager.SaveString("SavedLevel", "Level1");
+        SaveManager.SaveInt("SavedCheckpoint", 0);
         SettingsManager.Instance?.LoadAllSettings();
         ResetCollectibles();
         ResetUnlocks();
@@ -168,9 +168,9 @@ public class GameManager : MonoBehaviour
     {
         foreach (Level level in levels) {
             
-            level.totalDeaths = SaveManager.Instance.LoadInt(level.connectedScene.SceneName + " TotalDeaths");
-            level.bestTime = SaveManager.Instance.LoadFloat(level.connectedScene.SceneName + " BestTime");
-            level.noDeathRunRun = SaveManager.Instance.LoadBool(level.connectedScene.SceneName + " NoDeathRun");
+            level.totalDeaths = SaveManager.LoadInt(level.connectedScene.SceneName + " TotalDeaths");
+            level.bestTime = SaveManager.LoadFloat(level.connectedScene.SceneName + " BestTime");
+            level.noDeathRunRun = SaveManager.LoadBool(level.connectedScene.SceneName + " NoDeathRun");
         }
     }
 
@@ -193,7 +193,7 @@ public class GameManager : MonoBehaviour
 
                 if (time < level.bestTime || level.bestTime == 0) {
                     level.bestTime = time;
-                    SaveManager.Instance.SaveFloat(level.connectedScene.SceneName + " BestTime", level.bestTime);
+                    SaveManager.SaveFloat(level.connectedScene.SceneName + " BestTime", level.bestTime);
 
                     if (PlayerController.Instance && funnyMode)
                     {
@@ -211,7 +211,7 @@ public class GameManager : MonoBehaviour
             if (level.connectedScene.SceneName == connectedLevelName) {
 
                 level.totalDeaths += 1;
-                SaveManager.Instance.SaveInt(level.connectedScene.SceneName + " TotalDeaths", level.totalDeaths);
+                SaveManager.SaveInt(level.connectedScene.SceneName + " TotalDeaths", level.totalDeaths);
                 
                 if (PlayerController.Instance&& funnyMode)
                 {
@@ -229,7 +229,7 @@ public class GameManager : MonoBehaviour
                 if (!level.noDeathRunRun)
                 {
                     level.noDeathRunRun = true;
-                    SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " NoDeathRun", true);
+                    SaveManager.SaveBool(level.connectedScene.SceneName + " NoDeathRun", true);
                 
                     if (PlayerController.Instance&& funnyMode)
                     {
@@ -266,6 +266,42 @@ public class GameManager : MonoBehaviour
     
     #endregion // -----------------------------------------
 
+
+    #region Levels // -----------------------------------------
+
+    public bool SceneIsALevel()
+    {
+        foreach (Level level in levels) {
+            if (SceneManager.GetActiveScene().name == level.connectedScene.SceneName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public string CurrentLevel()
+    {
+        foreach (Level level in levels) {
+            if (SceneManager.GetActiveScene().name == level.connectedScene.SceneName) {
+                return level.connectedScene.SceneName;
+            }
+        }
+        return "Not A Level!";
+    }
+
+    public int CurrentLevelNumber()
+    {
+        foreach (Level level in levels) {
+            if (SceneManager.GetActiveScene().name == level.connectedScene.SceneName) {
+                return System.Array.IndexOf(levels, level);
+            }
+        }
+        return 0;
+    }
+    
+
+    #endregion Levels // -----------------------------------------
+    
     
     #region GameStates // -----------------------------------------
 
@@ -358,7 +394,7 @@ public class GameManager : MonoBehaviour
             if (unlock.name == unlockName)
             {
                 unlock.state = state;
-                SaveManager.Instance.SaveBool(unlockName, unlock.state);
+                SaveManager.SaveBool(unlockName, unlock.state);
                 PlayerController.Instance?.ToggleAllCosmetics();
                 return;
             }
@@ -413,7 +449,7 @@ public class GameManager : MonoBehaviour
         foreach (Level level in levels) {
             if (level.connectedScene.SceneName == connectedLevelName) {
                 level.collectibleCollected = true;
-                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
+                SaveManager.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
                 return;
             }
         }
@@ -422,7 +458,7 @@ public class GameManager : MonoBehaviour
     
     public bool IsCollectibleCollected(string levelName) {
         foreach (Level level in levels) {
-            if (level.name == levelName) {
+            if (level.connectedScene.SceneName == levelName) {
                 return level.collectibleCollected;
             }
         }
@@ -455,7 +491,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (Level level in levels) {
             
-            level.collectibleCollected = SaveManager.Instance.LoadBool(level.connectedScene.SceneName + " Collectible");
+            level.collectibleCollected = SaveManager.LoadBool(level.connectedScene.SceneName + " Collectible");
         }
 
         CheckUnlocks();
@@ -467,7 +503,7 @@ public class GameManager : MonoBehaviour
             foreach (Level level in levels) 
             {
                 level.collectibleCollected = false;
-                SaveManager.Instance.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
+                SaveManager.SaveBool(level.connectedScene.SceneName + " Collectible", level.collectibleCollected);
             }
             
             CheckUnlocks();
@@ -479,7 +515,7 @@ public class GameManager : MonoBehaviour
             foreach (Level level in levels) 
             {
                 level.collectibleCollected = true;
-                SaveManager.Instance.SaveBool(level.connectedScene.SceneName  + " Collectible", level.collectibleCollected);
+                SaveManager.SaveBool(level.connectedScene.SceneName  + " Collectible", level.collectibleCollected);
             }
 
             CheckUnlocks();

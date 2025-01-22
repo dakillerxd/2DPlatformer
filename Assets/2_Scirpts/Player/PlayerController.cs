@@ -459,6 +459,7 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Movement functions
     
+    
     #region Jump functions //------------------------------------
 
     private void HandleJump() {
@@ -589,6 +590,7 @@ public class PlayerController : MonoBehaviour {
     }
     #endregion Jump functions
       
+    
     #region Abilitis functions //------------------------------------
     
     private void HandleDashing() {
@@ -759,6 +761,7 @@ public class PlayerController : MonoBehaviour {
 
     #endregion Abilitis functions
     
+    
     #region Gravity function //------------------------------------
 
     private void HandleGravity() {
@@ -857,6 +860,7 @@ public class PlayerController : MonoBehaviour {
     }
     
     #endregion Gravity functions 
+    
     
     #region Collision functions //------------------------------------
 
@@ -1158,6 +1162,7 @@ public class PlayerController : MonoBehaviour {
 
     #endregion Health/Checkpoint functions
     
+    
     #region Other functions //------------------------------------
     private void CheckForInput() {
 
@@ -1431,6 +1436,7 @@ public class PlayerController : MonoBehaviour {
     
     #endregion Other functions
 
+    
     #region Camera functions //------------------------------------
 
     
@@ -1481,6 +1487,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     #endregion
+    
     
     #region Debugging functions //------------------------------------
 

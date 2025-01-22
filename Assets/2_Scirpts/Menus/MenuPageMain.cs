@@ -34,9 +34,9 @@ public class MenuPageMain : MenuPage
             buttonStart.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
             
             var buttonText = buttonStart.GetComponentInChildren<TextMeshProUGUI>();
-            int highestLevel = SaveManager.Instance.LoadInt("HighestLevel");
-            int savedCheckpoint = SaveManager.Instance.LoadInt("SavedCheckpoint");
-            string savedLevel = SaveManager.Instance.LoadString("SavedLevel");
+            int highestLevel = SaveManager.LoadInt("HighestLevel");
+            int savedCheckpoint = SaveManager.LoadInt("SavedCheckpoint");
+            string savedLevel = SaveManager.LoadString("SavedLevel");
             SceneField level1 = GameManager.Instance.levels[0].connectedScene;
             
             // Check save

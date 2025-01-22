@@ -83,14 +83,14 @@ public class SettingsManager : MonoBehaviour
 
     public void LoadAllSettings()
     {
-        SetForce16by9(SaveManager.Instance.LoadBool("Force16by9", defaultForce16By9));
-        SetResolution(SaveManager.Instance.LoadInt("ResolutionIndex", defaultResolutionIndex));
-        SetScreenMode((ScreenModes)SaveManager.Instance.LoadInt("screenMode", (int)defaultScreenMode));
-        SetVSync(SaveManager.Instance.LoadInt("VSync", defaultVSync));
-        SetFPS(SaveManager.Instance.LoadInt("FPS", defaultTargetFPS));
-        SetMasterVolume(SaveManager.Instance.LoadFloat("MasterVolume", defaultMasterGameVolume));
-        SetSoundFXVolume(SaveManager.Instance.LoadFloat("GameVolume", defaultSoundFXVolume));
-        SetMusicVolume(SaveManager.Instance.LoadFloat("MusicVolume", defaultMusicVolume));
+        SetForce16by9(SaveManager.LoadBool("Force16by9", defaultForce16By9));
+        SetResolution(SaveManager.LoadInt("ResolutionIndex", defaultResolutionIndex));
+        SetScreenMode((ScreenModes)SaveManager.LoadInt("screenMode", (int)defaultScreenMode));
+        SetVSync(SaveManager.LoadInt("VSync", defaultVSync));
+        SetFPS(SaveManager.LoadInt("FPS", defaultTargetFPS));
+        SetMasterVolume(SaveManager.LoadFloat("MasterVolume", defaultMasterGameVolume));
+        SetSoundFXVolume(SaveManager.LoadFloat("GameVolume", defaultSoundFXVolume));
+        SetMusicVolume(SaveManager.LoadFloat("MusicVolume", defaultMusicVolume));
     }
 
     public void SetForce16by9(bool force)
@@ -98,10 +98,10 @@ public class SettingsManager : MonoBehaviour
         if (force16By9AspectRatio != force)
         {
             force16By9AspectRatio = force;
-            SaveManager.Instance.SaveBool("Force16by9", force);
+            SaveManager.SaveBool("Force16by9", force);
             UpdateAvailableResolutions();
             
-            // Reset resolution to highest available if current resolution is not valid
+            // Reset resolution to the highest available if current resolution is not valid
             if (resolutionIndex >= _cachedResolutions.Length)
             {
                 SetResolution(_cachedResolutions.Length - 1);
@@ -134,7 +134,7 @@ public class SettingsManager : MonoBehaviour
         }
 
         screenMode = modes;
-        SaveManager.Instance.SaveInt("ScreenModes", (int)modes);
+        SaveManager.SaveInt("ScreenModes", (int)modes);
     }
 
     public void SetResolution(int index)
@@ -144,7 +144,7 @@ public class SettingsManager : MonoBehaviour
             Resolution resolution = _cachedResolutions[index];
             resolutionIndex = index;
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
-            SaveManager.Instance.SaveInt("ResolutionIndex", index);
+            SaveManager.SaveInt("ResolutionIndex", index);
             onResolutionChange.Invoke();
         }
     }
@@ -153,34 +153,34 @@ public class SettingsManager : MonoBehaviour
     {
         vSync = vSyncCount;
         QualitySettings.vSyncCount = vSync;
-        SaveManager.Instance.SaveInt("VSync", vSync);
+        SaveManager.SaveInt("VSync", vSync);
     }
 
     public void SetFPS(int fps)
     {
         targetFPS = fps;
         Application.targetFrameRate = targetFPS;
-        SaveManager.Instance.SaveInt("FPS", fps);
+        SaveManager.SaveInt("FPS", fps);
     }
 
     public void SetMasterVolume(float volume)
     {
         masterGameVolume = volume;
-        SaveManager.Instance.SaveFloat("MasterVolume", masterGameVolume);
+        SaveManager.SaveFloat("MasterVolume", masterGameVolume);
         onMasterVolumeChange.Invoke();
     }
     
     public void SetSoundFXVolume(float volume)
     {
         soundFXVolume = volume;
-        SaveManager.Instance.SaveFloat("GameVolume", soundFXVolume);
+        SaveManager.SaveFloat("GameVolume", soundFXVolume);
         onSoundFXVolumeChange.Invoke();
     }
 
     public void SetMusicVolume(float volume)
     {
         musicVolume = volume;
-        SaveManager.Instance.SaveFloat("MusicVolume", musicVolume);
+        SaveManager.SaveFloat("MusicVolume", musicVolume);
         onMusicVolumeChange.Invoke();
     }
 }

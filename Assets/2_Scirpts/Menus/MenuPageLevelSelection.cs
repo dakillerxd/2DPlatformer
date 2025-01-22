@@ -95,7 +95,7 @@ public class MenuPageLevelSelection : MenuPage
         {
             buttonShowcaseLevel.onClick.RemoveAllListeners();
             buttonShowcaseLevel.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            buttonShowcaseLevel.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
+            buttonShowcaseLevel.onClick.AddListener(() => SaveManager.SaveInt("SavedCheckpoint", 0));
             buttonShowcaseLevel.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
             buttonShowcaseLevel.onClick.AddListener(() => SceneManager.LoadScene("ShowcaseLevel"));
         }
@@ -126,9 +126,9 @@ public class MenuPageLevelSelection : MenuPage
             
             buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = level.name.Replace("Level ", "");
             buttonObject.name = "ButtonLevel" + level.name;
-            button.interactable = (i + 1) <= SaveManager.Instance.LoadInt("HighestLevel");
+            button.interactable = (i +1) <= SaveManager.LoadInt("HighestLevel");
             button.onClick.AddListener(() => SoundManager.Instance?.PlaySoundFX("ButtonClick"));
-            button.onClick.AddListener(() => SaveManager.Instance?.SaveInt("SavedCheckpoint", 0));
+            button.onClick.AddListener(() => SaveManager.SaveInt("SavedCheckpoint", 0));
             button.onClick.AddListener(() => GameManager.Instance?.SetGameState(GameStates.GamePlay));
             button.onClick.AddListener(() => SceneManager.LoadScene(level.connectedScene.BuildIndex));
             

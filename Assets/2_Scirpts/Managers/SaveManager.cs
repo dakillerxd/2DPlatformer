@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -38,59 +39,61 @@ public class SaveManager : MonoBehaviour
     }
 
     // Save methods for different data types
-    public void SaveInt(string key, int value)
+    public static void SaveInt(string key, int value)
     {
         PlayerPrefs.SetInt(key, value);
         PlayerPrefs.Save();
     }
 
-    public void SaveFloat(string key, float value)
+    public static void SaveFloat(string key, float value)
     {
         PlayerPrefs.SetFloat(key, value);
         PlayerPrefs.Save();
     }
 
-    public void SaveString(string key, string value)
+    public static void SaveString(string key, string value)
     {
         PlayerPrefs.SetString(key, value);
         PlayerPrefs.Save();
     }
 
-    public void SaveBool(string key, bool value)
+    public static void SaveBool(string key, bool value)
     {
         PlayerPrefs.SetInt(key, value ? 1 : 0);
         PlayerPrefs.Save();
     }
 
     // Load methods for different data types
-    public int LoadInt(string key, int defaultValue = 0)
+    public static int LoadInt(string key, int defaultValue = 0)
     {
         return PlayerPrefs.GetInt(key, defaultValue);
     }
 
-    public float LoadFloat(string key, float defaultValue = 0f)
+    public static float LoadFloat(string key, float defaultValue = 0f)
     {
         return PlayerPrefs.GetFloat(key, defaultValue);
     }
 
-    public string LoadString(string key, string defaultValue = "")
+    public static string LoadString(string key, string defaultValue = "")
     {
         return PlayerPrefs.GetString(key, defaultValue);
     }
 
-    public bool LoadBool(string key, bool defaultValue = false)
+    public static bool LoadBool(string key, bool defaultValue = false)
     {
         return PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) == 1;
     }
+    
+    
 
     // Check if a key exists
-    public bool HasKey(string key)
+    public static bool HasKey(string key)
     {
         return PlayerPrefs.HasKey(key);
     }
 
     // Delete a specific key
-    public void DeleteKey(string key)
+    public static void DeleteKey(string key)
     {
         PlayerPrefs.DeleteKey(key);
         PlayerPrefs.Save();
@@ -99,25 +102,43 @@ public class SaveManager : MonoBehaviour
     
 
     // Save current game session
-    public void SaveGame(int checkpoint = 0)
+    public static void SaveGame(int checkpoint = 0)
     {
-        if (SceneManager.GetActiveScene().name == "ShowcaseLevel" || SceneManager.GetActiveScene().name == "TestLevel") return;
-
-        if (LoadInt("HighestLevel") <= SceneManager.GetActiveScene().buildIndex) // Save level index
+        if (GameManager.Instance.SceneIsALevel())
         {
-            SaveInt("HighestLevel", SceneManager.GetActiveScene().buildIndex);
-        }
+            
+            if (LoadInt("HighestLevel") <= GameManager.Instance.CurrentLevelNumber()) // Save level index
+            {
+                SaveInt("HighestLevel", GameManager.Instance.CurrentLevelNumber());
+            }
 
-        SaveString("SavedLevel", SceneManager.GetActiveScene().name); // Save level
+            SaveString("SavedLevel", GameManager.Instance.CurrentLevel()); // Save level
 
-        SaveInt("SavedCheckpoint", checkpoint); // Save checkpoint
+            SaveInt("SavedCheckpoint", checkpoint); // Save checkpoint
         
-        PlayerPrefs.Save();
+            PlayerPrefs.Save();
+        }
     }
-    
+
+    public static void LoadCheckpoint(ref Checkpoint activeCheckpoint, List<Checkpoint> checkpoints)
+    {
+        if (GameManager.Instance.SceneIsALevel())
+        {
+            if (LoadString("SavedLevel") == GameManager.Instance.CurrentLevel())
+            {
+                if (LoadInt("SavedCheckpoint") == 0)
+                    activeCheckpoint = null;
+                else
+                    activeCheckpoint = checkpoints[LoadInt("SavedCheckpoint") - 1];
+            }
+        }
+    }
+
+
+
 
     // Delete all saved data
-    public void DeleteAllKeys()
+    public static void DeleteAllKeys()
     {
         PlayerPrefs.DeleteAll();
         

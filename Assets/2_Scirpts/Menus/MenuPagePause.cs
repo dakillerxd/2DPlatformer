@@ -22,6 +22,13 @@ public class MenuPagePause : MenuPage
         UpdatePauseScreenInfo();
     }
 
+    public override void OnPageSelected()
+    {
+        base.OnPageSelected();
+        UpdatePauseScreenInfo();
+        
+    }
+
 
     private void UpdatePauseScreenInfo()
     {

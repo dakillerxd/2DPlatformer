@@ -8,7 +8,7 @@ using VInspector;
 public class Checkpoint : MonoBehaviour
 {
     [System.Serializable]
-    public class StateGfx
+    public class CheckpointState
     {
         public Color innerSpriteColor;
         public Color outerSpriteColor;
@@ -16,20 +16,12 @@ public class Checkpoint : MonoBehaviour
         public bool rotateEffect;
         public ParticleSystem particleEffect;
         public UnityEvent[] events;
-
-        public void InvokeExtraEvents()
-        {
-            foreach (UnityEvent e in events) {
-                e.Invoke();
-            }
-        }
+        
     }
     
     [Header("Settings")]
-    [SerializeField] private StateGfx activeStateGfx;
-    [SerializeField] private StateGfx disabledStateGfx;
-    [SerializeField] private UnityEvent[] eventsOnActivate;
-    [SerializeField] private UnityEvent[] eventsOnDeactivate;
+    [SerializeField] private CheckpointState activeCheckpointState;
+    [SerializeField] private CheckpointState disabledCheckpointState;
     private bool _isActive = false;
 
     
@@ -71,8 +63,9 @@ public class Checkpoint : MonoBehaviour
         if (_isActive) return;
         
         _isActive = true;
-        SetCheckpointGfx(activeStateGfx);
-        VFXManager.Instance?.SpawnParticleEffect(activeStateGfx.particleEffect, transform, transform.rotation, transform);
+        SetCheckpointGfx(activeCheckpointState);
+        InvokeStateEvents(activeCheckpointState);
+        VFXManager.Instance?.SpawnParticleEffect(activeCheckpointState.particleEffect, transform, transform.rotation, transform);
         SoundManager.Instance?.PlaySoundFX("Checkpoint Set");
         CheckpointManager.Instance?.ActivateCheckpoint(this);
     }
@@ -80,11 +73,9 @@ public class Checkpoint : MonoBehaviour
     [Button] public void DeactivateCheckpoint() {
         if (!_isActive) return;
         _isActive = false;
-        SetCheckpointGfx(disabledStateGfx);
-        VFXManager.Instance?.SpawnParticleEffect(disabledStateGfx.particleEffect, transform, transform.rotation, transform);
-        foreach (UnityEvent e in eventsOnDeactivate) {
-            e.Invoke();
-        }
+        SetCheckpointGfx(disabledCheckpointState);
+        InvokeStateEvents(disabledCheckpointState);
+        VFXManager.Instance?.SpawnParticleEffect(disabledCheckpointState.particleEffect, transform, transform.rotation, transform);
         CheckpointManager.Instance?.DeactivateCheckpoint(this);
     }
     
@@ -101,16 +92,23 @@ public class Checkpoint : MonoBehaviour
     }
     
 
-    private void SetCheckpointGfx(StateGfx stateGfx)
+    private void SetCheckpointGfx(CheckpointState checkpointState)
     {
-        innerSprite.color = stateGfx.innerSpriteColor;
-        outerSprite.color = stateGfx.outerSpriteColor;
-        light2d.color = stateGfx.lightColor;
+        if (innerSprite) innerSprite.color = checkpointState.innerSpriteColor;
+        if (outerSprite) outerSprite.color = checkpointState.outerSpriteColor;
+        if (light2d) light2d.color = checkpointState.lightColor;
+        
         foreach (RotateEffect rotateEffect in rotateEffects)
         {
-            rotateEffect.enabled = stateGfx.rotateEffect;
+            rotateEffect.enabled = checkpointState.rotateEffect;
         }
-        
+    }
+
+    private void InvokeStateEvents(CheckpointState checkpointState)
+    {
+        foreach (UnityEvent e in checkpointState.events) {
+            e.Invoke();
+        }
     }
 
 
@@ -118,7 +116,7 @@ public class Checkpoint : MonoBehaviour
 #if UNITY_EDITOR
     
         private void OnValidate() {
-            SetCheckpointGfx(disabledStateGfx);
+            SetCheckpointGfx(disabledCheckpointState);
         }
         
 #endif

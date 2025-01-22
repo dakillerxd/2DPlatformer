@@ -33,20 +33,36 @@ MonoBehaviour:
         values:
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
     - goDatas_byGlobalId:
         keys:
         - globalObjectIdString: GlobalObjectId_V1-2-5e5efdc77c857db4db05e93b5998911a-657903552-0
@@ -55,10 +71,16 @@ MonoBehaviour:
         values:
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
     - goDatas_byGlobalId:
         keys:
         - globalObjectIdString: GlobalObjectId_V1-2-97fce1ae5de02d44ba4b0519ee4ffd50-645037584-0
@@ -67,10 +89,16 @@ MonoBehaviour:
         values:
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
     - goDatas_byGlobalId:
         keys: []
         values: []
@@ -82,7 +110,25 @@ MonoBehaviour:
         values:
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
         - colorIndex: 1
           iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
+  bookmarks: []
+  bookmarkedScenePaths:
+  - Assets/1_Scenes/IntroScene.unity
+  - Assets/1_Scenes/Level1.unity
+  - Assets/1_Scenes/Level2.unity
+  - Assets/1_Scenes/Level3.unity
+  - Assets/1_Scenes/Level4.unity
+  - Assets/1_Scenes/Level5.unity
+  - Assets/1_Scenes/Level6.unity
+  - Assets/1_Scenes/Level7.unity
+  - Assets/1_Scenes/Level8.unity
+  - Assets/1_Scenes/MainMenu.unity
